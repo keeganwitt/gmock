@@ -28,3 +28,47 @@ play {
 }
 
 }}}
+
+= Some proposals from Johnny =
+
+Simplest mock:
+{{{
+def mock = mock()
+// only these methods are expected, invoking can be in any order
+mock.load(1, 2).returns(3)
+mock.load(2, 3).raises(SomeException)
+mock.put(1, 2)
+play {
+  // test
+}
+}}}
+
+Other kinds of mocking can use dynamic methods:
+{{{
+def mock1 = stubMock() // the methods can be invoked for any times
+def mock2 = strictMock() // method calls in strict order
+def mock3 = niceMock() // unexpected methods return empty values
+def mock4 = stubAndNiceMock() // combine stub mock and nice mock
+// also strictAndNiceMock(), niceAndStubMock() and niceAndStrictMock(), but no stubAndStrictMock()
+}}}
+
+The kinds of these mocks(except nice mock) are only available without specifing the kind of method. The kind of method can be specified by "type methods" and "type closures":
+{{{
+def mock = stubMock()
+mock.load(1, 2).returns(3) // stub
+mock.put(1, 2).expected() // type changed
+mock.put(2, 3).stubbed() // definitely specify to be stub type, but not necessary
+mock.get().returns(4).strict() // strict type can be specified by type method
+expect { // type closures
+  // ...
+}
+stub {
+  // ...
+}
+strict {
+  // ...
+}
+play {
+  // test
+}
+}}}
