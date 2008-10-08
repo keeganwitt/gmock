@@ -4,60 +4,46 @@ import static junit.framework.Assert.*
 
 class Mock {
 
-    def expectations = []
+    def expectations = new ExpectationCollection()
     def replay = false
-
 
     def methodMissing(String name, args) {
         def signature = new MethodSignature(name, args)
         if (replay){
-            def expectation = expectations.find { it.canCall(signature)}
+            def expectation = expectations.findMatching(signature)
             if (expectation){
                 return expectation.doReturn()
             } else {
-                def callState = callState().toString()
+                def callState = expectations.callState().toString()
                 if (callState){ callState = "\n$callState" }
                 fail("Unexpected method call '${signature}'$callState")
-
             }
             return result
         } else {
-            def expectation = new MethodExpectation(name, args)
-            expectations.add(expectation)
-            return expectation
+            def expectation = new Expectation(signature)
+            expectations.add( expectation )
+            return new MethodRecorder(expectation)
         }
     }
+
 
     def propertyMissing(name, args) {
         methodMissing(name, args)
     }
 
+    private void _verify(){
+        expectations.verify()
+    }
+
+    private void _reset(){
+        this.expectations = new ExpectationCollection()
+        replay = false
+    }
 
     private void _replay(){
         replay = true
     }
-
-    private void _verify(){
-        assert replay, "Mock should be replay before verify"
-        if (expectations.find { !it.isVerified()} ){
-            fail("Expectation not matched on verify:\n${callState()}")
-        }
-    }
-
-    private void _reset(){
-        this.expectations = []        
-        replay = false
-
-    }
-
-    private callState(){
-        def callState = new CallState()
-        expectations.each {
-            callState.append(it)
-        }
-        return callState
-    }
-
+    
 
 
 

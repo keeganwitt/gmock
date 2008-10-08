@@ -1,28 +1,33 @@
 package org.gmock
 
+import static junit.framework.Assert.*
+
 class ExpectationCollection {
 
-    def proxies = []
+    def expectations = []
 
-    def expectConstructor(aClass, args, mock){
-        def interceptor = proxies.find{ it.theClass == aClass }
-        if (!interceptor){
-            interceptor =  ProxyInterceptor.getInstance(aClass)
-            proxies << interceptor
+    void add(expectation){
+        expectations << expectation
+    }
+
+    def findMatching(signature){
+        expectations.find { it.canCall(signature)}
+    }
+
+    void verify(){
+        if (expectations.find { !it.isVerified()} ){
+            fail("Expectation not matched on verify:\n${callState()}")
         }
-        interceptor.expectConstructor(args, mock)
-
     }
 
-    def startProxy(){
-        proxies.each {it.startProxy()}
+    def callState(){
+        def callState = new CallState()
+        expectations.each {
+            callState.append(it)
+        }
+        return callState
     }
 
-    def stopProxy(){
-        proxies.each {it.stopProxy()}
-    }
-
-    
 
 
 }
