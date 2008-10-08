@@ -2,11 +2,11 @@ package org.gmock
 
 import groovy.mock.interceptor.MockProxyMetaClass
 
-class GMockTestCase extends GroovyTestCase {
+abstract class GMockTestCase extends GroovyTestCase {
 
     def mocks = []
 
-    ExpectationCollection expectationCollection = new ExpectationCollection()
+    ProxyCollection proxyCollection = new ProxyCollection()
 
     def mock(){
         def mock = new Mock()
@@ -16,18 +16,18 @@ class GMockTestCase extends GroovyTestCase {
 
     def mockNew(Class aClass, Object[] args){
         def mock = mock()
-        expectationCollection.expectConstructor(aClass, args, mock)
+        proxyCollection.expectConstructor(aClass, args, mock)
         return mock
     }
 
 
     def play = { closure ->
         mocks.each {it._replay()}
-        expectationCollection.startProxy()
+        proxyCollection.startProxy()
         try {
             closure.call()
         } finally {
-            expectationCollection.stopProxy()            
+            proxyCollection.stopProxy()
         }
         mocks.each {it._verify()}
         mocks.each {it._reset()}
