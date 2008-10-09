@@ -1,4 +1,4 @@
-package org.gmock
+package org.gmock.signature
 
 class MethodSignatureTest extends GroovyTestCase {
 

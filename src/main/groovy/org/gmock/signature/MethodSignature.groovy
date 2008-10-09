@@ -1,4 +1,4 @@
-package org.gmock
+package org.gmock.signature
 
 class MethodSignature {
 
@@ -13,7 +13,7 @@ class MethodSignature {
     String toString(){
         "${methodName}(${arguments.join(',')})"
     }
-    
+
 
     boolean equals(Object method) {
         if (method == null || getClass() != method.getClass()) return false
