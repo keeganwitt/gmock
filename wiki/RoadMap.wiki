@@ -1,0 +1,22 @@
+#summary Gmock development roadmap
+
+== Version 0.1 ==
+
+  * Basic mocking functionnality
+
+== Version 0.2 ==
+
+  * Rename raises and returns.
+  * Refactor constructor mocking
+
+== Version 0.3 ==
+
+  * Support for property mocking
+
+== Version 0.4 ==
+
+  * Support for static method mocking
+
+== Version 0.5 ==
+
+  * Multiple call definition (atLeast, more...). Arguments matcher.
