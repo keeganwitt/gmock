@@ -1,4 +1,6 @@
-package org.gmock
+package org.gmock.signature
+
+import org.gmock.Utils
 
 class ConstructorSignature {
 

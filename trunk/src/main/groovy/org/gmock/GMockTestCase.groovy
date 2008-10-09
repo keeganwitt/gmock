@@ -1,7 +1,5 @@
 package org.gmock
 
-import groovy.mock.interceptor.MockProxyMetaClass
-
 abstract class GMockTestCase extends GroovyTestCase {
 
     def mocks = []

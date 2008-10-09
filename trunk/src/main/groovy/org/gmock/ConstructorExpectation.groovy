@@ -1,5 +1,7 @@
 package org.gmock
 
+import org.gmock.signature.ConstructorSignature
+
 class ConstructorExpectation {
 
     def signature
@@ -25,6 +27,6 @@ class ConstructorExpectation {
 
 
 
-    
+
 
 }
