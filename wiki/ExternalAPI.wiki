@@ -14,16 +14,7 @@ def mock = mock()
 def mock = mock(SomeClass) // strong typing support
 
 // constructor mocking
-def mock = mockNew(SomeClass, "arg1", "arg2")
-// or to be decided
-def mock = mock(SomeClass, constructor: ["arg1", "arg2"]
-// or 
-def loader = mock(Loader) {
-  mock constructor: [1, 2]
-  argument matchers: false
-}
-
-
+def mock = mock(SomeClass, constructor: ["arg1", "arg2"])
 
 // method mocking
 mock.load(1, 2).returns(3) 
@@ -43,7 +34,7 @@ mock.name.set("some name")
 mock.name.returns("other name")
 
 // static mocking
-Foo.static.load(1,2).returns(3)
+mock.static.load(1,2).returns(3)
 
 
 strict { // strict ordering
