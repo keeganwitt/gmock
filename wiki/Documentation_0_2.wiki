@@ -1,0 +1,32 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+Gmock is a mocking framework for the Groovy language. 
+
+Gmock is all about simple syntax and readability of your tests so you spend less time learning the framework and more writing code. To use Gmock just drop the gmock jar file in your classpath and make sure you also have junit.
+
+
+This documention describe the version 0.2 of Gmock.
+
+
+= Getting Started =
+
+{{{
+import org.gmock.GMockTestCase
+
+class LoaderTest extends GMockTestCase {
+    void testLoader(){
+        def mockLoader = mock()
+        mockLoader.load('key').returns('value')
+        play {
+            assertEquals "value", mockLoader.load('key')
+        }
+    }
+}  
+}}}
+
+  * First extends the `GMockTestCase`
+  * Create mock object using the `mock()` method
+  * Setup expectation by calling the method you expect on your mock
+  * Run the code you are testing within the `play` closure
