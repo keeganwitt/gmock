@@ -32,7 +32,8 @@ class ProxyInterceptor extends ProxyMetaClass {
 
 
     def expectConstructor(args, mock){
-        constructorExpectations << new ConstructorExpectation(theClass, args, mock)
+        ConstructorSignature signature = new ConstructorSignature(theClass, args)
+        constructorExpectations << new Expectation(signature, new ReturnValue(mock))
     }
 
     public Object invokeConstructor(Object[] arguments) {
@@ -50,14 +51,6 @@ class ProxyInterceptor extends ProxyMetaClass {
         } else {
             return originalMetaClass.invokeConstructor( arguments )
         }
-    }
-
-    private constructorState(){
-        def callState = new CallState()
-        constructorExpectations.each {
-            callState.append(it)
-        }
-        return callState
     }
 
 

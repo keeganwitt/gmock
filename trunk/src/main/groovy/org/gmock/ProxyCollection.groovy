@@ -11,15 +11,18 @@ class ProxyCollection {
             proxies << interceptor
         }
         interceptor.expectConstructor(args, mock)
-
     }
 
     def startProxy(){
-        proxies.each {it.startProxy()}
+        proxies*.startProxy()
     }
 
     def stopProxy(){
-        proxies.each {it.stopProxy()}
+        proxies*.stopProxy()
+    }
+
+    def verify(){
+        proxies*.verify()
     }
 
 
