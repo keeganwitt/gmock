@@ -6,7 +6,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
 
     void testConstructorNoArgument(){
         def mockLoader = mockNew(Loader)
-        mockLoader.load("abc").andReturn("123")
+        mockLoader.load("abc").returns("123")
 
         play {
             def expectedLoader = new Loader()
@@ -51,7 +51,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
 
     void testMockingConstructorAllowStaticMethodCall(){
         def mockLoader = mockNew(Loader)
-        mockLoader.load("abc").andReturn("123")
+        mockLoader.load("abc").returns("123")
 
         play {
             def expectedLoader = new Loader()
