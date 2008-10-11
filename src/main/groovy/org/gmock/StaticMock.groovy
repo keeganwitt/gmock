@@ -10,7 +10,7 @@ import org.gmock.signature.ConstructorSignature
 class StaticMock extends ProxyMetaClass {
 
     MetaClass originalMetaClass
-    def constructorExpectations = []
+    def constructorExpectations = new ExpectationCollection()
 
     public StaticMock(MetaClassRegistry metaClassRegistry, Class aClass, MetaClass adaptee) throws IntrospectionException {
         super(metaClassRegistry, aClass, adaptee)
@@ -32,6 +32,10 @@ class StaticMock extends ProxyMetaClass {
         registry.setMetaClass(theClass, originalMetaClass);
     }
 
+    def verify(){
+        constructorExpectations.verify()
+    }
+
 
     def expectConstructor(arguments, mock){
         def signature = new ConstructorSignature(theClass, arguments)
@@ -42,26 +46,17 @@ class StaticMock extends ProxyMetaClass {
     public Object invokeConstructor(Object[] arguments) {
         if (constructorExpectations){
             def signature = new ConstructorSignature(theClass, arguments)
-            def expectation = constructorExpectations.find { it.canCall(signature)}
+            def expectation = constructorExpectations.findMatching(signature)
             if (expectation){
                 return expectation.doReturn()
             } else {
-                def callState = constructorState().toString()
+                def callState = constructorExpectations.callState().toString()
                 if (callState){ callState = "\n$callState" }
                 fail("Unexpected constructor call '${signature}'$callState")
             }
         } else {
             return originalMetaClass.invokeConstructor( arguments )
         }
-    }
-
-
-    private constructorState(){
-        def callState = new CallState()
-        constructorExpectations.each {
-            callState.append(it)
-        }
-        return callState
     }
 
 

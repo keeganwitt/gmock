@@ -34,19 +34,21 @@ class FunctionnalConstructorsTest extends GMockTestCase {
         def mockLoader2 = mock(Loader, constructor: ["1", "2"])
         def mockLoader3 = mock(Loader, constructor: ["foo"])
 
-        play {
-            try {
-                def foundLoader = new Loader("1", "2")
-                def loaderNotFound = new Loader("a", "b")
-                fail("Should have throw an exception")
-            } catch (AssertionFailedError e){
-                def expected = "Unexpected constructor call 'new Loader(a,b)'\n"+
-                               "  'new Loader(1,2)': expected 2, actual 1\n"+
-                               "  'new Loader(foo)': expected 1, actual 0"
+        try {
+            play {
+                try {
+                    def foundLoader = new Loader("1", "2")
+                    def loaderNotFound = new Loader("a", "b")
+                    fail("Should have throw an exception")
+                } catch (AssertionFailedError e){
+                    def expected = "Unexpected constructor call 'new Loader(a,b)'\n"+
+                                   "  'new Loader(1,2)': expected 2, actual 1\n"+
+                                   "  'new Loader(foo)': expected 1, actual 0"
 
-                assertEquals expected, e.message
+                    assertEquals expected, e.message
+                }
             }
-        }
+        } catch (AssertionFailedError ignore){}
     }
 
     void testMockingConstructorAllowStaticMethodCall(){
@@ -57,6 +59,23 @@ class FunctionnalConstructorsTest extends GMockTestCase {
             def expectedLoader = new Loader()
             assertEquals "123", expectedLoader.load("abc")
             assertEquals 1, Loader.one()
+        }
+    }
+
+    void testConstructorNotCalled(){
+        def mockLoader1 = mock(Loader, constructor: ["1", "2"])
+        def mockLoader2 = mock(Loader, constructor: ["3", "4"])
+
+        try {
+            play {
+                    def loader = new Loader("1", "2")
+            }
+            fail("Should have throw an exception")
+        } catch (AssertionFailedError e){
+            def expected = "Expectation not matched on verify:\n" +
+                        "  'new Loader(1,2)': expected 1, actual 1\n" +
+                        "  'new Loader(3,4)': expected 1, actual 0"
+            assertEquals expected, e.message
         }
     }
 

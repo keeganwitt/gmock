@@ -31,6 +31,7 @@ abstract class GMockTestCase extends GroovyTestCase {
             proxyCollection.stopProxy()
         }
         mocks.each {it._verify()}
+        proxyCollection.verify()
         mocks.each {it._reset()}
     }
 
