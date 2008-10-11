@@ -8,11 +8,11 @@ class MethodRecorder {
         this.expectation = expectation
     }
 
-    void andReturn(returnValue){
+    void returns(returnValue){
         expectation.returnValue = new ReturnValue(returnValue)
     }
 
-    void andRaise(exception){
+    void raises(exception){
         expectation.returnValue = new ReturnRaiseException(exception)
     }
 

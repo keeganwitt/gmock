@@ -6,7 +6,7 @@ class FunctionalTest extends GMockTestCase {
 
     void testBasic(){
         def mockLoader = mock()
-        mockLoader.load('key').andReturn('value')
+        mockLoader.load('key').returns('value')
         play {
             assertEquals "value", mockLoader.load('key')
         }
@@ -15,9 +15,9 @@ class FunctionalTest extends GMockTestCase {
 
     void testCallMethodToManyTime(){
         def mockLoader = mock()
-        mockLoader.load('foo').andReturn('result1')
-        mockLoader.load('bar').andReturn('result1')
-        mockLoader.load('bar').andReturn('result1')
+        mockLoader.load('foo').returns('result1')
+        mockLoader.load('bar').returns('result1')
+        mockLoader.load('bar').returns('result1')
         def message
         play {
             try {
@@ -39,8 +39,8 @@ class FunctionalTest extends GMockTestCase {
     void testMultipleArguments(){
         def mockLoader1 = mock()
         def mockLoader2 = mock()
-        mockLoader1.put("1A", "1B").andReturn("result1")
-        mockLoader2.put("2A", "2B").andReturn("result2")
+        mockLoader1.put("1A", "1B").returns("result1")
+        mockLoader2.put("2A", "2B").returns("result2")
 
         play {
             assertEquals "result1", mockLoader1.put("1A", "1B")
@@ -51,8 +51,8 @@ class FunctionalTest extends GMockTestCase {
 
   void testMultipleArgumentsSameMock(){
     def mockLoader = mock()
-    mockLoader.load("key1", "other1").andReturn("key1 other1")
-    mockLoader.load("key2", "other2").andReturn("key2 other2")
+    mockLoader.load("key1", "other1").returns("key1 other1")
+    mockLoader.load("key2", "other2").returns("key2 other2")
     play {
         assertEquals "key1 other1", mockLoader.load("key1", "other1")
         assertEquals "key2 other2", mockLoader.load("key2", "other2")
@@ -62,9 +62,9 @@ class FunctionalTest extends GMockTestCase {
 
   void testMethodNotCall(){
     def mockLoader = mock()
-    mockLoader.load("load1").andReturn("result")
-    mockLoader.load("load2").andReturn("result")
-    mockLoader.load("load2").andReturn("result")
+    mockLoader.load("load1").returns("result")
+    mockLoader.load("load2").returns("result")
+    mockLoader.load("load2").returns("result")
     def expected = "Expectation not matched on verify:\n" +
                 "  'load(load1)': expected 1, actual 0\n" +
                 "  'load(load2)': expected 2, actual 0"
@@ -76,7 +76,7 @@ class FunctionalTest extends GMockTestCase {
       assertEquals expected, e.message
     }
   }
-  
+
   void testVerifyObjectNotReplayed(){
       def mockLoader = mock()
       try {
@@ -88,7 +88,7 @@ class FunctionalTest extends GMockTestCase {
 
     void testMultipleExpectation(){
         def mockLoader = mock()
-        mockLoader.load("key").andReturn("result")
+        mockLoader.load("key").returns("result")
         mockLoader.put("key")
         play {
             assertEquals "result", mockLoader.load("key")
@@ -110,8 +110,8 @@ class FunctionalTest extends GMockTestCase {
 
     void testSameExpectation(){
         def mockLoader = mock()
-        mockLoader.load('key').andReturn('first')
-        mockLoader.load('key').andReturn('second')
+        mockLoader.load('key').returns('first')
+        mockLoader.load('key').returns('second')
         play {
             assertEquals "first", mockLoader.load("key")
             assertEquals "second", mockLoader.load("key")
@@ -136,7 +136,7 @@ class FunctionalTest extends GMockTestCase {
 
     void testRaiseException(){
         def mockLoader = mock()
-        mockLoader.load("key").andRaise(new IllegalArgumentException())
+        mockLoader.load("key").raises(new IllegalArgumentException())
         play {
             shouldFail(IllegalArgumentException){
                 mockLoader.load("key")
@@ -146,7 +146,7 @@ class FunctionalTest extends GMockTestCase {
 
     void testRaiseExceptionNotCalled(){
         def mockLoader = mock()
-        mockLoader.load("key").andRaise(new IllegalArgumentException())
+        mockLoader.load("key").raises(new IllegalArgumentException())
         def expected = "Expectation not matched on verify:\n" +
                        "  'load(key)': expected 1, actual 0"
 
@@ -159,12 +159,12 @@ class FunctionalTest extends GMockTestCase {
 
     void testMultiplePlay(){
         def mockLoader = mock()
-        mockLoader.load("key1").andReturn("value1")
+        mockLoader.load("key1").returns("value1")
         play {
             assertEquals "value1", mockLoader.load("key1")
         }
 
-        mockLoader.load("key2").andReturn("value2")
+        mockLoader.load("key2").returns("value2")
         mockLoader.put("value3")
         play {
             assertEquals "value2", mockLoader.load("key2")
