@@ -19,7 +19,10 @@ def mock = mock(SomeClass, constructor: ["arg1", "arg2"])
 // method mocking
 mock.load(1, 2).returns(3) 
 mock.load(2, 3).raises(SomeException)
-mock.put({ it > 1 }, { it in 3..5 }) // argument matchers
+
+// argument matchers
+mock.put(match{ it > 1 }, match{ it in 3..5 }) // closure matchers
+mock.put(greaterThan(1), allOf(greaterThanOrEqualTo(3), lessThanOrEqualTo(5))) // hamcrest matchers
 
 // time matching
 mock.put(1, 2).times(1..2)  
