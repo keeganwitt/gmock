@@ -5,7 +5,7 @@ import junit.framework.AssertionFailedError
 class FunctionnalConstructorsTest extends GMockTestCase {
 
     void testConstructorNoArgument(){
-        def mockLoader = mockNew(Loader)
+        def mockLoader = mock(Loader, constructor: [])
         mockLoader.load("abc").returns("123")
 
         play {
@@ -18,8 +18,8 @@ class FunctionnalConstructorsTest extends GMockTestCase {
 
     void testConstructorMultipleArguments(){
         Date now = new Date()
-        def mockLoader1 = mockNew(Loader, "1", "2")
-        def mockLoader2 = mockNew(Loader, now)
+        def mockLoader1 = mock(Loader, constructor: ["1", "2"])
+        def mockLoader2 = mock(Loader, constructor: [now])
 
         play {
             def epectedLoader2 = new Loader(now)
@@ -30,9 +30,9 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testConstructorNoMatchFound(){
-        def mockLoader1 = mockNew(Loader, "1", "2")
-        def mockLoader2 = mockNew(Loader, "1", "2")
-        def mockLoader3 = mockNew(Loader, "foo")
+        def mockLoader1 = mock(Loader, constructor: ["1", "2"])
+        def mockLoader2 = mock(Loader, constructor: ["1", "2"])
+        def mockLoader3 = mock(Loader, constructor: ["foo"])
 
         play {
             try {
@@ -50,7 +50,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testMockingConstructorAllowStaticMethodCall(){
-        def mockLoader = mockNew(Loader)
+        def mockLoader = mock(Loader, constructor: [])
         mockLoader.load("abc").returns("123")
 
         play {
