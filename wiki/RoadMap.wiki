@@ -19,4 +19,5 @@
 
 == Version 0.5 ==
 
-  * Multiple call definition (atLeast, more...). Arguments matcher.
+  * Multiple call definition (atLeast, more...)
+  * Arguments matcher, both closure matcher and hamcrest matcher
