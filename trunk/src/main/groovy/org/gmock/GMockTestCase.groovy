@@ -12,11 +12,14 @@ abstract class GMockTestCase extends GroovyTestCase {
         return mock
     }
 
-    def mockNew(Class aClass, Object[] args){
+    def mock(Map constraints, Class aClass){
         def mock = mock()
-        proxyCollection.expectConstructor(aClass, args, mock)
+        if (constraints.constructor != null){
+            proxyCollection.expectConstructor(aClass, constraints.constructor, mock)
+        }
         return mock
     }
+
 
 
     def play = { closure ->
