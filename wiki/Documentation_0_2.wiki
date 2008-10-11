@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Gmock documentation for gmock-0.2
 
 = Introduction =
 
@@ -30,3 +30,20 @@ class LoaderTest extends GMockTestCase {
   * Create mock object using the `mock()` method
   * Setup expectation by calling the method you expect on your mock
   * Run the code you are testing within the `play` closure
+
+
+= Cookbook =
+
+== Expectation and Play mode == 
+
+Mock object are created using the `mock()` method available in `GMockTestCase`. 
+
+== Mock method call ==
+
+== Mock constructor call ==
+
+== GMockController ==
+
+
+
+
