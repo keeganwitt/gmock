@@ -8,18 +8,18 @@ class MethodRecorder {
         this.expectation = expectation
     }
 
-    void returns(returnValue){
+    def returns(returnValue){
         expectation.returnValue = new ReturnValue(returnValue)
+        return this
     }
 
-    void raises(exception){
+    def raises(exception){
         expectation.returnValue = new ReturnRaiseException(exception)
+        return this
     }
 
-    void andStubReturn(returnValue){
-        expectation.returnValue = new ReturnValue(returnValue)
+    def stub(){
         expectation.stubed = true
     }
-
 
 }
