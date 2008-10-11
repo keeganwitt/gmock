@@ -120,7 +120,7 @@ class FunctionalTest extends GMockTestCase {
 
     void testStubMethod(){
         def mockLoader = mock()
-        mockLoader.load("key").andStubReturn("stub")
+        mockLoader.load("key").returns("stub").stub()
         play {
             3.times {
                 assertEquals 'stub', mockLoader.load('key')
@@ -130,7 +130,7 @@ class FunctionalTest extends GMockTestCase {
 
     void testStubedMethodNotCall(){
         def mockLoader = mock()
-        mockLoader.load("key").andStubReturn("stub")
+        mockLoader.load("key").returns("stub").stub()
         play{}
     }
 
