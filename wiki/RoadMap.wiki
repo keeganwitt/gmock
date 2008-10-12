@@ -11,11 +11,13 @@
 
 == Version 0.3 ==
 
-  * Support for property mocking
+  * Support for property mocking [http://code.google.com/p/gmock/issues/detail?id=7 issue-7]
+  * Support for static method mocking [http://code.google.com/p/gmock/issues/detail?id=8 issue-8]
+  * Improvement of the raise method [http://code.google.com/p/gmock/issues/detail?id=10 issue-10]
 
 == Version 0.4 ==
 
-  * Support for static method mocking
+  * Closure matcher [http://code.google.com/p/gmock/issues/detail?id=12 issue-12]
 
 == Version 0.5 ==
 
