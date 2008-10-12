@@ -1,4 +1,4 @@
-#Gmock external API
+#summary Gmock external API
 
 = External API =
 
