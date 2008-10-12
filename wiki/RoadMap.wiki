@@ -1,23 +1,25 @@
 #summary Gmock development roadmap
 
-== Version 0.1 ==
+== ~~Version 0.1~~ ==
 
   * Basic mocking functionnality
 
-== Version 0.2 ==
+== ~~Version 0.2~~ ==
 
-  * Rename raises and returns.
-  * Refactor constructor mocking
+  * Rename raises and returns (~~[http://code.google.com/p/gmock/issues/detail?id=3 issue-3]~~)
+  * Refactor constructor mocking (~~[http://code.google.com/p/gmock/issues/detail?id=6 issue-6]~~)
+  * Introduce GMockController (~~[http://code.google.com/p/gmock/issues/detail?id=5 issue-5]~~)
+  * Refactor stub return (~~[http://code.google.com/p/gmock/issues/detail?id=11 issue-11]~~)
 
 == Version 0.3 ==
 
-  * Support for property mocking [http://code.google.com/p/gmock/issues/detail?id=7 issue-7]
-  * Support for static method mocking [http://code.google.com/p/gmock/issues/detail?id=8 issue-8]
-  * Improvement of the raise method [http://code.google.com/p/gmock/issues/detail?id=10 issue-10]
+  * Property mocking ([http://code.google.com/p/gmock/issues/detail?id=7 issue-7])
+  * Static method mocking ([http://code.google.com/p/gmock/issues/detail?id=8 issue-8])
+  * Improvement of the raise method ([http://code.google.com/p/gmock/issues/detail?id=10 issue-10])
 
 == Version 0.4 ==
 
-  * Closure matcher [http://code.google.com/p/gmock/issues/detail?id=12 issue-12]
+  * Closure matcher ([http://code.google.com/p/gmock/issues/detail?id=12 issue-12])
 
 == Version 0.5 ==
 
