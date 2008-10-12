@@ -2,11 +2,24 @@ package org.gmock
 
 import static junit.framework.Assert.fail
 import org.gmock.signature.MethodSignature
+import org.gmock.signature.ConstructorSignature
 
 class Mock {
 
+    def aClass
     def expectations = new ExpectationCollection()
+    def classExpectations
     def replay = false
+
+    Mock(classExpectations, Map constraints = [:], Class aClass = null){
+        this.aClass = aClass
+        this.classExpectations = classExpectations
+        if (aClass && constraints.constructor != null){
+            def signature = new ConstructorSignature(aClass, constraints.constructor)
+            def expectation = new Expectation(signature, new ReturnValue(this))
+            classExpectations.addConstructorExpectation(aClass, expectation)
+        }
+    }
 
     def methodMissing(String name, args) {
         def signature = new MethodSignature(name, args)
@@ -23,12 +36,16 @@ class Mock {
         } else {
             def expectation = new Expectation(signature)
             expectations.add( expectation )
-            return new MethodRecorder(expectation)
+            return new ReturnMethodRecorder(expectation)
         }
     }
 
-
     def propertyMissing(name, args) {
+        if (name == "static"){
+            def expectation = new Expectation()
+            classExpectations.addStaticExpectation(aClass, expectation)
+            return new StaticMethodRecoder(aClass, expectation)
+        }
         methodMissing(name, args)
     }
 
@@ -44,9 +61,6 @@ class Mock {
     private void _replay(){
         replay = true
     }
-
-
-
-
+ 
 }
 

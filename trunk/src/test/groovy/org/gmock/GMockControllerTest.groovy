@@ -41,4 +41,15 @@ class GMockControllerTest extends GroovyTestCase {
         }
     }
 
+    void testMockStaticMethods() {
+        def gmc = new GMockController()
+        def mockLoader = gmc.mock(Loader)
+        mockLoader.static.initialise().returns(true)
+
+        gmc.play {
+            assertTrue Loader.initialise()
+        }
+
+    }
+
 }

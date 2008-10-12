@@ -3,33 +3,29 @@ package org.gmock
 class GMockController {
 
     def mocks = []
+    def classExpectation = new ClassExpectations()
 
-    ProxyCollection proxyCollection = new ProxyCollection()
-
-    def mock(){
-        def mock = new Mock()
+    def mock(Map constraints = [:], Class aClass = null){
+        def mock = new Mock(classExpectation, constraints, aClass)
         mocks.add(mock)
         return mock
     }
 
-    def mock(Map constraints, Class aClass){
-        def mock = mock()
-        if (constraints.constructor != null){
-            proxyCollection.expectConstructor(aClass, constraints.constructor, mock)
-        }
-        return mock
+    def mock(Class aClass){
+        return mock([:], aClass)
     }
+
 
     def play(Closure closure) {
         mocks.each {it._replay()}
-        proxyCollection.startProxy()
+        classExpectation.startProxy()
         try {
             closure.call()
         } finally {
-            proxyCollection.stopProxy()
+            classExpectation.stopProxy()
         }
         mocks.each {it._verify()}
-        proxyCollection.verify()
+        classExpectation.verify()
         mocks.each {it._reset()}
     }
 
