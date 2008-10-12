@@ -28,6 +28,10 @@ class ExpectationCollection {
         return callState
     }
 
+    def empty(){
+        expectations.size() == 0
+    }
+
 
 
 }

@@ -7,7 +7,7 @@ class Expectation {
     def called = false
     def stubed = false
 
-    Expectation(signature, returnValue = new ReturnNull()){
+    Expectation(signature = null, returnValue = new ReturnNull()){
         this.signature = signature
         this.returnValue = returnValue
     }
