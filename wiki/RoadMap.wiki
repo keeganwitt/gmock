@@ -20,8 +20,8 @@
 == Version 0.4 ==
 
   * Closure matcher ([http://code.google.com/p/gmock/issues/detail?id=12 issue-12])
+  * Time matching ([http://code.google.com/p/gmock/issues/detail?id=13 issue-13])
 
 == Version 0.5 ==
 
-  * Multiple call definition (atLeast, more...)
-  * Arguments matcher, both closure matcher and hamcrest matcher
+  * Hamcrest still of matcher
