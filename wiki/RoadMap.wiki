@@ -24,4 +24,4 @@
 
 == Version 0.5 ==
 
-  * Hamcrest still of matcher
+  * Hamcrest style of matcher
