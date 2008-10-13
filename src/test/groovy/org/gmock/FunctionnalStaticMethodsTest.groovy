@@ -80,4 +80,11 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         }
     }
 
+    void testNothingExpected() {
+        def mockLoader = mock(Loader)
+        mockLoader.static
+
+        play {}
+    }
+
 }
