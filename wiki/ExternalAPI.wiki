@@ -35,7 +35,7 @@ mock.put(1, 2).atLeastOnce()
 
 
 // property mocking
-mock.name.set("some name")
+mock.name.sets("some name")
 mock.name.returns("other name")
 
 // static mocking
