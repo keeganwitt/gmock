@@ -19,6 +19,8 @@ def mock = mock(SomeClass, constructor: ["arg1", "arg2"])
 // method mocking
 mock.load(1, 2).returns(3) 
 mock.load(2, 3).raises(SomeException)
+mock.load(3, 4).raises(SomeException, "error message")
+mock.load(4, 5).raises(new SomeException())
 
 // argument matchers
 mock.put(match{ it > 1 }, match{ it in 3..5 }) // closure matchers
