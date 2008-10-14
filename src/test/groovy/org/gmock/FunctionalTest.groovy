@@ -157,6 +157,60 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
+    void testRaiseExceptionClass() {
+        def mockLoader = mock()
+        mockLoader.load("key").raises(IllegalArgumentException)
+
+        play {
+            shouldFail(IllegalArgumentException) {
+                mockLoader.load("key")
+            }
+        }
+    }
+
+    void testRaiseExceptionClassWithMessage() {
+        def mockLoader = mock()
+        mockLoader.load("key").raises(IllegalArgumentException, "error message")
+
+        play {
+            def expected = "error message"
+            def message = shouldFail(IllegalArgumentException) {
+                mockLoader.load("key")
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testRaiseExceptionClassWithMessageAndCause() {
+        def mockLoader = mock()
+        def message = "error message"
+        def cause = new Exception()
+        mockLoader.load("key").raises(IllegalArgumentException, message, cause)
+
+        play {
+            try {
+                mockLoader.load("key")
+                fail("Should have throw an exception")
+            } catch (IllegalArgumentException e) {
+                assertEquals message, e.message
+                assertEquals cause, e.cause
+            }
+        }
+    }
+
+    void testRaiseExceptionClassNotCalled() {
+        def mockLoader = mock()
+        mockLoader.load("key").raises(IllegalArgumentException)
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'load(key)': expected 1, actual 0"
+
+        try {
+            play {}
+        } catch (AssertionFailedError e){
+            assertEquals expected, e.message
+        }
+    }
+
     void testMultiplePlay(){
         def mockLoader = mock()
         mockLoader.load("key1").returns("value1")
