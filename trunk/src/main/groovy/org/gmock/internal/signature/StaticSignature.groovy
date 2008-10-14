@@ -1,9 +1,9 @@
-package org.gmock.signature
+package org.gmock.internal.signature
 
-import org.gmock.Utils
-
+import org.gmock.internal.Utils
 
 class StaticSignature {
+
     Class aClass
     def methodName
     def arguments
@@ -17,7 +17,6 @@ class StaticSignature {
     String toString(){
         "${Utils.abreviateClassName(aClass.name)}.$methodName(${arguments.join(',')})"
     }
-
 
     boolean equals(Object staticSignature) {
         if (staticSignature == null || getClass() != staticSignature.getClass()) return false

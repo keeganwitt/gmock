@@ -1,8 +1,13 @@
 package org.gmock
 
 import static junit.framework.Assert.fail
-import org.gmock.signature.MethodSignature
-import org.gmock.signature.ConstructorSignature
+import org.gmock.internal.Expectation
+import org.gmock.internal.ExpectationCollection
+import org.gmock.internal.ReturnMethodRecorder
+import org.gmock.internal.ReturnValue
+import org.gmock.internal.StaticMethodRecoder
+import org.gmock.internal.signature.ConstructorSignature
+import org.gmock.internal.signature.MethodSignature
 
 class Mock {
 
@@ -61,6 +66,6 @@ class Mock {
     private void _replay(){
         replay = true
     }
- 
+
 }
 
