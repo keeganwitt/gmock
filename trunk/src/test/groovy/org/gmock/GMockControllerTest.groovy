@@ -8,7 +8,7 @@ class GMockControllerTest extends GroovyTestCase {
         def gmc = new GMockController()
         def mockLoader = gmc.mock()
         mockLoader.load('key').returns('value')
-        mockLoader.put(1, 2).raises(new IllegalArgumentException())
+        mockLoader.put(1, 2).raises(IllegalArgumentException)
 
         gmc.play {
             assertEquals "value", mockLoader.load('key')
@@ -35,7 +35,7 @@ class GMockControllerTest extends GroovyTestCase {
         }
 
         gmc.mock(Loader, constructor: [1, 2])
-        
+
         shouldFail(AssertionFailedError) {
             gmc.play {}
         }
