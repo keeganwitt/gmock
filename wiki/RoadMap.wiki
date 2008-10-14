@@ -6,25 +6,25 @@
 
 == ~~Version 0.2~~ ==
 
-  * Rename raises and returns (~~[http://code.google.com/p/gmock/issues/detail?id=3 issue-3]~~)
-  * Refactor constructor mocking (~~[http://code.google.com/p/gmock/issues/detail?id=6 issue-6]~~)
-  * Introduce GMockController (~~[http://code.google.com/p/gmock/issues/detail?id=5 issue-5]~~)
-  * Refactor stub return (~~[http://code.google.com/p/gmock/issues/detail?id=11 issue-11]~~)
+  * Rename raises and returns (issue 3)
+  * Refactor constructor mocking (issue 6)
+  * Introduce GMockController (issue 5)
+  * Refactor stub return (issue 11)
 
 == Version 0.3 ==
 
-  * Property mocking ([http://code.google.com/p/gmock/issues/detail?id=7 issue-7])
-  * Static method mocking ([http://code.google.com/p/gmock/issues/detail?id=8 issue-8])
-  * Improvement of the raise method ([http://code.google.com/p/gmock/issues/detail?id=10 issue-10])
+  * Property mocking (issue 7)
+  * Static method mocking (issue 8)
+  * Improvement of the raise method (issue 10)
 
 == Version 0.4 ==
 
-  * Closure matcher ([http://code.google.com/p/gmock/issues/detail?id=12 issue-12])
-  * Time matching ([http://code.google.com/p/gmock/issues/detail?id=13 issue-13])
+  * Closure matcher (issue 12)
+  * Time matching (issue 13)
 
 == Version 0.5 ==
 
-  * Strong typing support ([http://code.google.com/p/gmock/issues/detail?id=14 issue-14])
+  * Strong typing support (issue 15, issue 16, issue 17)
 
 == Version 0.6 ==
 
