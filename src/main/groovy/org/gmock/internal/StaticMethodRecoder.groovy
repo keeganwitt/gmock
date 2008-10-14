@@ -1,7 +1,6 @@
-package org.gmock
+package org.gmock.internal
 
-import org.gmock.signature.StaticSignature
-
+import org.gmock.internal.signature.StaticSignature
 
 class StaticMethodRecoder {
 

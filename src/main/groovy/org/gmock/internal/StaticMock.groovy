@@ -1,8 +1,8 @@
-package org.gmock
+package org.gmock.internal
 
 import java.beans.IntrospectionException
-import static junit.framework.Assert.*
-import org.gmock.signature.ConstructorSignature
+import static junit.framework.Assert.fail
+import org.gmock.internal.signature.ConstructorSignature
 
 /**
  * StaticMock capture all static and constructor call in replay mode.

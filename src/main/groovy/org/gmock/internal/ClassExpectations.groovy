@@ -1,4 +1,5 @@
-package org.gmock
+package org.gmock.internal
+
 class ClassExpectations {
 
     def proxies = [:]

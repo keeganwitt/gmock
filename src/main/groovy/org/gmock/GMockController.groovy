@@ -1,5 +1,7 @@
 package org.gmock
 
+import org.gmock.internal.ClassExpectations
+
 class GMockController {
 
     def mocks = []

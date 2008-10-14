@@ -1,6 +1,6 @@
-package org.gmock.signature
+package org.gmock.internal.signature
 
-import org.gmock.Utils
+import org.gmock.internal.Utils
 
 class ConstructorSignature {
 
@@ -15,7 +15,6 @@ class ConstructorSignature {
     String toString(){
         "new ${Utils.abreviateClassName(aClass.name)}(${arguments.join(',')})"
     }
-
 
     boolean equals(Object constructor) {
         if (constructor == null || getClass() != constructor.getClass()) return false
