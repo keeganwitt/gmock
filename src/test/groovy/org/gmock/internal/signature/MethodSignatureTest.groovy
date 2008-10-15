@@ -26,4 +26,9 @@ class MethodSignatureTest extends GroovyTestCase {
         assertEquals signature1.hashCode(), signature2.hashCode()
     }
 
+    void testToString() {
+        def signature = new MethodSignature("someOperate", ["test", 3, true])
+        assertEquals "someOperate(test,3,true)", signature.toString()
+    }
+
 }
