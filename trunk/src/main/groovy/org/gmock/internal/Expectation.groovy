@@ -25,7 +25,7 @@ class Expectation {
     }
 
     def isVerified(){
-        return stubed || called
+        return stubed || called || !signature
     }
 
     String toString(){
