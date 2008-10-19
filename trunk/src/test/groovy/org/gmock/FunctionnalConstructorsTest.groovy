@@ -64,7 +64,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
 
     void testConstructorNotCalled(){
         def mockLoader1 = mock(Loader, constructor: ["1", "2"])
-        def mockLoader2 = mock(Loader, constructor: ["3", "4"])
+        def mockLoader2 = mock(Loader, constructor: [3, 4])
 
         try {
             play {
@@ -73,8 +73,8 @@ class FunctionnalConstructorsTest extends GMockTestCase {
             fail("Should have throw an exception")
         } catch (AssertionFailedError e){
             def expected = "Expectation not matched on verify:\n" +
-                        "  'new Loader(1,2)': expected 1, actual 1\n" +
-                        "  'new Loader(3,4)': expected 1, actual 0"
+                           "  'new Loader(\"1\", \"2\")': expected 1, actual 1\n" +
+                           "  'new Loader(3, 4)': expected 1, actual 0"
             assertEquals expected, e.message
         }
     }

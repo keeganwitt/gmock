@@ -75,7 +75,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
             }
         } catch (AssertionFailedError e){
             def expected = "Unexpected static method call 'Loader.two()'\n" +
-            "  'Loader.one()': expected 1, actual 0"
+                           "  'Loader.one()': expected 1, actual 0"
             assertEquals expected, e.message
         }
     }

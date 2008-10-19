@@ -2,32 +2,30 @@ package org.gmock.internal.signature
 
 import org.gmock.internal.Utils
 
-class StaticSignature {
+class StaticSignature extends ParameterSignature {
 
     Class aClass
     def methodName
-    def arguments
 
-    StaticSignature(aClass, methodName, arguments){
+    StaticSignature(aClass, methodName, arguments) {
+        super(arguments)
         this.aClass = aClass
         this.methodName = methodName
-        this.arguments = arguments.toList()
     }
 
-    String toString(){
-        "${Utils.abreviateClassName(aClass.name)}.$methodName(${arguments.join(',')})"
+    String toString() {
+        "${Utils.abreviateClassName(aClass.name)}.$methodName(${super.toString()})"
     }
 
     boolean equals(Object staticSignature) {
         if (staticSignature == null || getClass() != staticSignature.getClass()) return false
         if (aClass != staticSignature.aClass) return false
         if (methodName != staticSignature.methodName) return false
-        if (arguments != staticSignature.arguments) return false
-        return true;
+        return super.equals(staticSignature)
     }
 
     int hashCode() {
-        aClass.hashCode() * 51  + methodName.hashCode() * 31 + arguments.hashCode()
+        aClass.hashCode() * 51  + methodName.hashCode() * 31 + super.hashCode()
     }
 
 }
