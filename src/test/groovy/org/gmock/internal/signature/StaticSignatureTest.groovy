@@ -37,7 +37,7 @@ class StaticSignatureTest extends GroovyTestCase {
 
     void testToString() {
         def signature = new StaticSignature(Loader, "put", ["test", 3, true])
-        assertEquals "Loader.put(test,3,true)", signature.toString()
+        assertEquals 'Loader.put("test", 3, true)', signature.toString()
     }
 
 }

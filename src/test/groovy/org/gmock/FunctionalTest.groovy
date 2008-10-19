@@ -30,9 +30,9 @@ class FunctionalTest extends GMockTestCase {
                 message = e.message
             }
         }
-        def expected = "Unexpected method call 'load(bar)'\n"+
-                       "  'load(foo)': expected 1, actual 1\n"+
-                       "  'load(bar)': expected 2, actual 2"
+        def expected = "Unexpected method call 'load(\"bar\")'\n" +
+                       "  'load(\"foo\")': expected 1, actual 1\n" +
+                       "  'load(\"bar\")': expected 2, actual 2"
         assertEquals expected, message
     }
 
@@ -66,8 +66,8 @@ class FunctionalTest extends GMockTestCase {
     mockLoader.load("load2").returns("result")
     mockLoader.load("load2").returns("result")
     def expected = "Expectation not matched on verify:\n" +
-                "  'load(load1)': expected 1, actual 0\n" +
-                "  'load(load2)': expected 2, actual 0"
+                   "  'load(\"load1\")': expected 1, actual 0\n" +
+                   "  'load(\"load2\")': expected 2, actual 0"
 
     try {
       play{}
@@ -103,7 +103,7 @@ class FunctionalTest extends GMockTestCase {
                 mockLoader.load("key")
                 fail("Should have throw an exception")
             } catch (AssertionFailedError e){
-                assertEquals "Unexpected method call 'load(key)'", e.message
+                assertEquals "Unexpected method call 'load(\"key\")'", e.message
             }
         }
     }
@@ -148,7 +148,7 @@ class FunctionalTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.load("key").raises(new IllegalArgumentException())
         def expected = "Expectation not matched on verify:\n" +
-                       "  'load(key)': expected 1, actual 0"
+                       "  'load(\"key\")': expected 1, actual 0"
 
         try {
             play {}
@@ -202,7 +202,7 @@ class FunctionalTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.load("key").raises(IllegalArgumentException)
         def expected = "Expectation not matched on verify:\n" +
-                       "  'load(key)': expected 1, actual 0"
+                       "  'load(\"key\")': expected 1, actual 0"
 
         try {
             play {}

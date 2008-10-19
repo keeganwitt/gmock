@@ -2,31 +2,27 @@ package org.gmock.internal.signature
 
 import org.gmock.internal.Utils
 
-class ConstructorSignature {
+class ConstructorSignature extends ParameterSignature {
 
     Class aClass
-    def arguments
 
-    ConstructorSignature(aClass, arguments){
+    ConstructorSignature(aClass, arguments) {
+        super(arguments)
         this.aClass = aClass
-        this.arguments = arguments.toList()
     }
 
-    String toString(){
-        "new ${Utils.abreviateClassName(aClass.name)}(${arguments.join(',')})"
+    String toString() {
+        "new ${Utils.abreviateClassName(aClass.name)}(${super.toString()})"
     }
 
     boolean equals(Object constructor) {
         if (constructor == null || getClass() != constructor.getClass()) return false
         if (aClass != constructor.aClass) return false
-        if (arguments != constructor.arguments) return false
-        return true;
+        return super.equals(constructor)
     }
 
     int hashCode() {
-        aClass.hashCode() * 31  + arguments.hashCode()
+        aClass.hashCode() * 31  + super.hashCode()
     }
-
-
 
 }

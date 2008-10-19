@@ -31,7 +31,7 @@ class ConstructorSignatureTest extends GroovyTestCase {
 
     void testToString() {
         def signature = new ConstructorSignature(Loader, ["test", 3, true])
-        assertEquals "new Loader(test,3,true)", signature.toString()
+        assertEquals 'new Loader("test", 3, true)', signature.toString()
     }
 
 }

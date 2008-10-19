@@ -1,31 +1,26 @@
 package org.gmock.internal.signature
 
-class MethodSignature {
+class MethodSignature extends ParameterSignature {
 
     def methodName
-    def arguments
 
-    MethodSignature(methodName, arguments){
+    MethodSignature(methodName, arguments) {
+        super(arguments)
         this.methodName = methodName
-        this.arguments = arguments.toList()
     }
 
-    String toString(){
-        "${methodName}(${arguments.join(',')})"
+    String toString() {
+        "$methodName(${super.toString()})"
     }
-
 
     boolean equals(Object method) {
         if (method == null || getClass() != method.getClass()) return false
         if (methodName != method.methodName) return false
-        if (arguments != method.arguments) return false
-        return true;
+        return super.equals(method)
     }
 
     int hashCode() {
-        methodName.hashCode() * 31  + arguments.hashCode()
+        methodName.hashCode() * 31  + super.hashCode()
     }
-
-
 
 }
