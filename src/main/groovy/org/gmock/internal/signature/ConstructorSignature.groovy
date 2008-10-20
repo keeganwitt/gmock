@@ -1,7 +1,5 @@
 package org.gmock.internal.signature
 
-import org.gmock.internal.Utils
-
 class ConstructorSignature {
 
     Class aClass
@@ -13,7 +11,7 @@ class ConstructorSignature {
     }
 
     String toString() {
-        "new ${Utils.abreviateClassName(aClass.name)}($arguments)"
+        "new $aClass.simpleName($arguments)"
     }
 
     boolean equals(Object constructor) {

@@ -1,7 +1,5 @@
 package org.gmock.internal.signature
 
-import org.gmock.internal.Utils
-
 class StaticSignature {
 
     Class aClass
@@ -15,7 +13,7 @@ class StaticSignature {
     }
 
     String toString() {
-        "${Utils.abreviateClassName(aClass.name)}.$methodName($arguments)"
+        "${aClass.simpleName}.$methodName($arguments)"
     }
 
     boolean equals(Object staticSignature) {
