@@ -94,3 +94,40 @@ play {
   // test
 }
 }}}
+
+= Closure mocking proposals =
+
+First:
+{{{
+mockServer.multipleRunner(capture(), capture())
+mockServer.run('ls')
+mockServer.run('whoami')
+// nested closure
+mockServer.multipleRunner(capture(), capture())
+mockServer.run('ls', capture())
+mockServer.parameter('/home')
+mockServer.run('whoami')
+play {
+    doSomething()
+}
+}}}
+
+Second:
+{{{
+mockServer.multipleRunner(
+    invoke{ run('ls') },
+    invoke{ run('whoami') }
+)
+// nested closure
+mockServer.multipleRunner(
+    invoke{
+        run('ls', invoke{ parameter('/home') })
+    },
+    invoke{
+        run('whoami')
+    }
+)
+play {
+    doSomething()
+}
+}}}
