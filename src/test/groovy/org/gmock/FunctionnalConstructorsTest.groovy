@@ -79,4 +79,21 @@ class FunctionnalConstructorsTest extends GMockTestCase {
         }
     }
 
+    void testConstructorDifferentClassExpected(){
+        def mockLoader1 = mock(Loader, constructor: ["1"])
+
+        def now = new Date()
+        try {
+            play {
+                def loader = new Loader(now)
+            }
+            fail("Should have throw an exception")
+        } catch (AssertionFailedError e){
+            def expected = "Unexpected constructor call 'new Loader(${now.inspect()})'\n"+
+                           "  'new Loader(\"1\")': expected 1, actual 0"
+            assertEquals expected, e.message
+        }
+
+    }
+
 }
