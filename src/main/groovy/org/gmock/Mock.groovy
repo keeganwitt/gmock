@@ -8,6 +8,9 @@ import org.gmock.internal.ReturnValue
 import org.gmock.internal.StaticMethodRecoder
 import org.gmock.internal.signature.ConstructorSignature
 import org.gmock.internal.signature.MethodSignature
+import org.gmock.internal.PropertyRecorder
+import org.gmock.internal.signature.PropertySetSignature
+import org.gmock.internal.signature.PropertyGetSignature
 
 class Mock {
 
@@ -45,13 +48,30 @@ class Mock {
         }
     }
 
-    def propertyMissing(name, args) {
-        if (name == "static"){
-            def expectation = new Expectation()
-            classExpectations.addStaticExpectation(aClass, expectation)
-            return new StaticMethodRecoder(aClass, expectation)
+    def propertyMissing(name, arg) {
+
+        if (replay){
+            def signature = arg ? new PropertySetSignature(name, arg) : new PropertyGetSignature(name)
+            def expectation = expectations.findMatching(signature)
+            if (expectation){
+                return expectation.doReturn()
+            } else {
+                def callState = expectations.callState().toString()
+                if (callState){ callState = "\n$callState" }
+                fail("Unexpected property call '${signature}'$callState")
+            }
+            return result
+        } else {
+            if (name == "static"){
+                def expectation = new Expectation()
+                classExpectations.addStaticExpectation(aClass, expectation)
+                return new StaticMethodRecoder(aClass, expectation)
+            } else {
+                def expectation = new Expectation()
+                expectations.add( expectation )
+                return new PropertyRecorder(name, expectation)
+            }
         }
-        methodMissing(name, args)
     }
 
     private void _verify(){
