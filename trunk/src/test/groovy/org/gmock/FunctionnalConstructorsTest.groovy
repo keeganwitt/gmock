@@ -68,7 +68,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
 
         try {
             play {
-                    def loader = new Loader("1", "2")
+                def loader = new Loader("1", "2")
             }
             fail("Should have throw an exception")
         } catch (AssertionFailedError e){

@@ -19,8 +19,8 @@ class ReturnMethodRecorder {
     }
 
     def raises(Class exceptionClass, Object[] params) {
-        def exception = exceptionClass.metaClass.invokeConstructor(params)
-        return raises(exception)
+        expectation.returnValue = new ReturnRaiseException(exceptionClass, params)
+        return this
     }
 
     def stub(){

@@ -2,7 +2,7 @@ package org.gmock.internal
 
 class ReturnValue {
 
-    def returnValue;
+    def returnValue
 
     ReturnValue(returnValue){
         this.returnValue = returnValue;
