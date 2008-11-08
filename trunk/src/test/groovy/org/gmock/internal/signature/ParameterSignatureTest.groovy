@@ -8,6 +8,17 @@ class ParameterSignatureTest extends GroovyTestCase {
         assertEquals signature1, signature2
     }
 
+    void testNotEqualsToNull() {
+        def signature = new ParameterSignature([1, 2])
+        assert signature != null
+    }
+
+    void testNotEqualsDifferentClass() {
+        def signature1 = new ParameterSignature([1, 2])
+        def signature2 = new MethodSignature("name", [1, 2])
+        assert signature1 != signature2
+    }
+
     void testNotEqualsDifferentArguments(){
         def signature1 = new ParameterSignature(["arg1", 1])
         def signature2 = new ParameterSignature(["arg1", 2])
