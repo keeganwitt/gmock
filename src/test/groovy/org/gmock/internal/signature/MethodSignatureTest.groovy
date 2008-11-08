@@ -8,6 +8,17 @@ class MethodSignatureTest extends GroovyTestCase {
         assertEquals signature1, signature2
     }
 
+    void testNotEqualsToNull() {
+        def signature = new MethodSignature("name", [1, 2])
+        assert signature != null
+    }
+
+    void testNotEqualsDifferentClass() {
+        def signature1 = new MethodSignature("String", [1, 2])
+        def signature2 = new ConstructorSignature(String, [1, 2])
+        assert signature1 != signature2
+    }
+
     void testNotEqualsDifferentMethodName(){
         def signature1 = new MethodSignature("name", ["arg1", 1])
         def signature2 = new MethodSignature("other", ["arg1", 1])

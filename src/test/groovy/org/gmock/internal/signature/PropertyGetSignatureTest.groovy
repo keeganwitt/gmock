@@ -8,6 +8,17 @@ class PropertyGetSignatureTest extends GroovyTestCase {
         assertEquals signature1, signature2
     }
 
+    void testNotEqualsToNull() {
+        def signature = new PropertyGetSignature("property")
+        assert signature != null
+    }
+
+    void testNotEqualsDifferentClass() {
+        def signature1 = new PropertyGetSignature("property")
+        def signature2 = new MethodSignature("property", [])
+        assert signature1 != signature2
+    }
+
     void testNotEqualsDifferentPropertyName() {
         def signature1 = new PropertyGetSignature("name1")
         def signature2 = new PropertyGetSignature("name2")

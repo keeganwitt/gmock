@@ -11,7 +11,18 @@ class StaticSignatureTest extends GroovyTestCase {
         assertEquals signature1, signature2
     }
 
+    void testNotEqualsToNull() {
+        def signature = new StaticSignature(Loader, "put", [1, 2])
+        assert signature != null
+    }
+
     void testNotEqualsDifferentClass() {
+        def signature1 = new StaticSignature(Loader, "put", [1, 2])
+        def signature2 = new MethodSignature("put", [1, 2])
+        assert signature1 != signature2
+    }
+
+    void testNotEqualsDifferentMockClass() {
         def signature1 = new StaticSignature(Loader, "put", [1, 2])
         def signature2 = new StaticSignature(Mock, "put", [1, 2])
         assert signature1 != signature2
