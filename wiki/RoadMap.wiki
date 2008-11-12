@@ -21,14 +21,13 @@
 
   * Closure matcher (issue 12)
   * Time matching (issue 13)
+  * Hamcrest style of matcher (issue 20)
 
 == Version 0.5 ==
 
   * Strong typing support (issue 15, issue 16, issue 17)
 
 == Version 0.6 ==
-
-  * Hamcrest style of matcher
 
 == Version 0.7 ==
 
