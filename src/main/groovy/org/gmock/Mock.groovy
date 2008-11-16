@@ -74,6 +74,9 @@ class Mock {
     }
 
     private void _verify(){
+        if (!replay){
+            fail("Verify must be called on Mock after replay")
+        }
         expectations.verify()
     }
 
