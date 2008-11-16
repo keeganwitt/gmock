@@ -48,43 +48,40 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
-
-  void testMultipleArgumentsSameMock(){
-    def mockLoader = mock()
-    mockLoader.load("key1", "other1").returns("key1 other1")
-    mockLoader.load("key2", "other2").returns("key2 other2")
-    play {
-        assertEquals "key1 other1", mockLoader.load("key1", "other1")
-        assertEquals "key2 other2", mockLoader.load("key2", "other2")
+    void testMultipleArgumentsSameMock() {
+        def mockLoader = mock()
+        mockLoader.load("key1", "other1").returns("key1 other1")
+        mockLoader.load("key2", "other2").returns("key2 other2")
+        play {
+            assertEquals "key1 other1", mockLoader.load("key1", "other1")
+            assertEquals "key2 other2", mockLoader.load("key2", "other2")
+        }
     }
-  }
 
+    void testMethodNotCall() {
+        def mockLoader = mock()
+        mockLoader.load("load1").returns("result")
+        mockLoader.load("load2").returns("result")
+        mockLoader.load("load2").returns("result")
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'load(\"load1\")': expected 1, actual 0\n" +
+                       "  'load(\"load2\")': expected 2, actual 0"
 
-  void testMethodNotCall(){
-    def mockLoader = mock()
-    mockLoader.load("load1").returns("result")
-    mockLoader.load("load2").returns("result")
-    mockLoader.load("load2").returns("result")
-    def expected = "Expectation not matched on verify:\n" +
-                   "  'load(\"load1\")': expected 1, actual 0\n" +
-                   "  'load(\"load2\")': expected 2, actual 0"
-
-    try {
-      play{}
-      fail("Should have throw an exception")
-    } catch (AssertionFailedError e){
-      assertEquals expected, e.message
+        try {
+            play {}
+            fail("Should have throw an exception")
+        } catch (AssertionFailedError e) {
+            assertEquals expected, e.message
+        }
     }
-  }
 
-  void testVerifyObjectNotReplayed(){
-      def mockLoader = mock()
-      try {
-          mockLoader._verify()
-          fail("Should have throw an exception")
-      } catch (Throwable e){}
-  }
-
+    void testVerifyObjectNotReplayed() {
+        def mockLoader = mock()
+        try {
+            mockLoader._verify()
+            fail("Should have throw an exception")
+        } catch (Throwable e) {}
+    }
 
     void testMultipleExpectation(){
         def mockLoader = mock()
@@ -204,11 +201,10 @@ class FunctionalTest extends GMockTestCase {
         def expected = "Expectation not matched on verify:\n" +
                        "  'load(\"key\")': expected 1, actual 0"
 
-        try {
+        def message = shouldFail(AssertionFailedError) {
             play {}
-        } catch (AssertionFailedError e){
-            assertEquals expected, e.message
         }
+        assertEquals expected, message
     }
 
     void testMultiplePlay(){
@@ -228,4 +224,3 @@ class FunctionalTest extends GMockTestCase {
 
 
 }
-

@@ -1,4 +1,7 @@
-package org.gmock.internal
+package org.gmock.internal.recorder
+
+import org.gmock.internal.ReturnRaiseException
+import org.gmock.internal.ReturnValue
 
 class ReturnMethodRecorder {
 

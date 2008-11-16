@@ -15,6 +15,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
             assertEquals "a name", mockLoader.name
             assertEquals "a different name", mockLoader.name
             mockLoader.name = 'another name'
+            return null // prevent the getter of name from being invoked for evaluating the result of closure
         }
     }
 
@@ -29,7 +30,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
             mockLoader.id = "some id"
             assertEquals "a name", mockLoader.name
             mockLoader.name = 'another name'
-            assertEquals "apple", mockLoader.load("fruit") 
+            assertEquals "apple", mockLoader.load("fruit")
         }
     }
 
@@ -99,6 +100,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         play {
             mockLoader.name = "a value"
             mockLoader.name = "a value"
+            return null // prevent the getter of name from being invoked for evaluating the result of closure
         }
     }
 
@@ -114,14 +116,24 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
         mockLoader.name.raises(new RuntimeException("An exception"))
 
-        try {
-            play {
+        play {
+            def message = shouldFail(RuntimeException) {
                 mockLoader.name
-                fail("Should have throw an exception")
             }
+            assertEquals "An exception", message
         }
-        catch (RuntimeException e){
-            assertEquals "An exception", e.message
+    }
+
+    void testGetPropertyRaisesExceptionWithMessage() {
+        def mockLoader = mock()
+
+        mockLoader.name.raises(RuntimeException, "test")
+
+        play {
+            def message = shouldFail(RuntimeException) {
+                mockLoader.name
+            }
+            assertEquals "test", message
         }
     }
 
@@ -131,15 +143,25 @@ class FunctionnalPropertyTest extends GMockTestCase {
         mockLoader.name.sets("a name")
         mockLoader.name.sets("a invalid name").raises(new RuntimeException("An exception"))
 
-        try {
-            play {
-                mockLoader.name = "a name"
+        play {
+            mockLoader.name = "a name"
+            def message = shouldFail(RuntimeException) {
                 mockLoader.name = "a invalid name"
-                fail("Should have throw an exception")
             }
+            assertEquals "An exception", message
         }
-        catch (RuntimeException e){
-            assertEquals "An exception", e.message
+    }
+
+    void testSetPropertyRaisesExceptionWithMessage() {
+        def mockLoader = mock()
+
+        mockLoader.name.sets("invalid").raises(RuntimeException, "test")
+
+        play {
+            def message = shouldFail(RuntimeException) {
+                mockLoader.name = "invalid"
+            }
+            assertEquals "test", message
         }
     }
 
