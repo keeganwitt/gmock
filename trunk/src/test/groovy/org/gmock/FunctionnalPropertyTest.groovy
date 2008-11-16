@@ -165,4 +165,16 @@ class FunctionnalPropertyTest extends GMockTestCase {
         }
     }
 
+    void testLastPropertySetDontGetEvaluated(){
+        def mockLoader = mock()
+        mockLoader.name.sets('another name')
+        play {
+            setName(mockLoader)
+        }
+    }
+
+    void setName(mockLoader){
+        mockLoader.name = 'another name'
+    }
+
 }
