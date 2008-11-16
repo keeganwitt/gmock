@@ -1,9 +1,12 @@
-package org.gmock.internal
+package org.gmock.internal.recorder
 
 import org.gmock.GMockTestCase
+import org.gmock.internal.Expectation
+import org.gmock.internal.ReturnNull
+import org.gmock.internal.ReturnRaiseException
+import org.gmock.internal.ReturnValue
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
-
 
 class PropertyRecorderTest extends GMockTestCase {
 
@@ -47,19 +50,29 @@ class PropertyRecorderTest extends GMockTestCase {
         }
     }
 
-    void testRaises(){
+    void testRaisesException(){
         def expectation = new Expectation()
         PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
         def exception = new RuntimeException()
 
-        play {
-            propertyRecorder.raises(exception)
-        }
+        assertEquals propertyRecorder, propertyRecorder.raises(exception)
 
         assertEquals ReturnRaiseException, expectation.returnValue.class
         assertEquals exception, expectation.returnValue.exception
 
     }
 
+    void testRaisesExceptionClass() {
+        def expectation = new Expectation()
+        PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
+        def cause = new RuntimeException()
+
+        assertEquals propertyRecorder, propertyRecorder.raises(Exception, "test", cause)
+
+        assertEquals ReturnRaiseException, expectation.returnValue.class
+        assertEquals Exception, expectation.returnValue.exception.class
+        assertEquals "test", expectation.returnValue.exception.message
+        assertEquals cause, expectation.returnValue.exception.cause
+    }
 
 }

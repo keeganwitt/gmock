@@ -3,14 +3,14 @@ package org.gmock
 import static junit.framework.Assert.fail
 import org.gmock.internal.Expectation
 import org.gmock.internal.ExpectationCollection
-import org.gmock.internal.ReturnMethodRecorder
 import org.gmock.internal.ReturnValue
-import org.gmock.internal.StaticMethodRecoder
+import org.gmock.internal.recorder.PropertyRecorder
+import org.gmock.internal.recorder.ReturnMethodRecorder
+import org.gmock.internal.recorder.StaticMethodRecoder
 import org.gmock.internal.signature.ConstructorSignature
 import org.gmock.internal.signature.MethodSignature
-import org.gmock.internal.PropertyRecorder
-import org.gmock.internal.signature.PropertySetSignature
 import org.gmock.internal.signature.PropertyGetSignature
+import org.gmock.internal.signature.PropertySetSignature
 
 class Mock {
 
@@ -49,7 +49,6 @@ class Mock {
     }
 
     def propertyMissing(name, arg) {
-
         if (replay){
             def signature = arg ? new PropertySetSignature(name, arg) : new PropertyGetSignature(name)
             def expectation = expectations.findMatching(signature)
@@ -88,4 +87,3 @@ class Mock {
     }
 
 }
-
