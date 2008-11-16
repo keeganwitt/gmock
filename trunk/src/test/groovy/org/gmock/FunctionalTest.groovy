@@ -4,7 +4,7 @@ import junit.framework.AssertionFailedError
 
 class FunctionalTest extends GMockTestCase {
 
-    void testBasic(){
+    void testBasic() {
         def mockLoader = mock()
         mockLoader.load('key').returns('value')
         play {
@@ -13,7 +13,7 @@ class FunctionalTest extends GMockTestCase {
     }
 
 
-    void testCallMethodToManyTime(){
+    void testCallMethodToManyTime() {
         def mockLoader = mock()
         mockLoader.load('foo').returns('result1')
         mockLoader.load('bar').returns('result1')
@@ -26,17 +26,17 @@ class FunctionalTest extends GMockTestCase {
                 mockLoader.load("bar")
                 mockLoader.load("bar")
                 fail("Should have throw an exception")
-            } catch (AssertionFailedError e){
+            } catch (AssertionFailedError e) {
                 message = e.message
             }
         }
         def expected = "Unexpected method call 'load(\"bar\")'\n" +
-                       "  'load(\"foo\")': expected 1, actual 1\n" +
-                       "  'load(\"bar\")': expected 2, actual 2"
+                "  'load(\"foo\")': expected 1, actual 1\n" +
+                "  'load(\"bar\")': expected 2, actual 2"
         assertEquals expected, message
     }
 
-    void testMultipleArguments(){
+    void testMultipleArguments() {
         def mockLoader1 = mock()
         def mockLoader2 = mock()
         mockLoader1.put("1A", "1B").returns("result1")
@@ -48,6 +48,7 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
+
     void testMultipleArgumentsSameMock() {
         def mockLoader = mock()
         mockLoader.load("key1", "other1").returns("key1 other1")
@@ -58,14 +59,15 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
+
     void testMethodNotCall() {
         def mockLoader = mock()
         mockLoader.load("load1").returns("result")
         mockLoader.load("load2").returns("result")
         mockLoader.load("load2").returns("result")
         def expected = "Expectation not matched on verify:\n" +
-                       "  'load(\"load1\")': expected 1, actual 0\n" +
-                       "  'load(\"load2\")': expected 2, actual 0"
+                "  'load(\"load1\")': expected 1, actual 0\n" +
+                "  'load(\"load2\")': expected 2, actual 0"
 
         try {
             play {}
@@ -80,10 +82,13 @@ class FunctionalTest extends GMockTestCase {
         try {
             mockLoader._verify()
             fail("Should have throw an exception")
-        } catch (Throwable e) {}
+        } catch (Throwable e) {
+            assertEquals "Verify must be called on Mock after replay", e.message
+        }
     }
 
-    void testMultipleExpectation(){
+
+    void testMultipleExpectation() {
         def mockLoader = mock()
         mockLoader.load("key").returns("result")
         mockLoader.put("key")
@@ -93,19 +98,19 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
-    void testCallNotExpected(){
+    void testCallNotExpected() {
         def mockLoader = mock()
         play {
             try {
                 mockLoader.load("key")
                 fail("Should have throw an exception")
-            } catch (AssertionFailedError e){
+            } catch (AssertionFailedError e) {
                 assertEquals "Unexpected method call 'load(\"key\")'", e.message
             }
         }
     }
 
-    void testSameExpectation(){
+    void testSameExpectation() {
         def mockLoader = mock()
         mockLoader.load('key').returns('first')
         mockLoader.load('key').returns('second')
@@ -115,7 +120,7 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
-    void testStubMethod(){
+    void testStubMethod() {
         def mockLoader = mock()
         mockLoader.load("key").returns("stub").stub()
         play {
@@ -125,31 +130,31 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
-    void testStubedMethodNotCall(){
+    void testStubedMethodNotCall() {
         def mockLoader = mock()
         mockLoader.load("key").returns("stub").stub()
-        play{}
+        play {}
     }
 
-    void testRaiseException(){
+    void testRaiseException() {
         def mockLoader = mock()
         mockLoader.load("key").raises(new IllegalArgumentException())
         play {
-            shouldFail(IllegalArgumentException){
+            shouldFail(IllegalArgumentException) {
                 mockLoader.load("key")
             }
         }
     }
 
-    void testRaiseExceptionNotCalled(){
+    void testRaiseExceptionNotCalled() {
         def mockLoader = mock()
         mockLoader.load("key").raises(new IllegalArgumentException())
         def expected = "Expectation not matched on verify:\n" +
-                       "  'load(\"key\")': expected 1, actual 0"
+                "  'load(\"key\")': expected 1, actual 0"
 
         try {
             play {}
-        } catch (AssertionFailedError e){
+        } catch (AssertionFailedError e) {
             assertEquals expected, e.message
         }
     }
@@ -199,15 +204,16 @@ class FunctionalTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.load("key").raises(IllegalArgumentException)
         def expected = "Expectation not matched on verify:\n" +
-                       "  'load(\"key\")': expected 1, actual 0"
+                "  'load(\"key\")': expected 1, actual 0"
 
-        def message = shouldFail(AssertionFailedError) {
+        try {
             play {}
+        } catch (AssertionFailedError e) {
+            assertEquals expected, e.message
         }
-        assertEquals expected, message
     }
 
-    void testMultiplePlay(){
+    void testMultiplePlay() {
         def mockLoader = mock()
         mockLoader.load("key1").returns("value1")
         play {
@@ -224,3 +230,4 @@ class FunctionalTest extends GMockTestCase {
 
 
 }
+
