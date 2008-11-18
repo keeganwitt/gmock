@@ -11,7 +11,7 @@
   * Introduce GMockController (issue 5)
   * Refactor stub return (issue 11)
 
-== Version 0.3 ==
+== ~~Version 0.3~~ ==
 
   * Property mocking (issue 7)
   * Static method mocking (issue 8)
