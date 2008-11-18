@@ -83,6 +83,27 @@ play {
 }
 }}}
 
+== Mock property call ==
+
+Property call should be mock using the following syntax. For getter:
+{{{
+def loader = mock()
+loader.name.returns("a name")
+play {
+  assertEquals "a name", loader.name
+}
+}}}
+
+{{{
+def loader = mock()
+loader.name.sets("a different name")
+play {
+  loader.name = "a different name"
+}
+}}}
+ 
+
+
 == Mock static method call ==
 
 Mocking static method call is similar to standard method call, just add the static keyword:
