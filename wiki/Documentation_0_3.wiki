@@ -83,6 +83,20 @@ play {
 }
 }}}
 
+== Mock static method call ==
+
+Mocking static method call is similar to standard method call, just add the static keyword:
+{{{
+def mockMath = mock(Math)
+mockMath.static.random().returns(0.5)
+
+play {
+   assertEquals 0.5, Math.random()
+}
+}}}
+
+
+
 == Mock constructor call ==
 
 Constructor call are mocked using the following syntax:
