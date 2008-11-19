@@ -8,12 +8,12 @@ class PropertySetSignature {
 
     PropertySetSignature(propertyName, argument) {
         this.propertyName = propertyName
-        this.argument = argument
+        this.argument = new ParameterSignature([argument])
     }
 
 
     String toString() {
-        "${propertyName} = ${argument.inspect()}"
+        "${propertyName} = ${argument}"
     }
 
     boolean equals(Object setSignature) {

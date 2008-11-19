@@ -1,6 +1,7 @@
 package org.gmock
 
 import junit.framework.AssertionFailedError
+import static org.hamcrest.Matchers.*
 
 class FunctionalTest extends GMockTestCase {
 
@@ -11,7 +12,6 @@ class FunctionalTest extends GMockTestCase {
             assertEquals "value", mockLoader.load('key')
         }
     }
-
 
     void testCallMethodToManyTime() {
         def mockLoader = mock()
@@ -48,7 +48,6 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
-
     void testMultipleArgumentsSameMock() {
         def mockLoader = mock()
         mockLoader.load("key1", "other1").returns("key1 other1")
@@ -58,7 +57,6 @@ class FunctionalTest extends GMockTestCase {
             assertEquals "key2 other2", mockLoader.load("key2", "other2")
         }
     }
-
 
     void testMethodNotCall() {
         def mockLoader = mock()
@@ -86,7 +84,6 @@ class FunctionalTest extends GMockTestCase {
             assertEquals "Verify must be called on Mock after replay", e.message
         }
     }
-
 
     void testMultipleExpectation() {
         def mockLoader = mock()
@@ -228,6 +225,27 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
+    void testHamcrestMatcher() {
+        def mockLoader = mock()
+        mockLoader.put("test", is(not(lessThan(5)))).returns("correct")
+
+        play {
+            assertEquals "correct", mockLoader.put("test", 10)
+        }
+    }
+
+    void testHamcrestMatcherNotMatched() {
+        def mockLoader = mock()
+        mockLoader.load(is(not("test"))).returns("correct")
+        def expected = "Unexpected method call 'load(\"test\")'\n" +
+                       "  'load(is not \"test\")': expected 1, actual 0"
+
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                mockLoader.load("test")
+            }
+        }
+        assertEquals expected, message
+    }
 
 }
-

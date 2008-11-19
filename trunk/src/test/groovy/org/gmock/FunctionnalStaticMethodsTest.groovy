@@ -1,7 +1,7 @@
 package org.gmock
 
 import junit.framework.AssertionFailedError
-
+import static org.hamcrest.Matchers.*
 
 class FunctionnalStaticMethodsTest extends GMockTestCase {
 
@@ -86,4 +86,28 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
 
         play {}
     }
+
+    void testStaticMethodHamcrestMatcher() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.check(isIn(1..5), is("test")).returns("correct")
+
+        play {
+            assertEquals "correct", Loader.check(4, "test")
+        }
+    }
+
+    void testStaticMethodHamcrestMatcherNotMatched() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.check(isIn(1..5)).returns("correct")
+        def expected = "Unexpected static method call 'Loader.check(0)'\n" +
+                       "  'Loader.check(one of {<1>, <2>, <3>, <4>, <5>})': expected 1, actual 0"
+
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.check(0)
+            }
+        }
+        assertEquals expected, message
+    }
+
 }

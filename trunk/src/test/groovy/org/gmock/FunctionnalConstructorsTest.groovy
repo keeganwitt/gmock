@@ -1,6 +1,7 @@
 package org.gmock
 
 import junit.framework.AssertionFailedError
+import static org.hamcrest.Matchers.*
 
 class FunctionnalConstructorsTest extends GMockTestCase {
 
@@ -94,6 +95,27 @@ class FunctionnalConstructorsTest extends GMockTestCase {
             assertEquals expected, e.message
         }
 
+    }
+
+    void testConstructorHamcrestMatcher() {
+        def mockLoader = mock(Loader, constructor: [greaterThanOrEqualTo(5), "1"])
+
+        play {
+            assertSame mockLoader, new Loader(5, "1")
+        }
+    }
+
+    void testConstructorHamcrestMatcherNotMatched() {
+        def mockLoader = mock(Loader, constructor: [greaterThan(5), "2"])
+        def expected = "Unexpected constructor call 'new Loader(5, \"2\")'\n" +
+                       "  'new Loader(a value greater than <5>, \"2\")': expected 1, actual 0"
+
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                new Loader(5, "2")
+            }
+        }
+        assertEquals expected, message
     }
 
 }

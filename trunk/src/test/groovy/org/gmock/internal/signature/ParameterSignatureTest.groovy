@@ -1,5 +1,7 @@
 package org.gmock.internal.signature
 
+import static org.hamcrest.Matchers.*
+
 class ParameterSignatureTest extends GroovyTestCase {
 
     void testEquals(){
@@ -32,8 +34,18 @@ class ParameterSignatureTest extends GroovyTestCase {
     }
 
     void testToString() {
-        def signature = new ParameterSignature(["test", 3, true, [1, 2], [3, 4] as Object[], [a: "b", c: "d"], [], [:]])
-        assertEquals '"test", 3, true, [1, 2], [3, 4], ["a":"b", "c":"d"], [], [:]', signature.toString()
+        def signature = new ParameterSignature(["test", 3, true, [1, 2], [3, 4] as Object[], [a: "b", c: "d"], [], [:],
+                is(greaterThanOrEqualTo(3))])
+        assertEquals '"test", 3, true, [1, 2], [3, 4], ["a":"b", "c":"d"], [], [:], ' +
+                     'is a value greater than or equal to <3>',
+                signature.toString()
+    }
+
+    void testHamcrestMatcherEquals() {
+        def signature1 = new ParameterSignature([greaterThan(1), "test", is(not(10))])
+        def signature2 = new ParameterSignature([2, "test", 11])
+        assertEquals signature1, signature2
+        assertEquals signature2, signature1
     }
 
 }
