@@ -17,20 +17,17 @@ class ParameterSignature {
     boolean equals(Object signature) {
         if (signature == null || !(signature instanceof ParameterSignature)) return false
         if (arguments.size() != signature.arguments.size()) return false
-        if (arguments.any { isMatcher(it) }) {
-            return [arguments, signature.arguments].transpose().every { arg1, arg2 ->
-                isMatcher(arg1) ? arg1.matches(arg2) : arg1 == arg2
-            }
-        } else if (signature.arguments.any { isMatcher(it) }) {
-            return signature == this
-        } else {
-            return arguments == signature.arguments;
+
+        return [arguments, signature.arguments].transpose().every { arg1, arg2 ->
+            if (isMatcher(arg1)) return arg1.matches(arg2)
+            else if (isMatcher(arg2)) return arg2.matches(arg1)
+            else return arg1 == arg2
         }
     }
 
     private boolean isMatcher(object) {
         if (object == null) return false
-        
+
         // as the Hamcrest library is optional, it may be not present at runtime
         // so we cannot use "object instanceof org.hamcrest.Matcher" directly
         return object instanceof Matcher || isHamcrestMatcherClass(object.class)
