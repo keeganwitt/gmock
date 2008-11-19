@@ -1,6 +1,7 @@
 package org.gmock.internal.signature
 
 import static org.hamcrest.Matchers.*
+import static org.gmock.GMock.match
 
 class ParameterSignatureTest extends GroovyTestCase {
 
@@ -35,9 +36,9 @@ class ParameterSignatureTest extends GroovyTestCase {
 
     void testToString() {
         def signature = new ParameterSignature(["test", 3, true, [1, 2], [3, 4] as Object[], [a: "b", c: "d"], [], [:],
-                is(greaterThanOrEqualTo(3))])
+                is(greaterThanOrEqualTo(3)), match { it > 3 }])
         assertEquals '"test", 3, true, [1, 2], [3, 4], ["a":"b", "c":"d"], [], [:], ' +
-                     'is a value greater than or equal to <3>',
+                     'is a value greater than or equal to <3>, a value matching the closure matcher',
                 signature.toString()
     }
 
@@ -46,6 +47,27 @@ class ParameterSignatureTest extends GroovyTestCase {
         def signature2 = new ParameterSignature([2, "test", 11])
         assertEquals signature1, signature2
         assertEquals signature2, signature1
+    }
+
+    void testHamcrestMatcherNotEquals() {
+        def signature1 = new ParameterSignature([1, lessThan(1), 3])
+        def signature2 = new ParameterSignature([1, 2, 3])
+        assert signature1 != signature2
+        assert signature2 != signature1
+    }
+
+    void testClosureMatcherEquals() {
+        def signature1 = new ParameterSignature([1, match { it > 1 }, 3])
+        def signature2 = new ParameterSignature([1, 2, 3])
+        assertEquals signature1, signature2
+        assertEquals signature2, signature1
+    }
+
+    void testClosureMatcherNotEquals() {
+        def signature1 = new ParameterSignature([match { it != "test" }, "correct"])
+        def signature2 = new ParameterSignature(["test", "correct"])
+        assert signature1 != signature2
+        assert signature2 != signature1
     }
 
 }

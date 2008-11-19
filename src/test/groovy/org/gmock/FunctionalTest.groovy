@@ -248,4 +248,27 @@ class FunctionalTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testClosureMatcher() {
+        def mockLoader = mock()
+        mockLoader.put("test", match { it > 5 }).returns("correct")
+
+        play {
+            assertEquals "correct", mockLoader.put("test", 10)
+        }
+    }
+
+    void testClosureMatcherNotMatched() {
+        def mockLoader = mock()
+        mockLoader.load(match { it != "test" }).returns("correct")
+        def expected = "Unexpected method call 'load(\"test\")'\n" + 
+                       "  'load(a value matching the closure matcher)': expected 1, actual 0"
+
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                mockLoader.load("test")
+            }
+        }
+        assertEquals expected, message
+    }
+
 }
