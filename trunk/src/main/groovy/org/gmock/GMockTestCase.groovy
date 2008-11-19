@@ -8,4 +8,6 @@ abstract class GMockTestCase extends GroovyTestCase {
 
     def play = gMockController.&play
 
+    def match = GMock.&match
+
 }

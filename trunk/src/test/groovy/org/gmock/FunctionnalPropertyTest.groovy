@@ -202,4 +202,29 @@ class FunctionnalPropertyTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testSetPropertyClosureMatcher() {
+        def mockLoader = mock()
+        mockLoader.test.sets(match { it != "wrong" })
+
+        play {
+            mockLoader.test = "correct"
+            return null // prevent the getter of name from being invoked for evaluating the result of closure
+        }
+    }
+
+    void testSetPropertyClosureMatcherNotMatched() {
+        def mockLoader = mock()
+        mockLoader.test.sets(match { it in [1, 2, 3] })
+        def expected = "Unexpected property call 'test'\n" +
+                       "  'test = a value matching the closure matcher': expected 1, actual 0"
+
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                mockLoader.test = 0
+                return null // prevent the getter of name from being invoked for evaluating the result of closure
+            }
+        }
+        assertEquals expected, message
+    }
+
 }

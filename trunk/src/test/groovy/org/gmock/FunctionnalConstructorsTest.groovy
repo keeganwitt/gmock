@@ -106,9 +106,30 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testConstructorHamcrestMatcherNotMatched() {
-        def mockLoader = mock(Loader, constructor: [greaterThan(5), "2"])
+        mock(Loader, constructor: [greaterThan(5), "2"])
         def expected = "Unexpected constructor call 'new Loader(5, \"2\")'\n" +
                        "  'new Loader(a value greater than <5>, \"2\")': expected 1, actual 0"
+
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                new Loader(5, "2")
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testConstructorClosureMatcher() {
+        def mockLoader = mock(Loader, constructor: [match { it >= 5 }, "1"])
+
+        play {
+            assertSame mockLoader, new Loader(5, "1")
+        }
+    }
+
+    void testConstructorClosureMatcherNotMatched() {
+        mock(Loader, constructor: [match { it > 5 }, "2"])
+        def expected = "Unexpected constructor call 'new Loader(5, \"2\")'\n" +
+                       "  'new Loader(a value matching the closure matcher, \"2\")': expected 1, actual 0"
 
         def message = shouldFail(AssertionFailedError) {
             play {

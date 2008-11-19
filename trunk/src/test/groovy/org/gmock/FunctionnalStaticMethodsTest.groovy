@@ -110,4 +110,27 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testStaticMethodClosureMatcher() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.check(match { it in 1..5 }, match { it == "test" }).returns("correct")
+
+        play {
+            assertEquals "correct", Loader.check(4, "test")
+        }
+    }
+
+    void testStaticMethodClosureMatcherNotMatched() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.check(match { it in 1..5 }).returns("correct")
+        def expected = "Unexpected static method call 'Loader.check(0)'\n" +
+                       "  'Loader.check(a value matching the closure matcher)': expected 1, actual 0"
+
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.check(0)
+            }
+        }
+        assertEquals expected, message
+    }
+
 }

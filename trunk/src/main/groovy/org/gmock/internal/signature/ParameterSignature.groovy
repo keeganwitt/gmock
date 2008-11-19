@@ -1,5 +1,7 @@
 package org.gmock.internal.signature
 
+import org.gmock.Matcher
+
 class ParameterSignature {
 
     def arguments
@@ -27,9 +29,11 @@ class ParameterSignature {
     }
 
     private boolean isMatcher(object) {
+        if (object == null) return false
+        
         // as the Hamcrest library is optional, it may be not present at runtime
         // so we cannot use "object instanceof org.hamcrest.Matcher" directly
-        return isHamcrestMatcherClass(object.class)
+        return object instanceof Matcher || isHamcrestMatcherClass(object.class)
     }
 
     private boolean isHamcrestMatcherClass(Class clazz) {

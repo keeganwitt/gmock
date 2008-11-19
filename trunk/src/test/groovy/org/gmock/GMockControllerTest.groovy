@@ -1,6 +1,7 @@
 package org.gmock
 
 import junit.framework.AssertionFailedError
+import static org.gmock.GMock.match
 
 class GMockControllerTest extends GroovyTestCase {
 
@@ -50,6 +51,16 @@ class GMockControllerTest extends GroovyTestCase {
             assertTrue Loader.initialise()
         }
 
+    }
+
+    void testMockUsingClosureMatcher() {
+        def gmc = new GMockController()
+        def mockLoader = gmc.mock()
+        mockLoader.load(match { it > 5 }).returns('correct')
+
+        gmc.play {
+            assertEquals "correct", mockLoader.load(8)
+        }
     }
 
 }
