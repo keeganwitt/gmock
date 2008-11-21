@@ -48,16 +48,16 @@ class Mock {
         }
     }
 
-    def propertyMissing(name, arg) {
+    def propertyMissing(String name) {
         if (replay){
-            def signature = arg ? new PropertySetSignature(name, arg) : new PropertyGetSignature(name)
+            def signature = new PropertyGetSignature(name)
             def expectation = expectations.findMatching(signature)
             if (expectation){
                 return expectation.doReturn()
             } else {
                 def callState = expectations.callState().toString()
                 if (callState){ callState = "\n$callState" }
-                fail("Unexpected property call '${signature}'$callState")
+                fail("Unexpected property getter call '${signature}'$callState")
             }
             return result
         } else {
@@ -70,6 +70,25 @@ class Mock {
                 expectations.add( expectation )
                 return new PropertyRecorder(name, expectation)
             }
+        }
+    }
+
+    def propertyMissing(String name, arg) {
+        if (replay){
+            def signature = new PropertySetSignature(name, arg)
+            def expectation = expectations.findMatching(signature)
+            if (expectation){
+                return expectation.doReturn()
+            } else {
+                def callState = expectations.callState().toString()
+                if (callState){ callState = "\n$callState" }
+                fail("Unexpected property setter call '${signature}'$callState")
+            }
+            return result
+        } else {
+            def expectation = new Expectation()
+            expectations.add( expectation )
+            return new PropertyRecorder(name, expectation)
         }
     }
 
