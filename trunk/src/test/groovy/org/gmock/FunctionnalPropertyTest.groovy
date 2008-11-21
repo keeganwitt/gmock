@@ -48,7 +48,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
             }
             fail("Should throw an exception")
         } catch (AssertionFailedError e){
-            def expected = "Unexpected property call 'unexpected = 10'\n"+
+            def expected = "Unexpected property setter call 'unexpected = 10'\n"+
                            "  'name': expected 1, actual 1\n"+
                            "  'id = \"some id\"': expected 1, actual 0\n"+
                            "  'load(\"fruit\")': expected 1, actual 0"
@@ -190,7 +190,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
     void testSetPropertyHamcrestMatcherNotMatched() {
         def mockLoader = mock()
         mockLoader.test.sets(isOneOf(1, 2, 3))
-        def expected = "Unexpected property call 'test'\n" +
+        def expected = "Unexpected property setter call 'test = 0'\n" +
                        "  'test = one of {<1>, <2>, <3>}': expected 1, actual 0"
 
         def message = shouldFail(AssertionFailedError) {
@@ -215,7 +215,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
     void testSetPropertyClosureMatcherNotMatched() {
         def mockLoader = mock()
         mockLoader.test.sets(match { it in [1, 2, 3] })
-        def expected = "Unexpected property call 'test'\n" +
+        def expected = "Unexpected property setter call 'test = 0'\n" +
                        "  'test = a value matching the closure matcher': expected 1, actual 0"
 
         def message = shouldFail(AssertionFailedError) {
@@ -225,6 +225,16 @@ class FunctionnalPropertyTest extends GMockTestCase {
             }
         }
         assertEquals expected, message
+    }
+
+    void testSetPropertyToNull() {
+        def mockLoader = mock()
+        mockLoader.test.sets(null)
+
+        play {
+            mockLoader.test = null
+            return null // prevent the getter of name from being invoked for evaluating the result of closure
+        }
     }
 
 }
