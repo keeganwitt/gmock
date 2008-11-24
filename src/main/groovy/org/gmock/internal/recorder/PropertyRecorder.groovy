@@ -6,14 +6,13 @@ import org.gmock.internal.ReturnValue
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
 
-class PropertyRecorder {
+class PropertyRecorder extends BaseRecorder {
 
     def propertyName
-    def expectation
 
-    PropertyRecorder(propertyName, expectation){
+    PropertyRecorder(propertyName, expectation) {
+        super(expectation)
         this.propertyName = propertyName
-        this.expectation = expectation
     }
 
     def sets(value) {
@@ -42,11 +41,6 @@ class PropertyRecorder {
 
     def raises(Class exceptionClass, Object[] params) {
         return doRaises(exceptionClass, *params)
-    }
-
-    def stub() {
-        expectation.stubed = true
-        return this
     }
 
 }

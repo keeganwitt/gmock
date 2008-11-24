@@ -24,8 +24,9 @@ class Mock {
         this.classExpectations = classExpectations
         if (aClass && constraints.constructor != null){
             def signature = new ConstructorSignature(aClass, constraints.constructor)
-            def expectation = new Expectation(signature, new ReturnValue(this))
+            def expectation = new Expectation(returnValue: new ReturnValue(this))
             classExpectations.addConstructorExpectation(aClass, expectation)
+            expectation.signature = signature
         }
     }
 
@@ -42,7 +43,7 @@ class Mock {
             }
             return result
         } else {
-            def expectation = new Expectation(signature)
+            def expectation = new Expectation(expectations: expectations, signature: signature)
             expectations.add( expectation )
             return new ReturnMethodRecorder(expectation)
         }
@@ -66,7 +67,7 @@ class Mock {
                 classExpectations.addStaticExpectation(aClass, expectation)
                 return new StaticMethodRecoder(aClass, expectation)
             } else {
-                def expectation = new Expectation()
+                def expectation = new Expectation(expectations: expectations)
                 expectations.add( expectation )
                 return new PropertyRecorder(name, expectation)
             }
@@ -86,7 +87,7 @@ class Mock {
             }
             return result
         } else {
-            def expectation = new Expectation()
+            def expectation = new Expectation(expectations: expectations)
             expectations.add( expectation )
             return new PropertyRecorder(name, expectation)
         }

@@ -3,12 +3,10 @@ package org.gmock.internal.recorder
 import org.gmock.internal.ReturnRaiseException
 import org.gmock.internal.ReturnValue
 
-class ReturnMethodRecorder {
-
-    def expectation
+class ReturnMethodRecorder extends BaseRecorder {
 
     ReturnMethodRecorder(expectation){
-        this.expectation = expectation
+        super(expectation)
     }
 
     def returns(returnValue){
@@ -24,10 +22,6 @@ class ReturnMethodRecorder {
     def raises(Class exceptionClass, Object[] params) {
         expectation.returnValue = new ReturnRaiseException(exceptionClass, params)
         return this
-    }
-
-    def stub(){
-        expectation.stubed = true
     }
 
 }

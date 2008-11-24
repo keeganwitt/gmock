@@ -18,7 +18,6 @@ class ClassProxy extends ProxyMetaClass {
         super(metaClassRegistry, aClass, adaptee)
     }
 
-
     static getInstance(theClass){
         MetaClassRegistry metaRegistry = GroovySystem.getMetaClassRegistry();
         MetaClass meta = metaRegistry.getMetaClass(theClass);
@@ -37,6 +36,11 @@ class ClassProxy extends ProxyMetaClass {
     def verify(){
         constructorExpectations.verify()
         staticExpectations.verify()
+    }
+
+    def reset() {
+        constructorExpectations = new ExpectationCollection()
+        staticExpectations = new ExpectationCollection()
     }
 
     public Object invokeConstructor(Object[] arguments) {

@@ -1,6 +1,7 @@
 package org.gmock.internal
 
 import static junit.framework.Assert.*
+import org.gmock.internal.times.StrictTimes
 
 class ExpectationCollection {
 
@@ -32,6 +33,14 @@ class ExpectationCollection {
         expectations.size() == 0
     }
 
-
+    void checkTimes(expectation) {
+        def last = expectations.reverse().find {
+            !it.is(expectation) && it.signature == expectation.signature
+        }
+        if (last != null && !(last.times instanceof StrictTimes)) {
+            expectations.remove(expectation)
+            throw new IllegalStateException("last method called on mock already has a non-fixed count set.")
+        }
+    }
 
 }
