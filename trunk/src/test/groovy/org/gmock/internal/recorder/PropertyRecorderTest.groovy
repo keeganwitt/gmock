@@ -7,13 +7,17 @@ import org.gmock.internal.ReturnRaiseException
 import org.gmock.internal.ReturnValue
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
+import org.gmock.internal.times.AnyTimes
 
 class PropertyRecorderTest extends GMockTestCase {
 
     void testRecordGetProperty(){
         def getSignature = mock(PropertyGetSignature, constructor: ["name"])
 
-        def expectation = new Expectation()
+        def mockExpectations = mock()
+        def expectation = new Expectation(expectations: mockExpectations)
+        mockExpectations.checkTimes(expectation)
+
         PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
 
         play {
@@ -28,7 +32,10 @@ class PropertyRecorderTest extends GMockTestCase {
     void testRecordSetProperty(){
         def setSignature = mock(PropertySetSignature, constructor: ["name", "a value"])
 
-        def expectation = new Expectation()
+        def mockExpectations = mock()
+        def expectation = new Expectation(expectations: mockExpectations)
+        mockExpectations.checkTimes(expectation)
+
         PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
 
         play {
@@ -43,7 +50,7 @@ class PropertyRecorderTest extends GMockTestCase {
         def expectation = mock()
         PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
 
-        expectation.stubed.sets(true)
+        expectation.times.sets(match { it instanceof AnyTimes })
 
         play {
             propertyRecorder.stub()
@@ -51,7 +58,10 @@ class PropertyRecorderTest extends GMockTestCase {
     }
 
     void testRaisesException(){
-        def expectation = new Expectation()
+        def mockExpectations = mock()
+        def expectation = new Expectation(expectations: mockExpectations)
+        mockExpectations.checkTimes(expectation)
+
         PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
         def exception = new RuntimeException()
 
@@ -63,7 +73,10 @@ class PropertyRecorderTest extends GMockTestCase {
     }
 
     void testRaisesExceptionClass() {
-        def expectation = new Expectation()
+        def mockExpectations = mock()
+        def expectation = new Expectation(expectations: mockExpectations)
+        mockExpectations.checkTimes(expectation)
+
         PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
         def cause = new RuntimeException()
 

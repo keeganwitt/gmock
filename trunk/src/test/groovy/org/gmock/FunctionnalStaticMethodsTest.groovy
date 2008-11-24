@@ -133,4 +133,197 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testStub() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().stub()
+        play {}
+
+        mockLoader.static.one().returns(4).stub()
+        play {
+            5.times {
+                assertEquals 4, Loader.one()
+            }
+        }
+    }
+
+    void testRangeTimes() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().times(1..2)
+        play {
+            Loader.one()
+        }
+
+        mockLoader.static.one().times(1..2)
+        play {
+            2.times { Loader.one() }
+        }
+    }
+
+    void testRangeTimesTooMany() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().times(1..2)
+        def expected = "Unexpected static method call 'Loader.one()'\n" +
+                       "  'Loader.one()': expected 1..2, actual 2"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                3.times { Loader.one() }
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testStrictTimes() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().times(2)
+        play {
+            2.times { Loader.one() }
+        }
+    }
+
+    void testStrictTimesTooMany() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().times(2)
+        def expected = "Unexpected static method call 'Loader.one()'\n" +
+                       "  'Loader.one()': expected 2, actual 2"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                3.times { Loader.one() }
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testNever() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().never()
+        play {}
+    }
+
+    void testNeverTooMany() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().never()
+        def expected = "Unexpected static method call 'Loader.one()'\n" +
+                       "  'Loader.one()': expected never, actual 0"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                Loader.one()
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testOnce() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().once()
+        play {
+            Loader.one()
+        }
+    }
+
+    void testAtLeast() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().atLeast(2)
+        play {
+            2.times { Loader.one() }
+        }
+
+        mockLoader.static.one().atLeast(2)
+        play {
+            3.times { Loader.one() }
+        }
+    }
+
+    void testAtLeastTooFew() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().atLeast(2)
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'Loader.one()': expected at least 2, actual 1"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.one()
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testAtLeastOnce() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().atLeastOnce()
+        play {
+            Loader.one()
+        }
+    }
+
+    void testAtMost() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().atMost(2)
+        play {
+            Loader.one()
+        }
+
+        mockLoader.static.one().atMost(2)
+        play {
+            2.times { Loader.one() }
+        }
+    }
+
+    void testAtMostTooMany() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().atMost(2)
+        def expected = "Unexpected static method call 'Loader.one()'\n" +
+                       "  'Loader.one()': expected at most 2, actual 2"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                3.times { Loader.one() }
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testAtMostOnce() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().atMostOnce()
+        play {
+            Loader.one()
+        }
+    }
+
+    void testNonfixedTimesAfterFixedTimes() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().times(2)
+        mockLoader.static.one().once()
+        mockLoader.static.one().times(1..2)
+        play {
+            4.times { Loader.one() }
+        }
+    }
+
+    void testNonfixedTimesAfterFixedTimesFailed() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().times(2)
+        mockLoader.static.one().once()
+        mockLoader.static.one().times(1..2)
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'Loader.one()': expected 4..5, actual 3"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                3.times { Loader.one() }
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testAnythingAfterNonfixedTimes() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one().times(2)
+        mockLoader.static.one().atLeast(3)
+
+        shouldFail(IllegalStateException) {
+            mockLoader.static.one().once()
+        }
+        shouldFail(IllegalStateException) {
+            mockLoader.static.one().atMostOnce()
+        }
+    }
+
 }

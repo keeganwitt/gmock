@@ -21,30 +21,21 @@ class CallState {
 class MethodState {
 
     def methodSignature
-    def expected = 0
+    def expected = null
     def called = 0
-    def stubed = false
 
     MethodState(methodSignature){
         this.methodSignature = methodSignature
     }
 
     def merge(expectation){
-        expected ++
-        if (expectation.called){
-            called ++
-        }
-        if (expectation.stubed){
-            stubed = true
-        }
+        expected = expected ? expectation.times.merge(expected) : expectation.times
+        called += expectation.called
     }
 
     String toString(){
-        def stubbedStatement = ""
-        if (stubed){
-            stubbedStatement = ", and stubbed"
-        }
-        "  '${methodSignature}': expected $expected, actual $called$stubbedStatement"
+        "  '${methodSignature}': expected $expected, actual $called"
+        // TODO: we should improve this message, the actual called count may be one less sometimes
     }
 
 }

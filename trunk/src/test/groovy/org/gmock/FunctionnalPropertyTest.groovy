@@ -183,7 +183,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
         play {
             mockLoader.test = "correct"
-            return null // prevent the getter of name from being invoked for evaluating the result of closure
+            return null // prevent the getter of test from being invoked for evaluating the result of closure
         }
     }
 
@@ -196,7 +196,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def message = shouldFail(AssertionFailedError) {
             play {
                 mockLoader.test = 0
-                return null // prevent the getter of name from being invoked for evaluating the result of closure
+                return null // prevent the getter of test from being invoked for evaluating the result of closure
             }
         }
         assertEquals expected, message
@@ -208,7 +208,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
         play {
             mockLoader.test = "correct"
-            return null // prevent the getter of name from being invoked for evaluating the result of closure
+            return null // prevent the getter of test from being invoked for evaluating the result of closure
         }
     }
 
@@ -221,7 +221,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def message = shouldFail(AssertionFailedError) {
             play {
                 mockLoader.test = 0
-                return null // prevent the getter of name from being invoked for evaluating the result of closure
+                return null // prevent the getter of test from being invoked for evaluating the result of closure
             }
         }
         assertEquals expected, message
@@ -233,7 +233,195 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
         play {
             mockLoader.test = null
-            return null // prevent the getter of name from being invoked for evaluating the result of closure
+            return null // prevent the getter of test from being invoked for evaluating the result of closure
+        }
+    }
+
+    void testRangeTimes() {
+        def mockLoader = mock()
+        mockLoader.id.returns(1).times(1..2)
+        play {
+            assertEquals 1, mockLoader.id
+        }
+
+        mockLoader.id.returns(2).times(1..2)
+        play {
+            2.times {
+                assertEquals 2, mockLoader.id
+            }
+        }
+    }
+
+    void testRangeTimesTooMany() {
+        def mockLoader = mock()
+        mockLoader.id.returns(3).times(1..2)
+        def expected = "Unexpected property getter call 'id'\n" +
+                       "  'id': expected 1..2, actual 2"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                3.times {
+                    assertEquals 3, mockLoader.id
+                }
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testStrictTimes() {
+        def mockLoader = mock()
+        mockLoader.id.sets(4).times(2)
+        mockLoader.id.returns(5).once()
+
+        play {
+            mockLoader.id = 4
+            mockLoader.id = 4
+            assertEquals 5, mockLoader.id
+        }
+    }
+
+    void testStrictTimesTooMany() {
+        def mockLoader = mock()
+        mockLoader.id.sets(6).times(2)
+        def expected = "Unexpected property setter call 'id = 6'\n" +
+                       "  'id = 6': expected 2, actual 2"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                3.times {
+                    mockLoader.id = 6
+                    return null
+                }
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testNever() {
+        def mockLoader = mock()
+        mockLoader.id.sets(7).never()
+        play {}
+    }
+
+    void testNeverTooMany() {
+        def mockLoader = mock()
+        mockLoader.id.sets(8).never()
+        def expected = "Unexpected property setter call 'id = 8'\n" +
+                       "  'id = 8': expected never, actual 0"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                mockLoader.id = 8
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testAtLeast() {
+        def mockLoader = mock()
+        mockLoader.id.sets(9).atLeast(2)
+        mockLoader.id.returns(10).atLeastOnce()
+
+        play {
+            mockLoader.id = 9
+            mockLoader.id = 9
+            assertEquals 10, mockLoader.id
+        }
+    }
+
+    void testAtLeastTooFew() {
+        def mockLoader = mock()
+        mockLoader.id.sets(11).atLeastOnce()
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'id = 11': expected at least 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
+    void testAtMost() {
+        def mockLoader = mock()
+        mockLoader.id.sets(12).atMost(2)
+        mockLoader.id.returns(13).atMostOnce()
+
+        play {
+            mockLoader.id = 12
+            mockLoader.id = 12
+            assertEquals 13, mockLoader.id
+        }
+    }
+
+    void testAtMostTooMany() {
+        def mockLoader = mock()
+        mockLoader.id.returns(14).atMost(2)
+        def expected = "Unexpected property getter call 'id'\n" +
+                       "  'id': expected at most 2, actual 2"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                3.times {
+                    assertEquals 14, mockLoader.id
+                }
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testNonfixedTimesAfterFixedTimes() {
+        def mockLoader = mock()
+        mockLoader.id.sets(15).once()
+        mockLoader.id.sets(15).times(2)
+        mockLoader.id.returns(16).times(3)
+        mockLoader.id.sets(15).atMost(3)
+        mockLoader.id.returns(16).never()
+
+        play {
+            4.times {
+                mockLoader.id = 15
+                return null
+            }
+            3.times {
+                assertEquals 16, mockLoader.id
+            }
+        }
+    }
+
+    void testNonfixedTimesAfterFixedTimesFailed() {
+        def mockLoader = mock()
+        mockLoader.id.sets(15).once()
+        mockLoader.id.sets(15).times(2)
+        mockLoader.id.returns(16).times(3)
+        mockLoader.id.sets(15).atMost(3)
+        mockLoader.id.returns(16).never()
+
+        def expected = "Unexpected property getter call 'id'\n" +
+                       "  'id = 15': expected at most 6, actual 4\n" +
+                       "  'id': expected 3, actual 3"
+        play {
+            4.times {
+                mockLoader.id = 15
+                return null
+            }
+            3.times {
+                assertEquals 16, mockLoader.id
+            }
+            def message = shouldFail(AssertionFailedError) {
+                assertEquals 16, mockLoader.id
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testAnythingAfterNonfixedTimes() {
+        def mockLoader = mock()
+        mockLoader.id.sets(15).once()
+        mockLoader.id.sets(15).times(2)
+        mockLoader.id.returns(16).times(3)
+        mockLoader.id.sets(15).atLeastOnce()
+        mockLoader.id.returns(16).times(1..2)
+
+        shouldFail(IllegalStateException) {
+            mockLoader.id.sets(15)
+        }
+        shouldFail(IllegalStateException) {
+            mockLoader.id.returns(16).never()
         }
     }
 

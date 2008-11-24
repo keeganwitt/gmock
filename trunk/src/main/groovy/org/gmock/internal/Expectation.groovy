@@ -1,35 +1,35 @@
 package org.gmock.internal
 
+import org.gmock.internal.times.StrictTimes
+
 class Expectation {
 
+    def expectations
     def signature
     def returnValue = new ReturnNull()
-    def called = false
-    def stubed = false
+    def times = new StrictTimes(1)
+    def called = 0
 
-    Expectation(signature = null, returnValue = new ReturnNull()){
+    void setSignature(signature) {
         this.signature = signature
-        this.returnValue = returnValue
+        expectations.checkTimes(this)
     }
 
-    boolean canCall(methodSignature){
-        if (called) return false
-        def result = this.signature == methodSignature
-        return result
+    boolean canCall(methodSignature) {
+        return times.stillRemain(called) && signature == methodSignature
     }
 
-
-    def doReturn(){
-        if (!stubed) called = true
+    def doReturn() {
+        ++called
         return returnValue.doReturn()
     }
 
-    def isVerified(){
-        return stubed || called || !signature
+    def isVerified() {
+        return !signature || called in times
     }
 
-    String toString(){
-        return "Expectation [signature: $signature, return: $returnValue]"
+    String toString() {
+        return "Expectation [signature: $signature, return: $returnValue, times: $times]"
     }
 
 }

@@ -13,7 +13,7 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
-    void testCallMethodToManyTime() {
+    void testCallMethodTooManyTime() {
         def mockLoader = mock()
         mockLoader.load('foo').returns('result1')
         mockLoader.load('bar').returns('result1')
@@ -31,8 +31,8 @@ class FunctionalTest extends GMockTestCase {
             }
         }
         def expected = "Unexpected method call 'load(\"bar\")'\n" +
-                "  'load(\"foo\")': expected 1, actual 1\n" +
-                "  'load(\"bar\")': expected 2, actual 2"
+                       "  'load(\"foo\")': expected 1, actual 1\n" +
+                       "  'load(\"bar\")': expected 2, actual 2"
         assertEquals expected, message
     }
 
@@ -64,8 +64,8 @@ class FunctionalTest extends GMockTestCase {
         mockLoader.load("load2").returns("result")
         mockLoader.load("load2").returns("result")
         def expected = "Expectation not matched on verify:\n" +
-                "  'load(\"load1\")': expected 1, actual 0\n" +
-                "  'load(\"load2\")': expected 2, actual 0"
+                       "  'load(\"load1\")': expected 1, actual 0\n" +
+                       "  'load(\"load2\")': expected 2, actual 0"
 
         try {
             play {}
@@ -147,7 +147,7 @@ class FunctionalTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.load("key").raises(new IllegalArgumentException())
         def expected = "Expectation not matched on verify:\n" +
-                "  'load(\"key\")': expected 1, actual 0"
+                       "  'load(\"key\")': expected 1, actual 0"
 
         try {
             play {}
@@ -201,7 +201,7 @@ class FunctionalTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.load("key").raises(IllegalArgumentException)
         def expected = "Expectation not matched on verify:\n" +
-                "  'load(\"key\")': expected 1, actual 0"
+                       "  'load(\"key\")': expected 1, actual 0"
 
         try {
             play {}
@@ -260,7 +260,7 @@ class FunctionalTest extends GMockTestCase {
     void testClosureMatcherNotMatched() {
         def mockLoader = mock()
         mockLoader.load(match { it != "test" }).returns("correct")
-        def expected = "Unexpected method call 'load(\"test\")'\n" + 
+        def expected = "Unexpected method call 'load(\"test\")'\n" +
                        "  'load(a value matching the closure matcher)': expected 1, actual 0"
 
         def message = shouldFail(AssertionFailedError) {
@@ -269,6 +269,263 @@ class FunctionalTest extends GMockTestCase {
             }
         }
         assertEquals expected, message
+    }
+
+    void testRangeTimes() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).times(1..2)
+        play {
+            assertEquals 2, mockLoader.load(1)
+        }
+
+        mockLoader.load(1).returns(2).times(1..2)
+        play {
+            2.times {
+                assertEquals 2, mockLoader.load(1)
+            }
+        }
+    }
+
+    void testRangeTimesTooFew() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).times(1..2)
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'load(1)': expected 1..2, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
+    void testRangeTimesTooMany() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).times(1..2)
+        def expected = "Unexpected method call 'load(1)'\n" +
+                       "  'load(1)': expected 1..2, actual 2"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                3.times { mockLoader.load(1) }
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testStrictTimes() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).times(2)
+
+        play {
+            2.times {
+                assertEquals 2, mockLoader.load(1)
+            }
+        }
+    }
+
+    void testStrictTimesTooFew() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).times(2)
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'load(1)': expected 2, actual 1"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                assertEquals 2, mockLoader.load(1)
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testStrictTimesTooMany() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).times(2)
+        def expected = "Unexpected method call 'load(1)'\n" +
+                       "  'load(1)': expected 2, actual 2"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                3.times { mockLoader.load(1) }
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testNever() {
+        def mockLoader = mock()
+        mockLoader.load(1).never()
+        play {}
+    }
+
+    void testNeverTooMany() {
+        def mockLoader = mock()
+        mockLoader.load(1).never()
+        def expected = "Unexpected method call 'load(1)'\n" +
+                       "  'load(1)': expected never, actual 0"
+        play {
+            def message = shouldFail(AssertionFailedError) {
+                mockLoader.load(1)
+            }
+            assertEquals expected, message
+        }
+    }
+
+    void testOnce() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).once()
+        play {
+            assertEquals 2, mockLoader.load(1)
+        }
+    }
+
+    void testAtLeast() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).atLeast(2)
+        play {
+            2.times {
+                assertEquals 2, mockLoader.load(1)
+            }
+        }
+
+        mockLoader.load(1).returns(3).atLeast(2)
+        play {
+            3.times {
+                assertEquals 3, mockLoader.load(1)
+            }
+        }
+    }
+
+    void testAtLeastTooFew() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).atLeast(2)
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'load(1)': expected at least 2, actual 1"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                assertEquals 2, mockLoader.load(1)
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testAtLeastOnce() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).atLeastOnce()
+        play {
+            assertEquals 2, mockLoader.load(1)
+        }
+
+        mockLoader.load(2).returns(3).atLeastOnce()
+        play {
+            2.times {
+                assertEquals 3, mockLoader.load(2)
+            }
+        }
+    }
+
+    void testAtMost() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).atMost(3)
+        play {
+            2.times {
+                assertEquals 2, mockLoader.load(1)
+            }
+        }
+
+        mockLoader.load(2).returns(3).atMost(3)
+        play {
+            3.times {
+                assertEquals 3, mockLoader.load(2)
+            }
+        }
+    }
+
+    void testAtMostTooMany() {
+        def mockLoader = mock()
+        mockLoader.load(3).returns(4).atMost(2)
+        def expected = "Unexpected method call 'load(3)'\n" +
+                       "  'load(3)': expected at most 2, actual 2"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                3.times { mockLoader.load(3) }
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testAtMostOnce() {
+        def mockLoader = mock()
+        mockLoader.load(5).returns(5).atMostOnce()
+        play {}
+
+        mockLoader.load(5).returns(5).atMostOnce()
+        play {
+            assertEquals 5, mockLoader.load(5)
+        }
+    }
+
+    void testNonfixedTimesAfterFixedTimes() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).times(3)
+        mockLoader.put(9, 9).times(1)
+        mockLoader.load(1).returns(3).times(2)
+        mockLoader.load(1).returns(4).atMost(2)
+        mockLoader.put(9, 9).times(1..2)
+
+        play {
+            3.times {
+                assertEquals 2, mockLoader.load(1)
+            }
+            2.times {
+                assertEquals 3, mockLoader.load(1)
+            }
+            assertEquals 4, mockLoader.load(1)
+
+            2.times {
+                mockLoader.put(9, 9)
+            }
+        }
+    }
+
+    void testNonfixedTimesAfterFixedTimesFailed() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).times(3)
+        mockLoader.put(9, 9).times(1)
+        mockLoader.load(1).returns(3).times(2)
+        mockLoader.load(1).returns(4).atLeast(2)
+        mockLoader.put(9, 9).times(1..2)
+
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'load(1)': expected at least 7, actual 6\n" +
+                       "  'put(9, 9)': expected 2..3, actual 2"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                3.times {
+                    assertEquals 2, mockLoader.load(1)
+                }
+                2.times {
+                    assertEquals 3, mockLoader.load(1)
+                }
+                assertEquals 4, mockLoader.load(1)
+
+                2.times {
+                    mockLoader.put(9, 9)
+                }
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testAnythingAfterNonfixedTimes() {
+        def mockLoader = mock()
+        mockLoader.load(1).returns(2).times(3)
+        mockLoader.put(9, 9).times(1)
+        mockLoader.load(1).returns(3).times(2)
+        mockLoader.load(1).returns(4).stub()
+        mockLoader.put(9, 9).never()
+
+        shouldFail(IllegalStateException) {
+            mockLoader.load(1).returns(5).times(2)
+        }
+        shouldFail(IllegalStateException) {
+            mockLoader.put(9, 9).atLeastOnce()
+        }
     }
 
 }
