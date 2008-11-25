@@ -425,4 +425,13 @@ class FunctionnalPropertyTest extends GMockTestCase {
         }
     }
 
+    void testAssignPropertyInRecordState() {
+        def mockLoader = mock()
+        def expected = "Cannot use property setter in record mode. Are you trying to mock a setter? use 'id.sets(1)' instead."
+        def message = shouldFail(MissingPropertyException) {
+            mockLoader.id = 1
+        }
+        assertEquals expected, message
+    }
+
 }
