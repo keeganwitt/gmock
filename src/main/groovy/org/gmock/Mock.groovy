@@ -87,9 +87,8 @@ class Mock {
             }
             return result
         } else {
-            def expectation = new Expectation(expectations: expectations)
-            expectations.add( expectation )
-            return new PropertyRecorder(name, expectation)
+            throw new MissingPropertyException("Cannot use property setter in record mode. " +
+                    "Are you trying to mock a setter? use '${name}.sets($arg)' instead.")
         }
     }
 
