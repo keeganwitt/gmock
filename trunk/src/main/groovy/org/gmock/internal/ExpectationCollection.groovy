@@ -21,10 +21,13 @@ class ExpectationCollection {
         }
     }
 
-    def callState(){
+    def callState(signature = null) {
         def callState = new CallState()
         expectations.each {
             callState.append(it)
+        }
+        if (signature) {
+            callState.nowCalling(signature)
         }
         return callState
     }

@@ -12,6 +12,12 @@ class CallState {
         methodStates[signature].merge(expectation)
     }
 
+    def nowCalling(signature) {
+        if (methodStates.containsKey(signature)){
+            methodStates[signature].nowCalling = true
+        }
+    }
+
     String toString(){
         methodStates.values().join("\n")
     }
@@ -23,6 +29,7 @@ class MethodState {
     def methodSignature
     def expected = null
     def called = 0
+    def nowCalling = false
 
     MethodState(methodSignature){
         this.methodSignature = methodSignature
@@ -34,8 +41,7 @@ class MethodState {
     }
 
     String toString(){
-        "  '${methodSignature}': expected $expected, actual $called"
-        // TODO: we should improve this message, the actual called count may be one less sometimes
+        "  '${methodSignature}': expected $expected, actual $called${nowCalling ? ' (+1)' : ''}"
     }
 
 }

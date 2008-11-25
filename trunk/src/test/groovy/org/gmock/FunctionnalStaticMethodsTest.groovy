@@ -163,7 +163,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def mockLoader = mock(Loader)
         mockLoader.static.one().times(1..2)
         def expected = "Unexpected static method call 'Loader.one()'\n" +
-                       "  'Loader.one()': expected 1..2, actual 2"
+                       "  'Loader.one()': expected 1..2, actual 2 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 3.times { Loader.one() }
@@ -184,7 +184,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def mockLoader = mock(Loader)
         mockLoader.static.one().times(2)
         def expected = "Unexpected static method call 'Loader.one()'\n" +
-                       "  'Loader.one()': expected 2, actual 2"
+                       "  'Loader.one()': expected 2, actual 2 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 3.times { Loader.one() }
@@ -203,7 +203,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def mockLoader = mock(Loader)
         mockLoader.static.one().never()
         def expected = "Unexpected static method call 'Loader.one()'\n" +
-                       "  'Loader.one()': expected never, actual 0"
+                       "  'Loader.one()': expected never, actual 0 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 Loader.one()
@@ -271,7 +271,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def mockLoader = mock(Loader)
         mockLoader.static.one().atMost(2)
         def expected = "Unexpected static method call 'Loader.one()'\n" +
-                       "  'Loader.one()': expected at most 2, actual 2"
+                       "  'Loader.one()': expected at most 2, actual 2 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 3.times { Loader.one() }

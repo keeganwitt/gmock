@@ -50,7 +50,7 @@ class ClassProxy extends ProxyMetaClass {
             if (expectation){
                 return expectation.doReturn()
             } else {
-                def callState = constructorExpectations.callState().toString()
+                def callState = constructorExpectations.callState(signature).toString()
                 if (callState){ callState = "\n$callState" }
                 fail("Unexpected constructor call '${signature}'$callState")
             }
@@ -68,7 +68,7 @@ class ClassProxy extends ProxyMetaClass {
             if (expectation){
                 return expectation.doReturn()
             } else {
-                def callState = staticExpectations.callState().toString()
+                def callState = staticExpectations.callState(signature).toString()
                 if (callState){ callState = "\n$callState" }
                 fail("Unexpected static method call '${signature}'$callState")
             }

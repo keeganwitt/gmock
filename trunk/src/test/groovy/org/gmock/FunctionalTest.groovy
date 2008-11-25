@@ -32,7 +32,7 @@ class FunctionalTest extends GMockTestCase {
         }
         def expected = "Unexpected method call 'load(\"bar\")'\n" +
                        "  'load(\"foo\")': expected 1, actual 1\n" +
-                       "  'load(\"bar\")': expected 2, actual 2"
+                       "  'load(\"bar\")': expected 2, actual 2 (+1)"
         assertEquals expected, message
     }
 
@@ -301,7 +301,7 @@ class FunctionalTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.load(1).returns(2).times(1..2)
         def expected = "Unexpected method call 'load(1)'\n" +
-                       "  'load(1)': expected 1..2, actual 2"
+                       "  'load(1)': expected 1..2, actual 2 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 3.times { mockLoader.load(1) }
@@ -338,7 +338,7 @@ class FunctionalTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.load(1).returns(2).times(2)
         def expected = "Unexpected method call 'load(1)'\n" +
-                       "  'load(1)': expected 2, actual 2"
+                       "  'load(1)': expected 2, actual 2 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 3.times { mockLoader.load(1) }
@@ -357,7 +357,7 @@ class FunctionalTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.load(1).never()
         def expected = "Unexpected method call 'load(1)'\n" +
-                       "  'load(1)': expected never, actual 0"
+                       "  'load(1)': expected never, actual 0 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 mockLoader.load(1)
@@ -440,7 +440,7 @@ class FunctionalTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.load(3).returns(4).atMost(2)
         def expected = "Unexpected method call 'load(3)'\n" +
-                       "  'load(3)': expected at most 2, actual 2"
+                       "  'load(3)': expected at most 2, actual 2 (+1)"
         def message = shouldFail(AssertionFailedError) {
             play {
                 3.times { mockLoader.load(3) }
