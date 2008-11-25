@@ -256,7 +256,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.id.returns(3).times(1..2)
         def expected = "Unexpected property getter call 'id'\n" +
-                       "  'id': expected 1..2, actual 2"
+                       "  'id': expected 1..2, actual 2 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 3.times {
@@ -283,7 +283,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.id.sets(6).times(2)
         def expected = "Unexpected property setter call 'id = 6'\n" +
-                       "  'id = 6': expected 2, actual 2"
+                       "  'id = 6': expected 2, actual 2 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 3.times {
@@ -305,7 +305,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.id.sets(8).never()
         def expected = "Unexpected property setter call 'id = 8'\n" +
-                       "  'id = 8': expected never, actual 0"
+                       "  'id = 8': expected never, actual 0 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 mockLoader.id = 8
@@ -353,7 +353,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.id.returns(14).atMost(2)
         def expected = "Unexpected property getter call 'id'\n" +
-                       "  'id': expected at most 2, actual 2"
+                       "  'id': expected at most 2, actual 2 (+1)"
         play {
             def message = shouldFail(AssertionFailedError) {
                 3.times {
@@ -393,7 +393,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
         def expected = "Unexpected property getter call 'id'\n" +
                        "  'id = 15': expected at most 6, actual 4\n" +
-                       "  'id': expected 3, actual 3"
+                       "  'id': expected 3, actual 3 (+1)"
         play {
             4.times {
                 mockLoader.id = 15

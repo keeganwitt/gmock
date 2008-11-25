@@ -37,7 +37,7 @@ class Mock {
             if (expectation){
                 return expectation.doReturn()
             } else {
-                def callState = expectations.callState().toString()
+                def callState = expectations.callState(signature).toString()
                 if (callState){ callState = "\n$callState" }
                 fail("Unexpected method call '${signature}'$callState")
             }
@@ -56,7 +56,7 @@ class Mock {
             if (expectation){
                 return expectation.doReturn()
             } else {
-                def callState = expectations.callState().toString()
+                def callState = expectations.callState(signature).toString()
                 if (callState){ callState = "\n$callState" }
                 fail("Unexpected property getter call '${signature}'$callState")
             }
@@ -81,7 +81,7 @@ class Mock {
             if (expectation){
                 return expectation.doReturn()
             } else {
-                def callState = expectations.callState().toString()
+                def callState = expectations.callState(signature).toString()
                 if (callState){ callState = "\n$callState" }
                 fail("Unexpected property setter call '${signature}'$callState")
             }
