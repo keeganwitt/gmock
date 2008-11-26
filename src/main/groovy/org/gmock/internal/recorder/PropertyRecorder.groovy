@@ -16,6 +16,10 @@ class PropertyRecorder extends BaseRecorder {
     }
 
     def sets(value) {
+        throw new DeprecationException("'sets' is deprecated. Use 'set' instead.");
+    }
+
+    def set(value) {
         expectation.signature = new PropertySetSignature(propertyName, value)
         expectation.returnValue = new ReturnNull()
         return this

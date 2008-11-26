@@ -9,7 +9,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.name.returns('a name')
         mockLoader.name.returns('a different name')
-        mockLoader.name.sets('another name')
+        mockLoader.name.set('another name')
 
         play {
             assertEquals "a name", mockLoader.name
@@ -22,8 +22,8 @@ class FunctionnalPropertyTest extends GMockTestCase {
     void testMultiplePropertyAndMethod(){
         def mockLoader = mock()
         mockLoader.name.returns('a name')
-        mockLoader.name.sets('another name')
-        mockLoader.id.sets('some id')
+        mockLoader.name.set('another name')
+        mockLoader.id.set('some id')
         mockLoader.load("fruit").returns("apple")
 
         play {
@@ -38,7 +38,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def mockLoader = mock()
 
         mockLoader.name.returns('a name')
-        mockLoader.id.sets('some id')
+        mockLoader.id.set('some id')
         mockLoader.load("fruit").returns("apple")
 
         try {
@@ -61,7 +61,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def mockLoader = mock()
 
         mockLoader.name.returns('a name')
-        mockLoader.id.sets('some id')
+        mockLoader.id.set('some id')
 
         try {
             play {
@@ -95,7 +95,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
     void testStubSetter(){
         def mockLoader = mock()
 
-        mockLoader.name.sets('a value').stub()
+        mockLoader.name.set('a value').stub()
 
         play {
             mockLoader.name = "a value"
@@ -106,7 +106,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testStubSetterNotCalled(){
         def mockLoader = mock()
-        mockLoader.name.sets('a value').stub()
+        mockLoader.name.set('a value').stub()
         play {}
     }
 
@@ -140,8 +140,8 @@ class FunctionnalPropertyTest extends GMockTestCase {
     void testSetPropertyRaisesException(){
         def mockLoader = mock()
 
-        mockLoader.name.sets("a name")
-        mockLoader.name.sets("a invalid name").raises(new RuntimeException("An exception"))
+        mockLoader.name.set("a name")
+        mockLoader.name.set("a invalid name").raises(new RuntimeException("An exception"))
 
         play {
             mockLoader.name = "a name"
@@ -155,7 +155,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
     void testSetPropertyRaisesExceptionWithMessage() {
         def mockLoader = mock()
 
-        mockLoader.name.sets("invalid").raises(RuntimeException, "test")
+        mockLoader.name.set("invalid").raises(RuntimeException, "test")
 
         play {
             def message = shouldFail(RuntimeException) {
@@ -167,7 +167,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testLastPropertySetDontGetEvaluated(){
         def mockLoader = mock()
-        mockLoader.name.sets('another name')
+        mockLoader.name.set('another name')
         play {
             setName(mockLoader)
         }
@@ -179,7 +179,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testSetPropertyHamcrestMatcher() {
         def mockLoader = mock()
-        mockLoader.test.sets(is(not("wrong")))
+        mockLoader.test.set(is(not("wrong")))
 
         play {
             mockLoader.test = "correct"
@@ -189,7 +189,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testSetPropertyHamcrestMatcherNotMatched() {
         def mockLoader = mock()
-        mockLoader.test.sets(isOneOf(1, 2, 3))
+        mockLoader.test.set(isOneOf(1, 2, 3))
         def expected = "Unexpected property setter call 'test = 0'\n" +
                        "  'test = one of {<1>, <2>, <3>}': expected 1, actual 0"
 
@@ -204,7 +204,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testSetPropertyClosureMatcher() {
         def mockLoader = mock()
-        mockLoader.test.sets(match { it != "wrong" })
+        mockLoader.test.set(match { it != "wrong" })
 
         play {
             mockLoader.test = "correct"
@@ -214,7 +214,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testSetPropertyClosureMatcherNotMatched() {
         def mockLoader = mock()
-        mockLoader.test.sets(match { it in [1, 2, 3] })
+        mockLoader.test.set(match { it in [1, 2, 3] })
         def expected = "Unexpected property setter call 'test = 0'\n" +
                        "  'test = a value matching the closure matcher': expected 1, actual 0"
 
@@ -229,7 +229,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testSetPropertyToNull() {
         def mockLoader = mock()
-        mockLoader.test.sets(null)
+        mockLoader.test.set(null)
 
         play {
             mockLoader.test = null
@@ -269,7 +269,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testStrictTimes() {
         def mockLoader = mock()
-        mockLoader.id.sets(4).times(2)
+        mockLoader.id.set(4).times(2)
         mockLoader.id.returns(5).once()
 
         play {
@@ -281,7 +281,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testStrictTimesTooMany() {
         def mockLoader = mock()
-        mockLoader.id.sets(6).times(2)
+        mockLoader.id.set(6).times(2)
         def expected = "Unexpected property setter call 'id = 6'\n" +
                        "  'id = 6': expected 2, actual 2 (+1)"
         play {
@@ -297,13 +297,13 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testNever() {
         def mockLoader = mock()
-        mockLoader.id.sets(7).never()
+        mockLoader.id.set(7).never()
         play {}
     }
 
     void testNeverTooMany() {
         def mockLoader = mock()
-        mockLoader.id.sets(8).never()
+        mockLoader.id.set(8).never()
         def expected = "Unexpected property setter call 'id = 8'\n" +
                        "  'id = 8': expected never, actual 0 (+1)"
         play {
@@ -316,7 +316,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testAtLeast() {
         def mockLoader = mock()
-        mockLoader.id.sets(9).atLeast(2)
+        mockLoader.id.set(9).atLeast(2)
         mockLoader.id.returns(10).atLeastOnce()
 
         play {
@@ -328,7 +328,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testAtLeastTooFew() {
         def mockLoader = mock()
-        mockLoader.id.sets(11).atLeastOnce()
+        mockLoader.id.set(11).atLeastOnce()
         def expected = "Expectation not matched on verify:\n" +
                        "  'id = 11': expected at least 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
@@ -339,7 +339,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testAtMost() {
         def mockLoader = mock()
-        mockLoader.id.sets(12).atMost(2)
+        mockLoader.id.set(12).atMost(2)
         mockLoader.id.returns(13).atMostOnce()
 
         play {
@@ -366,10 +366,10 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testNonfixedTimesAfterFixedTimes() {
         def mockLoader = mock()
-        mockLoader.id.sets(15).once()
-        mockLoader.id.sets(15).times(2)
+        mockLoader.id.set(15).once()
+        mockLoader.id.set(15).times(2)
         mockLoader.id.returns(16).times(3)
-        mockLoader.id.sets(15).atMost(3)
+        mockLoader.id.set(15).atMost(3)
         mockLoader.id.returns(16).never()
 
         play {
@@ -385,10 +385,10 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testNonfixedTimesAfterFixedTimesFailed() {
         def mockLoader = mock()
-        mockLoader.id.sets(15).once()
-        mockLoader.id.sets(15).times(2)
+        mockLoader.id.set(15).once()
+        mockLoader.id.set(15).times(2)
         mockLoader.id.returns(16).times(3)
-        mockLoader.id.sets(15).atMost(3)
+        mockLoader.id.set(15).atMost(3)
         mockLoader.id.returns(16).never()
 
         def expected = "Unexpected property getter call 'id'\n" +
@@ -411,14 +411,14 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testAnythingAfterNonfixedTimes() {
         def mockLoader = mock()
-        mockLoader.id.sets(15).once()
-        mockLoader.id.sets(15).times(2)
+        mockLoader.id.set(15).once()
+        mockLoader.id.set(15).times(2)
         mockLoader.id.returns(16).times(3)
-        mockLoader.id.sets(15).atLeastOnce()
+        mockLoader.id.set(15).atLeastOnce()
         mockLoader.id.returns(16).times(1..2)
 
         shouldFail(IllegalStateException) {
-            mockLoader.id.sets(15)
+            mockLoader.id.set(15)
         }
         shouldFail(IllegalStateException) {
             mockLoader.id.returns(16).never()
@@ -427,7 +427,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testAssignPropertyInRecordState() {
         def mockLoader = mock()
-        def expected = "Cannot use property setter in record mode. Are you trying to mock a setter? use 'id.sets(1)' instead."
+        def expected = "Cannot use property setter in record mode. Are you trying to mock a setter? Use 'id.set(1)' instead."
         def message = shouldFail(MissingPropertyException) {
             mockLoader.id = 1
         }

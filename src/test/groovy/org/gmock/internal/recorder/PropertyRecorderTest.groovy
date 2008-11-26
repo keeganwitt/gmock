@@ -39,7 +39,7 @@ class PropertyRecorderTest extends GMockTestCase {
         PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
 
         play {
-            propertyRecorder.sets("a value")
+            propertyRecorder.set("a value")
         }
 
         assertEquals setSignature, expectation.signature
@@ -50,7 +50,7 @@ class PropertyRecorderTest extends GMockTestCase {
         def expectation = mock()
         PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
 
-        expectation.times.sets(match { it instanceof AnyTimes })
+        expectation.times.set(match { it instanceof AnyTimes })
 
         play {
             propertyRecorder.stub()

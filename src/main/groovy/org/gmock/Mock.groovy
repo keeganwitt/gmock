@@ -88,7 +88,7 @@ class Mock {
             return result
         } else {
             throw new MissingPropertyException("Cannot use property setter in record mode. " +
-                    "Are you trying to mock a setter? use '${name}.sets($arg)' instead.")
+                    "Are you trying to mock a setter? Use '${name}.set($arg)' instead.")
         }
     }
 
