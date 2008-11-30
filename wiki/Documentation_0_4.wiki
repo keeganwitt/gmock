@@ -135,7 +135,28 @@ play {
 }
 }}}
 
+== Using matcher == 
 
+You can setup customised matcher in your expectation using the `match` syntax. The argument get passed to match closure and you should return true if it match.
+
+Here is the idea:
+{{{
+mockLoader.put("test", match { it > 5 }).returns("correct")
+play {
+  assertEquals "correct", mockLoader.put("test", 10)
+}
+}}}
+
+Gmock is also fully compatible with [http://code.google.com/p/hamcrest/ Hamcrest] matcher. You will have to include the optional Hamcrest library in your classpath 
+
+Here is an example:
+{{{
+mockLoader.put("test", is(not(lessThan(5)))).returns("correct")
+
+play {
+    assertEquals "correct", mockLoader.put("test", 10)
+}
+}}}
 == Not extending the GMockTestCase ==
 
 If you don't want or can't extends the `GMockTestCase` in your test you can use the GMockController. 
