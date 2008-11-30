@@ -88,7 +88,7 @@ play {
 Property call should be mock using the following syntax. For Setter and getter
 {{{
 def loader = mock()
-loader.name.sets("a name")
+loader.name.set("a name")
 loader.name.returns("a different name")
 play {
   loader.name = "a name"
@@ -99,7 +99,7 @@ play {
 
 Support for exception and method stub is similar to standard method call. Ex:
   * `loader.name.raises(new RuntimeException())`
-  * `loader.name.sets("invalid).raises(new RuntimeException())`
+  * `loader.name.set("invalid).raises(new RuntimeException())`
   *  `mockLoader.name.returns('a name').stub()`
 
 
