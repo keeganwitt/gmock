@@ -73,15 +73,6 @@ play {
 }
 }}}
 
-If you don't care how many times a method is called or not called at all you can stubbed it.
-{{{
-def loader = mock()
-loader.put("fruit").returns("apple").stub()
-play {
-  assertEquals "apple", loader.put("fruit")
-  assertEquals "apple", loader.put("fruit")
-}
-}}}
 
 == Mock property call ==
 
@@ -132,6 +123,38 @@ mockFile.getName().returns("file.txt")
 play {
   def file = new File("/a/path/file.txt")
   assertEquals "file.txt", file.getName()
+}
+}}}
+
+== Time matching ==
+
+Gmock let you specify how many times an expectation can be call. Like here:
+{{{
+mockLoader.load(2).returns(3).atLeastOnce()
+play {
+    assertEquals 3, mockLoader.load(2)
+    assertEquals 3, mockLoader.load(2)
+}
+}}}
+
+The supported time matcher are:
+  * never() the expectation should never be called
+  * once() one time expectation (this is the implicit default)
+  * atLeastOnce() one time or more
+  * atMostOnce() zero or one time expectation
+  * stub() the expectation can be call anytime
+  * times(3) the expectation need to be call n time
+  * times(2..4) the expectation need to be call between within the range
+  * atLeast(4) the expectation need to be call at least n time
+  * atMost(4) the expectation need to be call at most n time
+
+If you don't care how many times a method is called or not called at all you can stubbed it.
+{{{
+def loader = mock()
+loader.put("fruit").returns("apple").stub()
+play {
+  assertEquals "apple", loader.put("fruit")
+  assertEquals "apple", loader.put("fruit")
 }
 }}}
 
