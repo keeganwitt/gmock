@@ -16,6 +16,9 @@ class PropertySetSignature {
         "${propertyName} = ${argument}"
     }
 
+    def validate(){
+    }
+    
     boolean equals(Object setSignature) {
         if (setSignature == null || getClass() != setSignature.getClass()) return false
         if (propertyName != setSignature.propertyName) return false

@@ -14,6 +14,9 @@ class ConstructorSignature {
         "new $aClass.simpleName($arguments)"
     }
 
+    def validate(){
+    }
+
     boolean equals(Object constructor) {
         if (constructor == null || getClass() != constructor.getClass()) return false
         if (aClass != constructor.aClass) return false

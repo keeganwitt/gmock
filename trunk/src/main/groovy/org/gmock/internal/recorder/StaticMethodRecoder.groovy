@@ -10,6 +10,7 @@ class StaticMethodRecoder {
     StaticMethodRecoder(aClass, expectation){
         this.expectation = expectation
         this.aClass = aClass
+        this.expectation.signature = new StaticSignature(aClass)
     }
 
     def methodMissing(String name, args) {

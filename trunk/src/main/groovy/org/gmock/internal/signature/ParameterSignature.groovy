@@ -14,6 +14,9 @@ class ParameterSignature {
         arguments*.inspect().join(", ")
     }
 
+    def validate(){
+    }
+
     boolean equals(Object signature) {
         if (signature == null || !(signature instanceof ParameterSignature)) return false
         if (arguments.size() != signature.arguments.size()) return false

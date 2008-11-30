@@ -14,6 +14,9 @@ class MethodSignature {
         "$methodName($arguments)"
     }
 
+    def validate(){
+    }
+
     boolean equals(Object method) {
         if (method == null || getClass() != method.getClass()) return false
         if (methodName != method.methodName) return false

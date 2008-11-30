@@ -80,13 +80,6 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         }
     }
 
-    void testNothingExpected() {
-        def mockLoader = mock(Loader)
-        mockLoader.static
-
-        play {}
-    }
-
     void testStaticMethodHamcrestMatcher() {
         def mockLoader = mock(Loader)
         mockLoader.static.check(isIn(1..5), is("test")).returns("correct")
@@ -337,5 +330,18 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
             Loader.second()
         }
     }
+
+    void testEmptyStaticExpectationsShouldNotAppearInErrorMessages() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.one()
+        mockLoader.static
+
+        def expected = "Missing static expectation for Loader"
+        def message = shouldFail(IllegalStateException) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
 
 }

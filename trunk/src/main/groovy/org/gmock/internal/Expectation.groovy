@@ -28,6 +28,10 @@ class Expectation {
         return !signature || called in times
     }
 
+    def validate(){
+        signature?.validate()
+    }
+
     String toString() {
         return "Expectation [signature: $signature, return: $returnValue, times: $times]"
     }

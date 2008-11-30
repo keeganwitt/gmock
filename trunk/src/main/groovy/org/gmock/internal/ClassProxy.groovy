@@ -33,6 +33,10 @@ class ClassProxy extends ProxyMetaClass {
         registry.setMetaClass(theClass, originalMetaClass);
     }
 
+    def validate(){
+        staticExpectations.validate()
+    }
+
     def verify(){
         constructorExpectations.verify()
         staticExpectations.verify()
