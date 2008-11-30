@@ -17,7 +17,7 @@
   * Static method mocking (issue 8)
   * Improvement of the raise method (issue 10)
 
-== Version 0.4 ==
+== ~~Version 0.4~~ ==
 
   * Closure matcher (issue 12)
   * Time matching (issue 13)
