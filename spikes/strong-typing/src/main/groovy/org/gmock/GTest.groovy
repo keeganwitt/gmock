@@ -26,7 +26,7 @@ class MockProxyMetaClass extends MetaClassImpl {
 
 }
 
-def filter = [
+filter = [
     accept: { Method method ->
         GroovyObject.metaClass.pickMethod(method.name, method.parameterTypes) ? 0 : 1
     },
@@ -35,7 +35,7 @@ def filter = [
     }
 ] as CallbackFilter
 
-def mock = { Class clazz ->
+def mock(Class clazz = Object) {
     def mpmc = new MockProxyMetaClass(clazz)
 
     def groovyMethodInterceptor = { obj, Method method, Object[] args, MethodProxy proxy ->
@@ -83,3 +83,8 @@ def mock = { Class clazz ->
     logger.dynamicMethod("call on groovy side")
     println()
 }
+
+println Object.name.center(80, "-")
+def duckTyping = mock()
+duckTyping.dynamicMethod("call on groovy side")
+println()
