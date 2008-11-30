@@ -434,4 +434,10 @@ class FunctionnalPropertyTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testNonCompletePropertyExpectation() {
+        def mockLoader = mock()
+        mockLoader.nonCompleteProperty
+        play {}
+    }
+
 }

@@ -326,4 +326,16 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         }
     }
 
+    void testMultipleStaticMocking() {
+        def mockLoader1 = mock(Loader)
+        def mockLoader2 = mock(Loader)
+        mockLoader1.static.first()
+        mockLoader2.static.second()
+
+        play {
+            Loader.first()
+            Loader.second()
+        }
+    }
+
 }
