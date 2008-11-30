@@ -5,6 +5,7 @@ import org.gmock.internal.ReturnRaiseException
 import org.gmock.internal.ReturnValue
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
+import org.gmock.internal.signature.PropertyUncompleteSignature
 
 class PropertyRecorder extends BaseRecorder {
 
@@ -13,6 +14,7 @@ class PropertyRecorder extends BaseRecorder {
     PropertyRecorder(propertyName, expectation) {
         super(expectation)
         this.propertyName = propertyName
+        this.expectation.signature = new PropertyUncompleteSignature(propertyName)
     }
 
     def sets(value) {
@@ -32,7 +34,7 @@ class PropertyRecorder extends BaseRecorder {
     }
 
     private doRaises(Object[] params) {
-        if (!expectation.signature){
+        if (expectation.signature.class == PropertyUncompleteSignature){
             expectation.signature = new PropertyGetSignature(propertyName)
         }
         expectation.returnValue = ReturnRaiseException.metaClass.invokeConstructor(params)

@@ -84,7 +84,7 @@ class ExpectationTest extends GMockTestCase {
 
     void testValidateCallsSignatureValidation(){
         def mockSignature = mock()
-        mockSignature.validate().once()
+        mockSignature.validate(match{it.class == ReturnNull}).once()
 
         def expectation = new Expectation()
         expectation.@signature = mockSignature

@@ -99,6 +99,10 @@ class Mock {
         expectations.verify()
     }
 
+    private void _validate(){
+        expectations.validate()
+    }
+
     private void _reset(){
         this.expectations = new ExpectationCollection()
         replay = false
