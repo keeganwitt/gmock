@@ -32,6 +32,10 @@ class ClassExpectations {
         proxies.values()*.stopProxy()
     }
 
+    def validate(){
+        proxies.values()*.validate()
+    }
+
     def verify() {
         proxies.values()*.verify()
     }

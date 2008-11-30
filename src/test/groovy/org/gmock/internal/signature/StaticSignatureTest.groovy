@@ -51,4 +51,16 @@ class StaticSignatureTest extends GroovyTestCase {
         assertEquals 'Loader.put("test", 3, true)', signature.toString()
     }
 
+    void testValidateWithMethodName(){
+        def signature = new StaticSignature(Loader, "put", [1, 2])
+        signature.validate()
+    }
+
+    void testValidateDoesntHaveMethodName(){
+        def signature = new StaticSignature(Loader)
+        shouldFail(IllegalStateException){
+            signature.validate()
+        }
+    }
+
 }

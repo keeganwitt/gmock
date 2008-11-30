@@ -6,6 +6,10 @@ class StaticSignature {
     def methodName
     def arguments
 
+    StaticSignature(aClass) {
+        this.aClass = aClass
+    }
+
     StaticSignature(aClass, methodName, arguments) {
         this.aClass = aClass
         this.methodName = methodName
@@ -14,6 +18,12 @@ class StaticSignature {
 
     String toString() {
         "${aClass.simpleName}.$methodName($arguments)"
+    }
+
+    def validate(){
+        if (!methodName){
+            throw new IllegalStateException("Missing static expectation for ${aClass.simpleName}")            
+        }
     }
 
     boolean equals(Object staticSignature) {

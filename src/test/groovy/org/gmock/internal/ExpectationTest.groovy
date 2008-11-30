@@ -82,4 +82,23 @@ class ExpectationTest extends GMockTestCase {
         }
     }
 
+    void testValidateCallsSignatureValidation(){
+        def mockSignature = mock()
+        mockSignature.validate().once()
+
+        def expectation = new Expectation()
+        expectation.@signature = mockSignature
+        play {
+            expectation.validate()
+        }
+    }
+
+    void testValidateWithoutSignature(){
+        def expectation = new Expectation()
+        play {
+            expectation.validate()
+        }
+    }
+
+
 }

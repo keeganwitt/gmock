@@ -36,6 +36,10 @@ class ExpectationCollection {
         expectations.size() == 0
     }
 
+    def validate(){
+        expectations*.validate()
+    }
+
     void checkTimes(expectation) {
         def last = expectations.reverse().find {
             !it.is(expectation) && it.signature == expectation.signature
