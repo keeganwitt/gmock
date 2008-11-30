@@ -1,0 +1,154 @@
+#summary Gmock documentation for gmock-0.4
+
+= Introduction =
+
+Gmock is a mocking framework for the Groovy language. 
+
+Gmock is all about simple syntax and readability of your tests so you spend less time learning the framework and more writing code. To use Gmock just drop the gmock jar file in your classpath and make sure you also have junit.
+
+
+This documention describe the version 0.4 of Gmock.
+
+
+= Getting Started =
+
+{{{
+import org.gmock.GMockTestCase
+
+class LoaderTest extends GMockTestCase {
+    void testLoader(){
+        def mockLoader = mock()
+        mockLoader.load('key').returns('value')
+        play {
+            assertEquals "value", mockLoader.load('key')
+        }
+    }
+}  
+}}}
+
+  * First extends the `GMockTestCase`
+  * Create mock object using the `mock()` method
+  * Setup expectation by calling the method you expect on your mock
+  * Run the code you are testing within the `play` closure
+
+
+= Cookbook =
+
+== Expectation and Play mode == 
+
+Mock object are created using the `mock()` method available in `GMockTestCase`. By default mock object will record method call and generate expectation. 
+
+The code under test should run through the `play` closure. 
+{{{
+void testBasic(){
+  def aMock = mock()
+  // setup expectation
+  play {
+    // run your code 
+  }
+}
+}}}
+
+== Mock method call ==
+
+Method call expectation are created when calling method on Mock. Return value can be setup using the `returns` keyword. 
+{{{
+def loader = mock()
+loader.put("fruit").returns("apple")
+play {
+  assertEquals "apple", loader.put("fruit") 
+}
+}}}
+
+Exception can be setup using the `raises` keyword.
+{{{
+def loader = mock()
+loader.put("throw exception").raises(new RuntimeException("an exception"))
+play {
+  try {
+    loader.put("throw exception") 
+  } catch (RuntimeException e){
+    assertEquals "an exception", e.message
+  }
+}
+}}}
+
+If you don't care how many times a method is called or not called at all you can stubbed it.
+{{{
+def loader = mock()
+loader.put("fruit").returns("apple").stub()
+play {
+  assertEquals "apple", loader.put("fruit")
+  assertEquals "apple", loader.put("fruit")
+}
+}}}
+
+== Mock property call ==
+
+Property call should be mock using the following syntax. For Setter and getter
+{{{
+def loader = mock()
+loader.name.sets("a name")
+loader.name.returns("a different name")
+play {
+  loader.name = "a name"
+  assertEquals "a different name", loader.name
+}
+}}}
+
+
+Support for exception and method stub is similar to standard method call. Ex:
+  * `loader.name.raises(new RuntimeException())`
+  * `loader.name.sets("invalid).raises(new RuntimeException())`
+  *  `mockLoader.name.returns('a name').stub()`
+
+
+== Mock static method call ==
+
+Mocking static method call is similar to standard method call, just add the static keyword:
+{{{
+def mockMath = mock(Math)
+mockMath.static.random().returns(0.5)
+
+play {
+   assertEquals 0.5, Math.random()
+}
+}}}
+
+
+
+== Mock constructor call ==
+
+Constructor call are mocked using the following syntax:
+{{{
+def mockFile = mock(File, constructor: ["/a/path/file.txt"])
+}}}
+This would match: `new File("/a/path/file.txt")`. The mockFile can then be used to setup further expectation.
+
+Here is the full picture:
+{{{
+def mockFile = mock(File, constructor: ["/a/path/file.txt"])
+mockFile.getName().returns("file.txt")
+play {
+  def file = new File("/a/path/file.txt")
+  assertEquals "file.txt", file.getName()
+}
+}}}
+
+
+== Not extending the GMockTestCase ==
+
+If you don't want or can't extends the `GMockTestCase` in your test you can use the GMockController. 
+
+In the beginning of your test create a new `GMockController`. You then can use its `mock()` method an `play` closure as a usual Gmock test.
+
+{{{
+void testController(){
+  def gmc = new GMockController()
+  def mockLoader = gmc.mock()
+  mockLoader.load('key').returns('value')
+  gmc.play {
+    assertEquals "value", mockLoader.load('key')
+  }
+}
+}}}
