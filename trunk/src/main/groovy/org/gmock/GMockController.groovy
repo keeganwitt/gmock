@@ -19,16 +19,17 @@ class GMockController {
 
     def play(Closure closure) {
         classExpectation.validate()
-        mocks.each {it._replay()}
+        mocks*._validate()
+        mocks*._replay()
         classExpectation.startProxy()
         try {
             closure.call()
         } finally {
             classExpectation.stopProxy()
         }
-        mocks.each {it._verify()}
+        mocks*._verify()
         classExpectation.verify()
-        mocks.each {it._reset()}
+        mocks*._reset()
         classExpectation.reset()
     }
 

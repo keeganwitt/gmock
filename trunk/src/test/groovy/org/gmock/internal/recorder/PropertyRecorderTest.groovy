@@ -8,6 +8,7 @@ import org.gmock.internal.ReturnValue
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
 import org.gmock.internal.times.AnyTimes
+import org.gmock.internal.signature.PropertyUncompleteSignature
 
 class PropertyRecorderTest extends GMockTestCase {
 
@@ -16,11 +17,11 @@ class PropertyRecorderTest extends GMockTestCase {
 
         def mockExpectations = mock()
         def expectation = new Expectation(expectations: mockExpectations)
-        mockExpectations.checkTimes(expectation)
+        mockExpectations.checkTimes(expectation).times(2)
 
-        PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
 
         play {
+            PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
             propertyRecorder.returns("a name")
         }
 
@@ -34,11 +35,11 @@ class PropertyRecorderTest extends GMockTestCase {
 
         def mockExpectations = mock()
         def expectation = new Expectation(expectations: mockExpectations)
-        mockExpectations.checkTimes(expectation)
+        mockExpectations.checkTimes(expectation).times(2)
 
-        PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
 
         play {
+            PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
             propertyRecorder.set("a value")
         }
 
@@ -48,11 +49,12 @@ class PropertyRecorderTest extends GMockTestCase {
 
     void testStubRecord(){
         def expectation = mock()
-        PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
 
+        expectation.signature.set(match {it instanceof PropertyUncompleteSignature})
         expectation.times.set(match { it instanceof AnyTimes })
 
         play {
+            PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
             propertyRecorder.stub()
         }
     }

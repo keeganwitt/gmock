@@ -15,7 +15,7 @@ class PropertyGetSignature {
 
     def validate(){
     }
-    
+
     boolean equals(Object getSignature) {
         if (getSignature == null || getClass() != getSignature.getClass()) return false
         if (propertyName != getSignature.propertyName) return false
