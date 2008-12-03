@@ -42,68 +42,69 @@ class ProxyMetaMethod extends MetaMethod {
         super(parameterTypes)
         this.theMetaClass = metaClass
         this.name = name
-        this.declaringClass = ReflectionCache.getCachedClass(metaClass.theClass);
+        this.declaringClass = ReflectionCache.getCachedClass(metaClass.theClass)
         getParameterTypes()
     }
 
     int getModifiers() {
-        return Modifier.PUBLIC;
+        return Modifier.PUBLIC
     }
 
     String getName() {
-        return name;
+        return name
     }
 
     Class getReturnType() {
-        return Object;
+        return Object
     }
 
     CachedClass getDeclaringClass() {
-        return declaringClass;
+        return declaringClass
     }
 
     Object invoke(Object object, Object[] arguments) {
-        return theMetaClass.invokeMethod(object, name, arguments);
+        return theMetaClass.invokeMethod(object, name, arguments)
     }
 
 }
 
-class FilterMetaClass extends MetaClassImpl {
+class DispatcherMetaClass extends MetaClassImpl {
 
     private MetaClass originalMetaClass
 
     private List metaClasses
 
-    private FilterMetaClass(Class clazz, MetaClass originalMetaClass) {
+    private DispatcherMetaClass(Class clazz, MetaClass originalMetaClass) {
         super(clazz)
         this.originalMetaClass = originalMetaClass
         metaClasses = new LinkedList()
     }
 
-    static FilterMetaClass getInstance(Class clazz) {
+
+    static DispatcherMetaClass getInstance(Class clazz) {
         MetaClassRegistry registry = GroovySystem.metaClassRegistry
         MetaClass metaClass = registry.getMetaClass(clazz)
-        if (metaClass instanceof FilterMetaClass) {
-            return metaClass as FilterMetaClass
+        if (metaClass instanceof DispatcherMetaClass) {
+            return metaClass as DispatcherMetaClass
         } else {
-            FilterMetaClass filterMetaClass = new FilterMetaClass(clazz, metaClass)
+            DispatcherMetaClass filterMetaClass = new DispatcherMetaClass(clazz, metaClass)
             registry.setMetaClass(clazz, filterMetaClass)
             return filterMetaClass
         }
     }
 
     Object invokeMethod(Class sender, Object receiver, String methodName, Object[] arguments, boolean isCallToSuper, boolean fromInsideClass) {
-        println "FilterMetaClass.invokeMethod($methodName, $arguments)"
+        println "DispatcherMetaClass.invokeMethod($methodName, $arguments)"
         return getMetaClassForInstance(receiver).invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
     }
 
     Object getProperty(Class sender, Object receiver, String property, boolean isCallToSuper, boolean fromInsideClass) {
-        println "FilterMetaClass.getProperty($property)"
+        println "DispatcherMetaClass.getProperty($property)"
         return getMetaClassForInstance(receiver).getProperty(sender, receiver, property, isCallToSuper, fromInsideClass)
     }
 
     void setProperty(Class sender, Object receiver, String property, Object value, boolean isCallToSuper, boolean fromInsideClass) {
-        println "FilterMetaClass.setProperty($property, $value)"
+        println "DispatcherMetaClass.setProperty($property, $value)"
         getMetaClassForInstance(receiver).setProperty(sender, receiver, property, value, isCallToSuper, fromInsideClass)
     }
 
@@ -170,16 +171,14 @@ def mock(Class clazz = Object) {
         def mockInstance = ObjenesisHelper.newInstance(mockClass) // mockClass.newInstance()
         return mockInstance
     } else {
+        def mockInstance = ObjenesisHelper.newInstance(clazz)
         if (GroovyObject.isAssignableFrom(clazz)) {
-            def mockInstance = ObjenesisHelper.newInstance(clazz)
             mockInstance.metaClass = mpmc
-            return mockInstance
         } else {
-            def mockInstance = ObjenesisHelper.newInstance(clazz)
-            def fmc = FilterMetaClass.getInstance(clazz)
+            def fmc = DispatcherMetaClass.getInstance(clazz)
             fmc.setMetaClassForInstance(mockInstance, mpmc)
-            return mockInstance
         }
+        return mockInstance
     }
 }
 
