@@ -6,4 +6,8 @@ public class JTest {
         logger.info("call on java side");
     }
 
+    public void testFinalMethod(AClassWithFinalMethod obj) {
+        obj.aFinalMethod();
+    }
+
 }

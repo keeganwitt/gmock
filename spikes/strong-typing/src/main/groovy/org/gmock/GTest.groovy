@@ -123,7 +123,7 @@ class DispatcherMetaClass extends MetaClassImpl {
 
     /**
      * This method should be called to restore the original meta class, but I don't know where to call it during unit
-     * tests, although it is OK to leave the filter meta class in the meta class registry
+     * tests, although it is OK to leave the dispatcher meta class in the meta class registry
      */
     void stopProxy() {
         GroovySystem.metaClassRegistry.setMetaClass(theClass, originalMetaClass)
@@ -131,14 +131,17 @@ class DispatcherMetaClass extends MetaClassImpl {
 
 }
 
-filter = [
-    accept: { Method method ->
+class GroovyObjectMethodFilter implements CallbackFilter {
+
+    static GroovyObjectMethodFilter instance = new GroovyObjectMethodFilter()
+
+    private GroovyObjectMethodFilter() {}
+
+    int accept(Method method) {
         GroovyObject.metaClass.pickMethod(method.name, method.parameterTypes) ? 0 : 1
-    },
-    equals: { o ->
-        this.is o
     }
-] as CallbackFilter
+
+}
 
 def mock(Class clazz = Object) {
     def mpmc = new MockProxyMetaClass(clazz)
@@ -163,7 +166,8 @@ def mock(Class clazz = Object) {
         def interfaces = clazz.isInterface() ? [clazz, GroovyObject] : [GroovyObject]
 
         def enhancer = new Enhancer(superclass: superClass, interfaces: interfaces, useFactory: false,
-                callbackFilter: filter, callbackTypes: [groovyMethodInterceptor.class, javaMethodInterceptor.class])
+                callbackFilter: GroovyObjectMethodFilter.instance,
+                callbackTypes: [groovyMethodInterceptor.class, javaMethodInterceptor.class])
         def mockClass = enhancer.createClass()
         Enhancer.registerCallbacks(mockClass, [groovyMethodInterceptor, javaMethodInterceptor] as Callback[])
 
@@ -181,6 +185,7 @@ def mock(Class clazz = Object) {
         return mockInstance
     }
 }
+
 
 [GLogger, JLogger, Logger].each { clazz ->
     println clazz.name.center(80, "-")
@@ -200,10 +205,12 @@ def mock(Class clazz = Object) {
     println()
 }
 
+
 println "duck typing mocking".center(80, "-")
 def duckTyping = mock()
 duckTyping.dynamicMethod("call on groovy side")
 println()
+
 
 println "closure delegate mocking".center(80, "-")
 def mockDelegate = mock()
@@ -232,6 +239,7 @@ class ForTestingClosureDelegateProperty {
 ForTestingClosureDelegateProperty.run(mockDelegate)
 println()
 
+
 println "final class mocking".center(80, "-")
 final class AFinalClass {}
 def mockGroovyFinalClass = mock(AFinalClass)
@@ -258,3 +266,13 @@ ForTestingClosureDelegateProperty.run(mockJavaFinalClass)
 println()
 
 println "some string: ".concat("try original implements")
+println()
+
+
+println "final method mocking".center(80, "-")
+AClassWithFinalMethod mockClassWithFinalMethod = mock(AClassWithFinalMethod)
+mockClassWithFinalMethod.aFinalMethod()
+println()
+// although we can mock final methods on the groovy side, but cannot do so on the java side
+new JTest().testFinalMethod(mockClassWithFinalMethod)
+println()
