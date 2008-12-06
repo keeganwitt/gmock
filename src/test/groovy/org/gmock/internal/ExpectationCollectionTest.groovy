@@ -110,7 +110,7 @@ class ExpectationCollectionTest extends GMockTestCase {
             def message = shouldFail(IllegalStateException) {
                 expectations.checkTimes(mockExpectation3)
             }
-            assertEquals "last method called on mock already has a non-fixed count set.", message
+            assertEquals "Last method called on mock already has a non-fixed count set.", message
         }
     }
 
