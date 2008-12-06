@@ -1,13 +1,19 @@
 package org.gmock;
 
+import groovy.lang.GroovyObject;
+
 public class JTest {
 
-    public void testLogger(Logger logger) {
+    public static void testLogger(Logger logger) {
         logger.info("call on java side");
     }
 
-    public void testFinalMethod(AClassWithFinalMethod obj) {
+    public static void testFinalMethod(AClassWithFinalMethod obj) {
         obj.aFinalMethod();
+    }
+
+    public static void printMetaClass(GroovyObject go) {
+        System.out.println(go.getMetaClass());
     }
 
 }

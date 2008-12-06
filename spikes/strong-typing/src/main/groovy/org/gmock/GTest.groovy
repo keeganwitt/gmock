@@ -70,6 +70,8 @@ class ProxyMetaMethod extends MetaMethod {
 
 class DispatcherMetaClass extends MetaClassImpl {
 
+    public static INSTANCES = []
+
     private MetaClass originalMetaClass
 
     private List metaClasses
@@ -80,7 +82,6 @@ class DispatcherMetaClass extends MetaClassImpl {
         metaClasses = new LinkedList()
     }
 
-
     static DispatcherMetaClass getInstance(Class clazz) {
         MetaClassRegistry registry = GroovySystem.metaClassRegistry
         MetaClass metaClass = registry.getMetaClass(clazz)
@@ -89,8 +90,14 @@ class DispatcherMetaClass extends MetaClassImpl {
         } else {
             DispatcherMetaClass filterMetaClass = new DispatcherMetaClass(clazz, metaClass)
             registry.setMetaClass(clazz, filterMetaClass)
+            INSTANCES << filterMetaClass
             return filterMetaClass
         }
+    }
+
+    static void clear() {
+        INSTANCES*.stopProxy()
+        INSTANCES = []
     }
 
     Object invokeMethod(Class sender, Object receiver, String methodName, Object[] arguments, boolean isCallToSuper, boolean fromInsideClass) {
@@ -143,6 +150,9 @@ class GroovyObjectMethodFilter implements CallbackFilter {
 
 }
 
+mockClasses = []
+mockInstances = []
+
 def mock(Class clazz = Object) {
     def mpmc = new MockProxyMetaClass(clazz)
 
@@ -165,14 +175,20 @@ def mock(Class clazz = Object) {
         def superClass = clazz.isInterface() ? Object : clazz
         def interfaces = clazz.isInterface() ? [clazz, GroovyObject] : [GroovyObject]
 
-        def enhancer = new Enhancer(superclass: superClass, interfaces: interfaces, useFactory: false,
+        def enhancer = new Enhancer(superclass: superClass, interfaces: interfaces, //useFactory: false,
                 callbackFilter: GroovyObjectMethodFilter.instance,
                 callbackTypes: [groovyMethodInterceptor.class, javaMethodInterceptor.class])
         def mockClass = enhancer.createClass()
-        Enhancer.registerCallbacks(mockClass, [groovyMethodInterceptor, javaMethodInterceptor] as Callback[])
+//        Enhancer.registerCallbacks(mockClass, [groovyMethodInterceptor, javaMethodInterceptor] as Callback[])
+
+        mockClasses << mockClass
 
         // use objenesis to instantiate the instance
         def mockInstance = ObjenesisHelper.newInstance(mockClass) // mockClass.newInstance()
+        MockHelper.setCallbacksTo(mockInstance, [groovyMethodInterceptor, javaMethodInterceptor] as Callback[])
+
+        mockInstances << mockInstance
+
         return mockInstance
     } else {
         def mockInstance = ObjenesisHelper.newInstance(clazz)
@@ -193,7 +209,7 @@ def mock(Class clazz = Object) {
 
     logger.info("call on groovy side")
     println()
-    new JTest().testLogger(logger)
+    JTest.testLogger(logger)
     println()
 
     logger.something = "set on groovy side"
@@ -268,11 +284,20 @@ println()
 println "some string: ".concat("try original implements")
 println()
 
+DispatcherMetaClass.clear()
 
 println "final method mocking".center(80, "-")
 AClassWithFinalMethod mockClassWithFinalMethod = mock(AClassWithFinalMethod)
 mockClassWithFinalMethod.aFinalMethod()
 println()
 // although we can mock final methods on the groovy side, but cannot do so on the java side
-new JTest().testFinalMethod(mockClassWithFinalMethod)
+JTest.testFinalMethod(mockClassWithFinalMethod)
+println()
+
+
+println "mock classes".center(80, "-")
+3.times { mock(GLogger) }
+mockClasses.each { println it }
+println()
+mockInstances.each { JTest.printMetaClass(it) }
 println()
