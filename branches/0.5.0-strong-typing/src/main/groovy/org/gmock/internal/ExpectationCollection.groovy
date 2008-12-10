@@ -46,7 +46,7 @@ class ExpectationCollection {
         }
         if (last != null && !(last.times instanceof StrictTimes)) {
             expectations.remove(expectation)
-            throw new IllegalStateException("last method called on mock already has a non-fixed count set.")
+            throw new IllegalStateException("Last method called on mock already has a non-fixed count set.")
         }
     }
 
