@@ -42,32 +42,32 @@ class ParameterSignatureTest extends GroovyTestCase {
                 signature.toString()
     }
 
-    void testHamcrestMatcherEquals() {
+    void testHamcrestMatcherMatch() {
         def signature1 = new ParameterSignature([greaterThan(1), "test", is(not(10))])
         def signature2 = new ParameterSignature([2, "test", 11])
-        assertEquals signature1, signature2
-        assertEquals signature2, signature1
+        assert signature1.match(signature2)
+        assert signature2.match(signature1)
     }
 
-    void testHamcrestMatcherNotEquals() {
+    void testHamcrestMatcherNotMatch() {
         def signature1 = new ParameterSignature([1, lessThan(1), 3])
         def signature2 = new ParameterSignature([1, 2, 3])
-        assert signature1 != signature2
-        assert signature2 != signature1
+        assert !signature1.match(signature2)
+        assert !signature2.match(signature1)
     }
 
-    void testClosureMatcherEquals() {
+    void testClosureMatcherMatch() {
         def signature1 = new ParameterSignature([1, match { it > 1 }, 3])
         def signature2 = new ParameterSignature([1, 2, 3])
-        assertEquals signature1, signature2
-        assertEquals signature2, signature1
+        assert signature1.match(signature2)
+        assert signature2.match(signature1)
     }
 
-    void testClosureMatcherNotEquals() {
+    void testClosureMatcherNotMatch() {
         def signature1 = new ParameterSignature([match { it != "test" }, "correct"])
         def signature2 = new ParameterSignature(["test", "correct"])
-        assert signature1 != signature2
-        assert signature2 != signature1
+        assert !signature1.match(signature2)
+        assert !signature2.match(signature1)
     }
 
 }

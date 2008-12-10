@@ -30,7 +30,7 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
 
     void testMatchConstructor(){
         Loader mockLoader = mock(Loader, constructor: ["a name"])
-        mockLoader.load("key").returns("value")
+        mockLoader.load("key").returns("a value")
         play {
             Loader loader = new Loader("a name")
             assertEquals "a value", loader.load("key")
@@ -71,7 +71,7 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
             assertEquals("a value", cache.load("a key"))
             assertEquals("a value", cache.load("a key"))
         }
-        
+
         mockLoader.load("another key").returns("another value").once()
         play {
             assertEquals("another value", cache.load("another key"))

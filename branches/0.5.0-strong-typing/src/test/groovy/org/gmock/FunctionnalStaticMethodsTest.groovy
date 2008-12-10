@@ -343,5 +343,13 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testMockStaticHashCode() {
+        Loader mockLoader = mock(Loader)
+        mockLoader.static.hashCode().returns(1)
+
+        play {
+            assertEquals 1, Loader.hashCode()
+        }
+    }
 
 }

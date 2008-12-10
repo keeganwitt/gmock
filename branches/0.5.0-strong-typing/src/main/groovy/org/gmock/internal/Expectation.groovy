@@ -16,7 +16,7 @@ class Expectation {
     }
 
     boolean canCall(methodSignature) {
-        return times.stillRemain(called) && signature == methodSignature
+        return times.stillRemain(called) && signature.match(methodSignature)
     }
 
     def doReturn() {

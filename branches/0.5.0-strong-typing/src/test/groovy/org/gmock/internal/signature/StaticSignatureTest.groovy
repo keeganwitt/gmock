@@ -1,7 +1,6 @@
 package org.gmock.internal.signature
 
 import org.gmock.Loader
-import org.gmock.Mock
 
 class StaticSignatureTest extends GroovyTestCase {
 
@@ -24,7 +23,7 @@ class StaticSignatureTest extends GroovyTestCase {
 
     void testNotEqualsDifferentMockClass() {
         def signature1 = new StaticSignature(Loader, "put", [1, 2])
-        def signature2 = new StaticSignature(Mock, "put", [1, 2])
+        def signature2 = new StaticSignature(Object, "put", [1, 2])
         assert signature1 != signature2
     }
 

@@ -17,10 +17,19 @@ class ParameterSignature {
     def validate(){
     }
 
-    boolean equals(Object signature) {
+    private boolean equalsWithoutArguments(Object signature) {
         if (signature == null || !(signature instanceof ParameterSignature)) return false
-        if (arguments.size() != signature.arguments.size()) return false
+        return true
+    }
 
+    boolean equals(Object signature) {
+        if (!equalsWithoutArguments(signature)) return false
+        return arguments == signature.arguments
+    }
+
+    boolean match(Object signature) {
+        if (!equalsWithoutArguments(signature)) return false
+        if (arguments.size() != signature.arguments.size()) return false
         return [arguments, signature.arguments].transpose().every { arg1, arg2 ->
             if (isMatcher(arg1)) return arg1.matches(arg2)
             else if (isMatcher(arg2)) return arg2.matches(arg1)
