@@ -17,6 +17,7 @@ class GMockController {
 
     def mocks = []
     def classExpectations = new ClassExpectations(this)
+    def dispatchers = new HashSet()
 
     // while running in internal mode, we should not mock any methods, instead, we should invoke the original implements
     // it is a little like the kernel mode in OS
@@ -71,6 +72,12 @@ class GMockController {
         }
     }
 
+    def stop() {
+        doInternal(this) {
+            dispatchers*.stopProxy()
+        }
+    }
+
     private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc) {
         def groovyMethodInterceptor = { obj, Method method, Object[] args, MethodProxy proxy ->
             switch (method.name) {
@@ -111,6 +118,7 @@ class GMockController {
             def fmc = DispatcherProxyMetaClass.getInstance(clazz)
             fmc.controller = this
             fmc.setMetaClassForInstance(mockInstance, mpmc)
+            dispatchers << fmc
         }
         return mockInstance
     }

@@ -69,9 +69,9 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
 
     /**
      * This method should be called to restore the original meta class, but I don't know where to call it between unit
-     * tests, although it is OK to leave the dispatcher meta class in the meta class registry
+     * tests except in the tearDown() method, although it is OK to leave the dispatcher meta class in the meta class
+     * registry
      */
-    // TODO: found out where to restore the original meta class
     void stopProxy() {
         registry.setMetaClass(theClass, adaptee)
     }
