@@ -347,10 +347,27 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
     void testMockStaticHashCode() {
         Loader mockLoader = mock(Loader)
         mockLoader.static.hashCode().returns(1)
+        mockLoader.static.hashCode().returns(2)
 
         play {
             assertEquals 1, Loader.hashCode()
+            assertEquals 2, Loader.hashCode()
         }
+    }
+
+    void testMockStaticHashCodeButUnexpectedCalled() {
+        Loader mockLoader = mock(Loader)
+        mockLoader.static.hashCode().returns(1)
+        mockLoader.static.hashCode().returns(2)
+
+        def expected = "Unexpected static method call 'Loader.toString()'\n" +
+                       "  'Loader.hashCode()': expected 2, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.toString()
+            }
+        }
+        assertEquals expected, message
     }
 
 }
