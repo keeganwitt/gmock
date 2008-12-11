@@ -32,7 +32,7 @@ class MockProxyMetaClass extends MetaClassImpl {
             if (replay){
                 def expectation = expectations.findMatching(signature)
                 if (expectation){
-                    return expectation.doReturn()
+                    return expectation.answer()
                 } else {
                     def callState = expectations.callState(signature).toString()
                     if (callState){ callState = "\n$callState" }
@@ -52,7 +52,7 @@ class MockProxyMetaClass extends MetaClassImpl {
                 def signature = new PropertyGetSignature(property)
                 def expectation = expectations.findMatching(signature)
                 if (expectation){
-                    return expectation.doReturn()
+                    return expectation.answer()
                 } else {
                     def callState = expectations.callState(signature).toString()
                     if (callState){ callState = "\n$callState" }
@@ -78,7 +78,7 @@ class MockProxyMetaClass extends MetaClassImpl {
                 def signature = new PropertySetSignature(property, value)
                 def expectation = expectations.findMatching(signature)
                 if (expectation){
-                    expectation.doReturn()
+                    expectation.answer()
                 } else {
                     def callState = expectations.callState(signature).toString()
                     if (callState){ callState = "\n$callState" }

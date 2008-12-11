@@ -1,12 +1,13 @@
 package org.gmock.internal
 
+import org.gmock.internal.result.ReturnNull
 import org.gmock.internal.times.StrictTimes
 
 class Expectation {
 
     def expectations
     def signature
-    def returnValue = new ReturnNull()
+    def result = new ReturnNull()
     def times = new StrictTimes(1)
     def called = 0
 
@@ -19,21 +20,23 @@ class Expectation {
         return times.stillRemain(called) && signature.match(methodSignature)
     }
 
-    def doReturn() {
+    def answer() {
         ++called
-        return returnValue.doReturn()
+        return result.answer()
     }
 
     def isVerified() {
+        // TODO: should we check if signature is null here any more?
         return !signature || called in times
     }
 
     def validate(){
+        // TODO: should we check if signature is null here any more?
         signature?.validate()
     }
 
     String toString() {
-        return "Expectation [signature: $signature, return: $returnValue, times: $times]"
+        return "Expectation [signature: $signature, result: $result, times: $times]"
     }
 
 }

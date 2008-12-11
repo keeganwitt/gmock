@@ -6,10 +6,14 @@ import net.sf.cglib.proxy.Callback
 import net.sf.cglib.proxy.Enhancer
 import net.sf.cglib.proxy.MethodInterceptor
 import net.sf.cglib.proxy.MethodProxy
-import org.gmock.internal.*
+import org.gmock.internal.ClassExpectations
+import org.gmock.internal.Expectation
+import org.gmock.internal.GroovyObjectMethodFilter
 import static org.gmock.internal.InternalModeHelper.doInternal
+import org.gmock.internal.MockHelper
 import org.gmock.internal.metaclass.DispatcherProxyMetaClass
 import org.gmock.internal.metaclass.MockProxyMetaClass
+import org.gmock.internal.result.ReturnValue
 import org.gmock.internal.signature.ConstructorSignature
 import org.objenesis.ObjenesisHelper
 
@@ -36,7 +40,7 @@ class GMockController {
 
             if (constraints.constructor != null){
                 def signature = new ConstructorSignature(clazz, constraints.constructor)
-                def expectation = new Expectation(returnValue: new ReturnValue(mockInstance))
+                def expectation = new Expectation(result: new ReturnValue(mockInstance))
                 classExpectations.addConstructorExpectation(clazz, expectation)
                 expectation.signature = signature
             }

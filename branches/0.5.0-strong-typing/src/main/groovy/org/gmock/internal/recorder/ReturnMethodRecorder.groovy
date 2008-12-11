@@ -1,7 +1,7 @@
 package org.gmock.internal.recorder
 
-import org.gmock.internal.ReturnRaiseException
-import org.gmock.internal.ReturnValue
+import org.gmock.internal.result.ReturnValue
+import org.gmock.internal.result.ThrowException
 
 class ReturnMethodRecorder extends BaseRecorder {
 
@@ -9,18 +9,18 @@ class ReturnMethodRecorder extends BaseRecorder {
         super(expectation)
     }
 
-    def returns(returnValue){
-        expectation.returnValue = new ReturnValue(returnValue)
+    def returns(value){
+        expectation.result = new ReturnValue(value)
         return this
     }
 
     def raises(Throwable exception){
-        expectation.returnValue = new ReturnRaiseException(exception)
+        expectation.result = new ThrowException(exception)
         return this
     }
 
     def raises(Class exceptionClass, Object[] params) {
-        expectation.returnValue = new ReturnRaiseException(exceptionClass, params)
+        expectation.result = new ThrowException(exceptionClass, params)
         return this
     }
 

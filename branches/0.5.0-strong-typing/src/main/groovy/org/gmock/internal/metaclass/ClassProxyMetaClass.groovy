@@ -56,7 +56,7 @@ class ClassProxyMetaClass extends ProxyMetaClass {
                 def signature = new ConstructorSignature(theClass, arguments)
                 def expectation = constructorExpectations.findMatching(signature)
                 if (expectation){
-                    return expectation.doReturn()
+                    return expectation.answer()
                 } else {
                     def callState = constructorExpectations.callState(signature).toString()
                     if (callState){ callState = "\n$callState" }
@@ -76,7 +76,7 @@ class ClassProxyMetaClass extends ProxyMetaClass {
                 def signature = new StaticSignature(aClass, method, arguments)
                 def expectation = staticExpectations.findMatching(signature)
                 if (expectation){
-                    return expectation.doReturn()
+                    return expectation.answer()
                 } else {
                     def callState = staticExpectations.callState(signature).toString()
                     if (callState){ callState = "\n$callState" }
