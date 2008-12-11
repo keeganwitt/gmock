@@ -2,6 +2,7 @@ package org.gmock
 
 import junit.framework.AssertionFailedError
 import static org.hamcrest.Matchers.*
+import org.gmock.utils.Loader
 
 class FunctionnalConstructorsTest extends GMockTestCase {
 

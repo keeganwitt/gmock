@@ -1,6 +1,6 @@
-package org.gmock;
+package org.gmock.utils;
 
-public class JavaLoader {
+public class JavaLoader implements ILoader {
 
     private String name;
 

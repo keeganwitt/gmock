@@ -1,8 +1,6 @@
 package org.gmock
 
-import org.gmock.utils.GroovyFinalClass
-import org.codehaus.groovy.tools.GroovyClass
-
+import org.gmock.utils.*
 
 class FunctionnalStrongTypingTest extends GMockTestCase {
 
@@ -16,9 +14,7 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
             assertEquals("a value", cache.load("a key"))
             assertEquals("a value", cache.load("a key"))
         }
-
     }
-
 
     void testGroovyClass(){
         GroovyClass mockGroovy = mock(GroovyClass)
@@ -61,7 +57,7 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
         }
     }
 
-    void multiplePlay(){
+    void testMultiplePlay(){
         JavaLoader mockLoader = mock(JavaLoader)
 
         JavaCache cache = new JavaCache(mockLoader)
@@ -77,7 +73,32 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
             assertEquals("another value", cache.load("another key"))
             assertEquals("another value", cache.load("another key"))
         }
+    }
 
+    void testLoaderInterface() {
+        ILoader mockLoader = mock(ILoader)
+        mockLoader.load("johnny").returns("jian").once()
+
+        JavaCache cache = new JavaCache(null)
+
+        play {
+            3.times {
+                assertEquals "jian", cache.load("johnny", mockLoader)
+            }
+        }
+    }
+
+    void testPassAMockGroovyObjectToJava() {
+        GroovyLoader mockLoader = mock(GroovyLoader)
+        mockLoader.load("johnny").returns("jian").once()
+
+        JavaCache cache = new JavaCache(null)
+
+        play {
+            3.times {
+                assertEquals "jian", cache.load("johnny", mockLoader)
+            }
+        }
     }
 
 }

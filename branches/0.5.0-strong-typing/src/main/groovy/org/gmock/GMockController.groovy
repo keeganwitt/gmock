@@ -47,6 +47,28 @@ class GMockController {
         return mock([:], clazz)
     }
 
+    def play(Closure closure) {
+        doInternal {
+            mocks*.validate()
+            classExpectations.validate()
+            mocks*.replay()
+            classExpectations.startProxy()
+        }
+        try {
+            closure.call()
+        } finally {
+            doInternal {
+                classExpectations.stopProxy()
+            }
+        }
+        doInternal {
+            mocks*.verify()
+            classExpectations.verify()
+            mocks*.reset()
+            classExpectations.reset()
+        }
+    }
+
     private doInternal(Closure work) {
         internal = true
         try {
@@ -82,46 +104,27 @@ class GMockController {
                                     callbackTypes: [MethodInterceptor, MethodInterceptor])
         def mockClass = enhancer.createClass()
 
-        // use objenesis to instantiate the instance
-        def mockInstance = ObjenesisHelper.newInstance(mockClass)
+        def mockInstance = newInstance(mockClass)
         MockHelper.setCallbacksTo(mockInstance, [groovyMethodInterceptor, javaMethodInterceptor] as Callback[])
 
         return mockInstance
     }
 
     private mockFinalClass(Class clazz, MockProxyMetaClass mpmc) {
-        // TODO
-//        def mockInstance = ObjenesisHelper.newInstance(clazz)
-//        if (GroovyObject.isAssignableFrom(clazz)) {
-//            mockInstance.metaClass = mpmc
-//        } else {
+        def mockInstance = newInstance(clazz)
+        if (GroovyObject.isAssignableFrom(clazz)) {
+            mockInstance.metaClass = mpmc
+        } else {
+            // TODO
 //            def fmc = DispatcherMetaClass.getInstance(clazz)
 //            fmc.setMetaClassForInstance(mockInstance, mpmc)
-//        }
-//        return mockInstance
-        return null
+        }
+        return mockInstance
     }
 
-    def play(Closure closure) {
-        doInternal {
-            mocks*.validate()
-            classExpectations.validate()
-            mocks*.replay()
-            classExpectations.startProxy()
-        }
-        try {
-            closure.call()
-        } finally {
-            doInternal {
-                classExpectations.stopProxy()
-            }
-        }
-        doInternal {
-            mocks*.verify()
-            classExpectations.verify()
-            mocks*.reset()
-            classExpectations.reset()
-        }
+    private newInstance(Class clazz) {
+        // use objenesis to instantiate an instance
+        ObjenesisHelper.newInstance(clazz)
     }
 
 }

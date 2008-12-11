@@ -1,6 +1,6 @@
 package org.gmock.internal.signature
 
-import org.gmock.Loader
+import org.gmock.utils.Loader
 
 class StaticSignatureTest extends GroovyTestCase {
 

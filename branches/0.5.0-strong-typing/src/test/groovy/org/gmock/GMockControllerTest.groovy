@@ -2,6 +2,7 @@ package org.gmock
 
 import junit.framework.AssertionFailedError
 import static org.gmock.GMock.match
+import org.gmock.utils.Loader
 
 class GMockControllerTest extends GroovyTestCase {
 
