@@ -56,13 +56,13 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
 
     void setMetaClassForInstance(Object instance, MetaClass mc) {
         doInternal(controller) {
-            metaClasses.put(instance, mc)
+            metaClasses.put(new InstanceWrapper(instance), mc)
         }
     }
 
     MetaClass getMetaClassForInstance(Object instance) {
         doInternal(controller, { adaptee }) {
-            MetaClass mc = metaClasses.get(instance)
+            MetaClass mc = metaClasses.get(new InstanceWrapper(instance))
             return mc ?: adaptee
         }
     }
@@ -74,6 +74,32 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
     // TODO: found out where to restore the original meta class
     void stopProxy() {
         registry.setMetaClass(theClass, adaptee)
+    }
+
+}
+
+/**
+ * This wrapper overrides the equals() method so that the wrapped instances are equal if and only if they are exactly
+ * the same instance.
+ */
+class InstanceWrapper {
+
+    def instance
+
+    InstanceWrapper(instance) {
+        this.instance = instance
+    }
+
+    public int hashCode() {
+        instance.hashCode()
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof InstanceWrapper) {
+            return instance.is(obj.instance)
+        } else {
+            return instance.is(obj)
+        }
     }
 
 }
@@ -93,15 +119,15 @@ class ProxyMetaMethod extends MetaMethod {
     }
 
     int getModifiers() {
-        return Modifier.PUBLIC
+        Modifier.PUBLIC
     }
 
     Class getReturnType() {
-        return Object
+        Object
     }
 
     Object invoke(Object object, Object[] arguments) {
-        return theMetaClass.invokeMethod(object, name, arguments)
+        theMetaClass.invokeMethod(object, name, arguments)
     }
 
 }
