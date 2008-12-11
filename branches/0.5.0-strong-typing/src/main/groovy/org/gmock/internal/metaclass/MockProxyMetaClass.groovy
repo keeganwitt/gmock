@@ -11,23 +11,25 @@ import org.gmock.internal.signature.MethodSignature
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
 
-class MockProxyMetaClass extends MetaClassImpl {
+class MockProxyMetaClass extends ProxyMetaClass {
 
     def expectations = new ExpectationCollection()
     def classExpectations
     def replay = false
     def controller
-    MetaClass originalMetaClass
 
     MockProxyMetaClass(Class clazz, classExpectations, controller) {
-        super(clazz)
+        super(GroovySystem.metaClassRegistry, clazz, GroovySystem.metaClassRegistry.getMetaClass(clazz))
         this.classExpectations = classExpectations
         this.controller = controller
-        originalMetaClass = GroovySystem.metaClassRegistry.getMetaClass(clazz)
+    }
+
+    Object invokeMethod(Object object, String methodName, Object[] arguments) {
+        invokeMethod(theClass, object, methodName, arguments, false, false)
     }
 
     Object invokeMethod(Class sender, Object receiver, String methodName, Object[] arguments, boolean isCallToSuper, boolean fromInsideClass) {
-        doInternal controller, { originalMetaClass.invokeMethod(receiver, methodName, arguments) }, {
+        doInternal controller, { adaptee.invokeMethod(receiver, methodName, arguments) }, {
             def signature = new MethodSignature(methodName, arguments)
             if (replay){
                 def expectation = expectations.findMatching(signature)
@@ -46,8 +48,12 @@ class MockProxyMetaClass extends MetaClassImpl {
         }
     }
 
+    Object getProperty(Object object, String property) {
+        getProperty(theClass, object, property, false, false)
+    }
+
     Object getProperty(Class sender, Object receiver, String property, boolean isCallToSuper, boolean fromInsideClass) {
-        doInternal controller, { originalMetaClass.getProperty(receiver, property) }, {
+        doInternal controller, { adaptee.getProperty(receiver, property) }, {
             if (replay){
                 def signature = new PropertyGetSignature(property)
                 def expectation = expectations.findMatching(signature)
@@ -72,8 +78,12 @@ class MockProxyMetaClass extends MetaClassImpl {
         }
     }
 
+    void setProperty(Object object, String property, Object newValue) {
+        setProperty(theClass, object, property, newValue, false, false)
+    }
+
     void setProperty(Class sender, Object receiver, String property, Object value, boolean isCallToSuper, boolean fromInsideClass) {
-        doInternal controller, { originalMetaClass.setProperty(receiver, property, value) }, {
+        doInternal controller, { adaptee.setProperty(receiver, property, value) }, {
             if (replay){
                 def signature = new PropertySetSignature(property, value)
                 def expectation = expectations.findMatching(signature)
@@ -92,9 +102,7 @@ class MockProxyMetaClass extends MetaClassImpl {
     }
 
     void verify(){
-        if (!replay){
-            fail("Verify must be called on Mock after replay")
-        }
+        assert replay, "verify() must be called after replay()."
         expectations.verify()
     }
 

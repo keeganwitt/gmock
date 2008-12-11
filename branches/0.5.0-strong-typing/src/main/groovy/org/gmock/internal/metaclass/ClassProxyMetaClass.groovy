@@ -12,7 +12,6 @@ import org.gmock.internal.signature.StaticSignature
  */
 class ClassProxyMetaClass extends ProxyMetaClass {
 
-    MetaClass originalMetaClass
     ExpectationCollection constructorExpectations = new ExpectationCollection()
     ExpectationCollection staticExpectations = new ExpectationCollection()
     def controller
@@ -22,18 +21,18 @@ class ClassProxyMetaClass extends ProxyMetaClass {
     }
 
     static getInstance(theClass){
-        MetaClassRegistry metaRegistry = GroovySystem.getMetaClassRegistry();
-        MetaClass meta = metaRegistry.getMetaClass(theClass);
-        return new ClassProxyMetaClass(metaRegistry, theClass, meta);
+        MetaClassRegistry registry = GroovySystem.metaClassRegistry
+        MetaClass adaptee = registry.getMetaClass(theClass)
+        return new ClassProxyMetaClass(registry, theClass, adaptee)
     }
 
     def startProxy(){
-        originalMetaClass = registry.getMetaClass(theClass);
-        registry.setMetaClass(theClass, this);
+        adaptee = registry.getMetaClass(theClass)
+        registry.setMetaClass(theClass, this)
     }
 
     def stopProxy(){
-        registry.setMetaClass(theClass, originalMetaClass);
+        registry.setMetaClass(theClass, adaptee)
     }
 
     def validate(){
@@ -52,7 +51,7 @@ class ClassProxyMetaClass extends ProxyMetaClass {
 
     public Object invokeConstructor(Object[] arguments) {
         if (!constructorExpectations.empty()) {
-            return doInternal(controller, { originalMetaClass.invokeConstructor(arguments) }) {
+            return doInternal(controller, { adaptee.invokeConstructor(arguments) }) {
                 def signature = new ConstructorSignature(theClass, arguments)
                 def expectation = constructorExpectations.findMatching(signature)
                 if (expectation){
@@ -64,15 +63,15 @@ class ClassProxyMetaClass extends ProxyMetaClass {
                 }
             }
         } else {
-            return originalMetaClass.invokeConstructor( arguments )
+            return adaptee.invokeConstructor( arguments )
         }
     }
 
     public Object invokeStaticMethod(Object aClass, String method, Object[] arguments) {
         if (staticExpectations.empty()) {
-            return originalMetaClass.invokeStaticMethod(aClass, method, arguments)
+            return adaptee.invokeStaticMethod(aClass, method, arguments)
         } else {
-            return doInternal(controller, { originalMetaClass.invokeStaticMethod(aClass, method, arguments) }) {
+            return doInternal(controller, { adaptee.invokeStaticMethod(aClass, method, arguments) }) {
                 def signature = new StaticSignature(aClass, method, arguments)
                 def expectation = staticExpectations.findMatching(signature)
                 if (expectation){

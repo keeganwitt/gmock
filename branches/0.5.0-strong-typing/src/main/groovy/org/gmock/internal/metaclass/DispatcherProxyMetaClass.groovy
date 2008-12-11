@@ -27,19 +27,19 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
     }
 
     Object invokeMethod(Object object, String methodName, Object[] arguments) {
-        return invokeMethod(theClass, object, methodName, arguments, false, false)
+        invokeMethod(theClass, object, methodName, arguments, false, false)
     }
 
     Object invokeMethod(Class sender, Object receiver, String methodName, Object[] arguments, boolean isCallToSuper, boolean fromInsideClass) {
-        return getMetaClassForInstance(receiver).invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
+        getMetaClassForInstance(receiver).invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
     }
 
     Object getProperty(Object object, String property) {
-        return getProperty(theClass, object, property, false, false)
+        getProperty(theClass, object, property, false, false)
     }
 
     Object getProperty(Class sender, Object receiver, String property, boolean isCallToSuper, boolean fromInsideClass) {
-        return getMetaClassForInstance(receiver).getProperty(sender, receiver, property, isCallToSuper, fromInsideClass)
+        getMetaClassForInstance(receiver).getProperty(sender, receiver, property, isCallToSuper, fromInsideClass)
     }
 
     void setProperty(Object object, String property, Object newValue) {
