@@ -7,12 +7,11 @@ import static org.gmock.internal.InternalModeHelper.doInternal
 
 class DispatcherProxyMetaClass extends ProxyMetaClass {
 
-    private List metaClasses
+    private Map metaClasses = [:]
     def controller
 
     private DispatcherProxyMetaClass(MetaClassRegistry registry, Class clazz, MetaClass originalMetaClass) {
         super(registry, clazz, originalMetaClass)
-        metaClasses = new LinkedList()
     }
 
     static DispatcherProxyMetaClass getInstance(Class clazz) {
@@ -55,14 +54,16 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
         new ProxyMetaMethod(this, methodName, arguments)
     }
 
-    void setMetaClassForInstance(Object instance, MetaClass metaClass) {
-        metaClasses << [instance, metaClass]
+    void setMetaClassForInstance(Object instance, MetaClass mc) {
+        doInternal(controller) {
+            metaClasses.put(instance, mc)
+        }
     }
 
     MetaClass getMetaClassForInstance(Object instance) {
         doInternal(controller, { adaptee }) {
-            MetaClass metaClass = metaClasses.find { obj, mc -> instance.is(obj) }?.get(1)
-            return metaClass ?: adaptee
+            MetaClass mc = metaClasses.get(instance)
+            return mc ?: adaptee
         }
     }
 
