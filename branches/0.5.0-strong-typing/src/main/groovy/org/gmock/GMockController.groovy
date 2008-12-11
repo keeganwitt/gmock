@@ -7,6 +7,8 @@ import net.sf.cglib.proxy.Enhancer
 import net.sf.cglib.proxy.MethodInterceptor
 import net.sf.cglib.proxy.MethodProxy
 import org.gmock.internal.*
+import static org.gmock.internal.InternalModeHelper.doInternal
+import org.gmock.internal.metaclass.DispatcherProxyMetaClass
 import org.gmock.internal.metaclass.MockProxyMetaClass
 import org.gmock.internal.signature.ConstructorSignature
 import org.objenesis.ObjenesisHelper
@@ -21,7 +23,7 @@ class GMockController {
     def internal = false
 
     def mock(Map constraints = [:], Class clazz = Object) {
-        doInternal {
+        doInternal(this) {
             def mpmc = new MockProxyMetaClass(clazz, classExpectations, this)
             def mockInstance
 
@@ -48,7 +50,7 @@ class GMockController {
     }
 
     def play(Closure closure) {
-        doInternal {
+        doInternal(this) {
             mocks*.validate()
             classExpectations.validate()
             mocks*.replay()
@@ -57,24 +59,15 @@ class GMockController {
         try {
             closure.call()
         } finally {
-            doInternal {
+            doInternal(this) {
                 classExpectations.stopProxy()
             }
         }
-        doInternal {
+        doInternal(this) {
             mocks*.verify()
             classExpectations.verify()
             mocks*.reset()
             classExpectations.reset()
-        }
-    }
-
-    private doInternal(Closure work) {
-        internal = true
-        try {
-            return work()
-        } finally {
-            internal = false
         }
     }
 
@@ -115,9 +108,9 @@ class GMockController {
         if (GroovyObject.isAssignableFrom(clazz)) {
             mockInstance.metaClass = mpmc
         } else {
-            // TODO
-//            def fmc = DispatcherMetaClass.getInstance(clazz)
-//            fmc.setMetaClassForInstance(mockInstance, mpmc)
+            def fmc = DispatcherProxyMetaClass.getInstance(clazz)
+            fmc.controller = this
+            fmc.setMetaClassForInstance(mockInstance, mpmc)
         }
         return mockInstance
     }

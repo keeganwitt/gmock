@@ -3,7 +3,7 @@ package org.gmock.internal.metaclass
 import static junit.framework.Assert.fail
 import org.gmock.internal.Expectation
 import org.gmock.internal.ExpectationCollection
-import static org.gmock.internal.metaclass.InternalModeHelper.doInternal
+import static org.gmock.internal.InternalModeHelper.doInternal
 import org.gmock.internal.recorder.PropertyRecorder
 import org.gmock.internal.recorder.ReturnMethodRecorder
 import org.gmock.internal.recorder.StaticMethodRecoder

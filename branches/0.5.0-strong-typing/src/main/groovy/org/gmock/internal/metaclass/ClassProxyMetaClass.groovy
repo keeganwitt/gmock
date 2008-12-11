@@ -3,7 +3,7 @@ package org.gmock.internal.metaclass
 import java.beans.IntrospectionException
 import static junit.framework.Assert.fail
 import org.gmock.internal.ExpectationCollection
-import static org.gmock.internal.metaclass.InternalModeHelper.doInternal
+import static org.gmock.internal.InternalModeHelper.doInternal
 import org.gmock.internal.signature.ConstructorSignature
 import org.gmock.internal.signature.StaticSignature
 

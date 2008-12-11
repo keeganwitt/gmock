@@ -2,6 +2,8 @@ package org.gmock
 
 import junit.framework.AssertionFailedError
 import static org.gmock.GMock.match
+import org.gmock.utils.JavaCache
+import org.gmock.utils.JavaLoader
 import org.gmock.utils.Loader
 
 class GMockControllerTest extends GroovyTestCase {
@@ -61,6 +63,20 @@ class GMockControllerTest extends GroovyTestCase {
 
         gmc.play {
             assertEquals "correct", mockLoader.load(8)
+        }
+    }
+
+    void testStrongTyping() {
+        def gmc = new GMockController()
+        JavaLoader mockLoader = gmc.mock(JavaLoader)
+        mockLoader.load("key").returns("something").once()
+
+        JavaCache cache = new JavaCache(mockLoader)
+
+        gmc.play {
+            3.times {
+                assertEquals "something", cache.load("key")
+            }
         }
     }
 
