@@ -2,13 +2,13 @@ package org.gmock.internal.recorder
 
 import org.gmock.GMockTestCase
 import org.gmock.internal.Expectation
-import org.gmock.internal.ReturnNull
-import org.gmock.internal.ReturnRaiseException
-import org.gmock.internal.ReturnValue
+import org.gmock.internal.result.ReturnNull
+import org.gmock.internal.result.ReturnValue
+import org.gmock.internal.result.ThrowException
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
-import org.gmock.internal.times.AnyTimes
 import org.gmock.internal.signature.PropertyUncompleteSignature
+import org.gmock.internal.times.AnyTimes
 
 class PropertyRecorderTest extends GMockTestCase {
 
@@ -26,8 +26,8 @@ class PropertyRecorderTest extends GMockTestCase {
         }
 
         assertEquals getSignature, expectation.signature
-        assertEquals ReturnValue, expectation.returnValue.class
-        assertEquals "a name", expectation.returnValue.returnValue
+        assertEquals ReturnValue, expectation.result.class
+        assertEquals "a name", expectation.result.value
     }
 
     void testRecordSetProperty(){
@@ -44,7 +44,7 @@ class PropertyRecorderTest extends GMockTestCase {
         }
 
         assertEquals setSignature, expectation.signature
-        assertEquals ReturnNull, expectation.returnValue.class
+        assertEquals ReturnNull, expectation.result.class
     }
 
     void testStubRecord(){
@@ -69,8 +69,8 @@ class PropertyRecorderTest extends GMockTestCase {
 
         assertEquals propertyRecorder, propertyRecorder.raises(exception)
 
-        assertEquals ReturnRaiseException, expectation.returnValue.class
-        assertEquals exception, expectation.returnValue.exception
+        assertEquals ThrowException, expectation.result.class
+        assertEquals exception, expectation.result.exception
 
     }
 
@@ -84,10 +84,10 @@ class PropertyRecorderTest extends GMockTestCase {
 
         assertEquals propertyRecorder, propertyRecorder.raises(Exception, "test", cause)
 
-        assertEquals ReturnRaiseException, expectation.returnValue.class
-        assertEquals Exception, expectation.returnValue.exception.class
-        assertEquals "test", expectation.returnValue.exception.message
-        assertEquals cause, expectation.returnValue.exception.cause
+        assertEquals ThrowException, expectation.result.class
+        assertEquals Exception, expectation.result.exception.class
+        assertEquals "test", expectation.result.exception.message
+        assertEquals cause, expectation.result.exception.cause
     }
 
 }

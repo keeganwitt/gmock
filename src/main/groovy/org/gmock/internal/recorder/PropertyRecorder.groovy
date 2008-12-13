@@ -1,8 +1,8 @@
 package org.gmock.internal.recorder
 
-import org.gmock.internal.ReturnNull
-import org.gmock.internal.ReturnRaiseException
-import org.gmock.internal.ReturnValue
+import org.gmock.internal.result.ReturnNull
+import org.gmock.internal.result.ReturnValue
+import org.gmock.internal.result.ThrowException
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
 import org.gmock.internal.signature.PropertyUncompleteSignature
@@ -23,13 +23,13 @@ class PropertyRecorder extends BaseRecorder {
 
     def set(value) {
         expectation.signature = new PropertySetSignature(propertyName, value)
-        expectation.returnValue = new ReturnNull()
+        expectation.result = new ReturnNull()
         return this
     }
 
     def returns(value) {
         expectation.signature = new PropertyGetSignature(propertyName)
-        expectation.returnValue = new ReturnValue(value)
+        expectation.result = new ReturnValue(value)
         return this
     }
 
@@ -37,7 +37,7 @@ class PropertyRecorder extends BaseRecorder {
         if (expectation.signature.class == PropertyUncompleteSignature){
             expectation.signature = new PropertyGetSignature(propertyName)
         }
-        expectation.returnValue = ReturnRaiseException.metaClass.invokeConstructor(params)
+        expectation.result = ThrowException.metaClass.invokeConstructor(params)
         return this
     }
 

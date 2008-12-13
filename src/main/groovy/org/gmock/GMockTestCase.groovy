@@ -2,12 +2,28 @@ package org.gmock
 
 abstract class GMockTestCase extends GroovyTestCase {
 
-    def gMockController = new GMockController()
+    protected gMockController = new GMockController()
 
-    def mock = gMockController.&mock
+    protected mock = gMockController.&mock
 
-    def play = gMockController.&play
+    protected play = gMockController.&play
 
-    def match = GMock.&match
+    protected match = GMock.&match
+
+    public void runBare() {
+        Throwable exception = null
+        try {
+            super.runBare()
+        } catch (Throwable e) {
+            exception = e
+        } finally {
+            try {
+                gMockController.stop()
+            } catch (Throwable e) {
+                exception = exception ?: e
+            }
+        }
+        if (exception) throw exception
+    }
 
 }

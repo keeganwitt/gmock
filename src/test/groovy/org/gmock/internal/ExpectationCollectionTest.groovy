@@ -52,10 +52,11 @@ class ExpectationCollectionTest extends GMockTestCase {
         mockCallState.append(mockExpectation1)
         mockCallState.append(mockExpectation2)
         mockCallState.append(mockExpectation3)
+        mockCallState.toString().returns("mockCallState")
         mockExpectation1.isVerified().returns(true)
         mockExpectation2.isVerified().returns(false)
         expectations.expectations = [mockExpectation1, mockExpectation2, mockExpectation3]
-        def expected = "Expectation not matched on verify:\n$mockCallState"
+        def expected = "Expectation not matched on verify:\nmockCallState"
 
         play {
             def message = shouldFail(AssertionFailedError) {
@@ -88,6 +89,9 @@ class ExpectationCollectionTest extends GMockTestCase {
     void testCheckTimes() {
         def signature1 = new MethodSignature("a", [1])
         def signature2 = new MethodSignature("b", [2])
+        mockExpectation3.is(mockExpectation3).returns(true)
+        mockExpectation2.is(mockExpectation3).returns(false)
+        mockExpectation1.is(mockExpectation3).returns(false)
         mockExpectation3.signature.returns(signature1).atLeast(1)
         mockExpectation2.signature.returns(signature2)
         mockExpectation1.signature.returns(signature1)
@@ -101,10 +105,17 @@ class ExpectationCollectionTest extends GMockTestCase {
 
     void testCheckTimesFailed() {
         def signature = new MethodSignature("a", [1])
+
+        mockExpectation3.is(mockExpectation3).returns(true)
+        mockExpectation2.is(mockExpectation3).returns(false)
         mockExpectation3.signature.returns(signature).atLeast(1)
         mockExpectation2.signature.returns(signature)
         mockExpectation2.times.returns(new RangeTimes(1..2))
-        expectations.expectations = [mockExpectation1, mockExpectation2, mockExpectation3]
+
+        def mockExpectations = mock()
+        mockExpectations.reverse().returns([mockExpectation3, mockExpectation2, mockExpectation1])
+        mockExpectations.remove(mockExpectation3)
+        expectations.expectations = mockExpectations
 
         play {
             def message = shouldFail(IllegalStateException) {

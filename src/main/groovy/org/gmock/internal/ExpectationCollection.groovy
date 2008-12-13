@@ -1,6 +1,6 @@
 package org.gmock.internal
 
-import static junit.framework.Assert.*
+import static junit.framework.Assert.fail
 import org.gmock.internal.times.StrictTimes
 
 class ExpectationCollection {

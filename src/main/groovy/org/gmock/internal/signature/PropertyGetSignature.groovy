@@ -22,9 +22,12 @@ class PropertyGetSignature {
         return true
     }
 
+    boolean match(Object getSignature) {
+        return equals(getSignature)
+    }
+
     int hashCode() {
         propertyName.hashCode()
     }
-
 
 }
