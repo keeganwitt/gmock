@@ -75,16 +75,6 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
-    void testVerifyObjectNotReplayed() {
-        def mockLoader = mock()
-        try {
-            mockLoader._verify()
-            fail("Should have throw an exception")
-        } catch (Throwable e) {
-            assertEquals "Verify must be called on Mock after replay", e.message
-        }
-    }
-
     void testMultipleExpectation() {
         def mockLoader = mock()
         mockLoader.load("key").returns("result")
@@ -526,6 +516,45 @@ class FunctionalTest extends GMockTestCase {
         shouldFail(IllegalStateException) {
             mockLoader.put(9, 9).atLeastOnce()
         }
+    }
+
+    void testPassAMockObjectToAnother() {
+        def mock1 = mock()
+        def mock2 = mock()
+        mock1.is(mock2).returns(true)
+
+        play {
+            assert mock1.is(mock2)
+        }
+    }
+
+    void testPassAMockObjectToAnotherButUnexpectedCalled() {
+        def mock1 = mock()
+        def mock2 = mock()
+        def mock3 = mock()
+        mock1.is(mock2).returns(true)
+
+        def expected = "Unexpected method call 'is(.*)'\n" +
+                       "  'is(.*)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                mock1.is(mock3)
+            }
+        }
+        assert message ==~ expected
+    }
+
+    void testPassAMockObjectToAnotherButNotCalled() {
+        def mock1 = mock()
+        def mock2 = mock()
+        mock1.is(mock2).returns(true)
+        
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'is(.*)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {}
+        }
+        assert message ==~ expected
     }
 
 }

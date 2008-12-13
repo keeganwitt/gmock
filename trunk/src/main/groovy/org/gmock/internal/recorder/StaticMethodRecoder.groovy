@@ -2,7 +2,7 @@ package org.gmock.internal.recorder
 
 import org.gmock.internal.signature.StaticSignature
 
-class StaticMethodRecoder {
+class StaticMethodRecoder implements GroovyInterceptable {
 
     def expectation
     def aClass
@@ -13,7 +13,7 @@ class StaticMethodRecoder {
         this.expectation.signature = new StaticSignature(aClass)
     }
 
-    def methodMissing(String name, args) {
+    Object invokeMethod(String name, Object args) {
         expectation.signature = new StaticSignature(aClass, name, args)
         return new ReturnMethodRecorder(expectation)
     }

@@ -1,13 +1,21 @@
 package org.gmock.internal
 
+import org.gmock.internal.metaclass.ClassProxyMetaClass
+
 class ClassExpectations {
 
     def proxies = [:]
+    def controller
+
+    ClassExpectations(controller) {
+        this.controller = controller
+    }
 
     def addConstructorExpectation(aClass, expectation){
-        ClassProxy proxy = proxies.get(aClass)
+        ClassProxyMetaClass proxy = proxies.get(aClass)
         if (!proxy){
-            proxy = ClassProxy.getInstance(aClass)
+            proxy = ClassProxyMetaClass.getInstance(aClass)
+            proxy.controller = controller
             proxies.put(aClass, proxy)
         }
         proxy.constructorExpectations.add(expectation)
@@ -15,9 +23,10 @@ class ClassExpectations {
     }
 
     def addStaticExpectation(aClass, expectation){
-        ClassProxy proxy = proxies.get(aClass)
+        ClassProxyMetaClass proxy = proxies.get(aClass)
         if (!proxy){
-            proxy = ClassProxy.getInstance(aClass)
+            proxy = ClassProxyMetaClass.getInstance(aClass)
+            proxy.controller = controller
             proxies.put(aClass, proxy)
         }
         proxy.staticExpectations.add(expectation)

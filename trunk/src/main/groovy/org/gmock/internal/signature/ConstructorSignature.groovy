@@ -17,10 +17,21 @@ class ConstructorSignature {
     def validate(){
     }
 
-    boolean equals(Object constructor) {
+    private boolean equalsWithoutArguments(Object constructor) {
         if (constructor == null || getClass() != constructor.getClass()) return false
         if (aClass != constructor.aClass) return false
+        return true
+    }
+
+    boolean equals(Object constructor) {
+        if (!equalsWithoutArguments(constructor)) return false
         if (arguments != constructor.arguments) return false
+        return true
+    }
+
+    boolean match(Object constructor) {
+        if (!equalsWithoutArguments(constructor)) return false
+        if (!arguments.match(constructor.arguments)) return false
         return true
     }
 
