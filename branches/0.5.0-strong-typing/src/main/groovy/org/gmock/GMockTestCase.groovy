@@ -10,10 +10,20 @@ abstract class GMockTestCase extends GroovyTestCase {
 
     protected match = GMock.&match
 
-    // TODO: find out a better place for restoring the original meta classes of final Java classes    
-    protected void tearDown() {
-        super.tearDown()
-        gMockController.stop()
+    public void runBare() {
+        Throwable exception = null
+        try {
+            super.runBare()
+        } catch (Throwable e) {
+            exception = e
+        } finally {
+            try {
+                gMockController.stop()
+            } catch (Throwable e) {
+                exception = exception ?: e
+            }
+        }
+        if (exception) throw exception
     }
 
 }
