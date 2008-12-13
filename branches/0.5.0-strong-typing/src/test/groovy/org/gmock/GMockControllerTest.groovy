@@ -26,6 +26,8 @@ class GMockControllerTest extends GroovyTestCase {
         shouldFail(AssertionFailedError) {
             gmc.play {}
         }
+
+        gmc.stop()
     }
 
     void testMockConstructor() {
@@ -43,6 +45,8 @@ class GMockControllerTest extends GroovyTestCase {
         shouldFail(AssertionFailedError) {
             gmc.play {}
         }
+
+        gmc.stop()
     }
 
     void testMockStaticMethods() {
@@ -54,6 +58,7 @@ class GMockControllerTest extends GroovyTestCase {
             assertTrue Loader.initialise()
         }
 
+        gmc.stop()
     }
 
     void testMockUsingClosureMatcher() {
@@ -64,6 +69,8 @@ class GMockControllerTest extends GroovyTestCase {
         gmc.play {
             assertEquals "correct", mockLoader.load(8)
         }
+
+        gmc.stop()
     }
 
     void testStrongTyping() {
@@ -78,6 +85,8 @@ class GMockControllerTest extends GroovyTestCase {
                 assertEquals "something", cache.load("key")
             }
         }
+
+        gmc.stop()
     }
 
 }
