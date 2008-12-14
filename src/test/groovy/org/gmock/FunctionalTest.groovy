@@ -548,13 +548,67 @@ class FunctionalTest extends GMockTestCase {
         def mock1 = mock()
         def mock2 = mock()
         mock1.is(mock2).returns(true)
-        
+
         def expected = "Expectation not matched on verify:\n" +
                        "  'is(.*)': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {}
         }
         assert message ==~ expected
+    }
+
+    void testMockObjectAsClosureDelegateWithOwnerFirstStrategy() {
+        def mock = mock()
+        mock.mockMethod().returns("correct")
+        mock.mockProperty.set(1)
+        mock.mockProperty.returns(2)
+
+        play {
+            def closure = {
+                assertEquals "correct", mockMethod()
+                mockProperty = 1
+                assertEquals 2, mockProperty
+            }
+            closure.delegate = mock
+            closure.resolveStrategy = Closure.OWNER_FIRST
+            closure()
+        }
+    }
+
+    void testMockObjectAsClosureDelegateWithDelegateFirstStrategy() {
+        def mock = mock()
+        mock.mockMethod().returns("correct")
+        mock.mockProperty.set(3)
+        mock.mockProperty.returns(4)
+
+        play {
+            def closure = {
+                this.assertEquals "correct", mockMethod()
+                mockProperty = 3
+                this.assertEquals 4, mockProperty
+            }
+            closure.delegate = mock
+            closure.resolveStrategy = Closure.DELEGATE_FIRST
+            closure()
+        }
+    }
+
+    void testMockObjectAsClosureDelegateWithDelegateOnlyStrategy() {
+        def mock = mock()
+        mock.mockMethod().returns("correct")
+        mock.mockProperty.set(5)
+        mock.mockProperty.returns(6)
+
+        play {
+            def closure = {
+                this.assertEquals "correct", mockMethod()
+                mockProperty = 5
+                this.assertEquals 6, mockProperty
+            }
+            closure.delegate = mock
+            closure.resolveStrategy = Closure.DELEGATE_ONLY
+            closure()
+        }
     }
 
 }
