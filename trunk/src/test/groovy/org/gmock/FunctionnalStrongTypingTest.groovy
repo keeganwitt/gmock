@@ -101,4 +101,46 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
         }
     }
 
+    void mockClosureDelegate(clazz, strategy) {
+        def mock = mock(clazz)
+        mock.mockMethod().returns("correct")
+        mock.mockProperty.set(0)
+        mock.mockProperty.returns(99)
+
+        play {
+            def closure = {
+                this.assertEquals "correct", mockMethod()
+                mockProperty = 0
+                this.assertEquals 99, mockProperty
+            }
+            closure.delegate = mock
+            closure.resolveStrategy = strategy
+            closure()
+        }
+    }
+
+    void testMockGroovyNonFinalClassAsClosureDelegate() {
+        mockClosureDelegate(GroovyClass, Closure.OWNER_FIRST)
+        mockClosureDelegate(GroovyClass, Closure.DELEGATE_FIRST)
+        mockClosureDelegate(GroovyClass, Closure.DELEGATE_ONLY)
+    }
+
+    void testMockGroovyFinalClassAsClosureDelegate() {
+        mockClosureDelegate(GroovyFinalClass, Closure.OWNER_FIRST)
+        mockClosureDelegate(GroovyFinalClass, Closure.DELEGATE_FIRST)
+        mockClosureDelegate(GroovyFinalClass, Closure.DELEGATE_ONLY)
+    }
+
+    void testMockJavaNonFinalClassAsClosureDelegate() {
+        mockClosureDelegate(JavaLoader, Closure.OWNER_FIRST)
+        mockClosureDelegate(JavaLoader, Closure.DELEGATE_FIRST)
+        mockClosureDelegate(JavaLoader, Closure.DELEGATE_ONLY)
+    }
+
+    void testMockJavaFinalClassAsClosureDelegate() {
+        mockClosureDelegate(String, Closure.OWNER_FIRST)
+        mockClosureDelegate(String, Closure.DELEGATE_FIRST)
+        mockClosureDelegate(String, Closure.DELEGATE_ONLY)
+    }
+
 }
