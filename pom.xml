@@ -52,13 +52,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <finalName>gmock-only-${project.version}</finalName>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.2</version>
                 <executions>
@@ -66,6 +59,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
+                                <move file="target/gmock-${project.version}.jar" tofile="target/gmock-only-${project.version}.jar" />
                                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
                                          classpath="lib/jarjar-1.0rc8.jar"/>
                                 <jarjar jarfile="target/gmock-${project.version}.jar">
