@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.gmock</groupId>
     <artifactId>gmock</artifactId>
-    <packaging>jar</packaging>
+    <!--<packaging>jar</packaging>-->
     <version>0.4.0</version>
     <name>GMock</name>
 
@@ -52,6 +52,13 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <finalName>gmock-only-${project.version}</finalName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.2</version>
                 <executions>
@@ -61,12 +68,14 @@
                             <tasks>
                                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
                                          classpath="lib/jarjar-1.0rc8.jar"/>
-                                <jarjar jarfile="target/gmock-${project.version}-all.jar">
-                                    <zipfileset src="target/gmock-${project.version}.jar"/>
+                                <jarjar jarfile="target/gmock-${project.version}.jar">
+                                    <zipfileset src="target/gmock-only-${project.version}.jar"/>
                                     <zipfileset src="target/dependencies/cglib-2.2.jar"/>
                                     <zipfileset src="target/dependencies/objenesis-1.1.jar"/>
+                                    <zipfileset src="target/dependencies/asm-3.1.jar"/>
                                     <rule pattern="net.sf.cglib.**" result="org.gmock.internal.cglib.@1"/>
                                     <rule pattern="org.objenesis.**" result="org.gmock.internal.objenesis.@1"/>
+                                    <rule pattern="org.objectweb.asm.**" result="org.gmock.internal.asm.@1"/>
                                 </jarjar>
                             </tasks>
                         </configuration>
@@ -80,7 +89,7 @@
 
     </build>
 
-    <dependencies>  
+    <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
