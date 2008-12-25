@@ -62,17 +62,22 @@ class GMockController {
             classExpectations.startProxy()
         }
         try {
-            closure.call()
+            try {
+                closure.call()
+            } finally {
+                doInternal(this) {
+                    classExpectations.stopProxy()
+                }
+            }
+            doInternal(this) {
+                mocks*.verify()
+                classExpectations.verify()
+            }
         } finally {
             doInternal(this) {
-                classExpectations.stopProxy()
+                mocks*.reset()
+                classExpectations.reset()
             }
-        }
-        doInternal(this) {
-            mocks*.verify()
-            classExpectations.verify()
-            mocks*.reset()
-            classExpectations.reset()
         }
     }
 
