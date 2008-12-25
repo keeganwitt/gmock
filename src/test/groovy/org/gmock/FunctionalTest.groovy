@@ -611,4 +611,28 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
+    void testShouldResetAfterThrowingExceptionForUnexpectedCall() {
+        def mock = mock()
+        mock.hashCode().returns(1)
+
+        shouldFail(AssertionFailedError) {
+            play {
+                mock.toString()
+            }
+        }
+
+        play {}
+    }
+
+    void testShouldResetAfterThrowingExceptionForVerifyFail() {
+        def mock = mock()
+        mock.hashCode().returns(1)
+
+        shouldFail(AssertionFailedError) {
+            play {}
+        }
+
+        play {}
+    }
+
 }
