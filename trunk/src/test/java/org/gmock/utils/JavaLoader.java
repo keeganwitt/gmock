@@ -12,4 +12,8 @@ public class JavaLoader implements ILoader {
         return "key";
     }
 
+    public final int finalMethod(int n) {
+        return n;
+    }
+
 }

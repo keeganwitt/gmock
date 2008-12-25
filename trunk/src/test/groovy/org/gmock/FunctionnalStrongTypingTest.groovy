@@ -101,11 +101,18 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
         }
     }
 
-    void mockClosureDelegate(clazz, strategy) {
+    void runClosureWithDifferentResolveStrategies(Closure closure) {
+        [Closure.OWNER_FIRST, Closure.DELEGATE_FIRST, Closure.DELEGATE_ONLY].each { strategy ->
+            closure.resolveStrategy = strategy
+            closure()
+        }
+    }
+
+    void mockClosureDelegate(clazz) {
         def mock = mock(clazz)
-        mock.mockMethod().returns("correct")
-        mock.mockProperty.set(0)
-        mock.mockProperty.returns(99)
+        mock.mockMethod().returns("correct").times(3)
+        mock.mockProperty.set(0).times(3)
+        mock.mockProperty.returns(99).times(3)
 
         play {
             def closure = {
@@ -114,33 +121,78 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
                 this.assertEquals 99, mockProperty
             }
             closure.delegate = mock
-            closure.resolveStrategy = strategy
-            closure()
+            runClosureWithDifferentResolveStrategies(closure)
         }
     }
 
     void testMockGroovyNonFinalClassAsClosureDelegate() {
-        mockClosureDelegate(GroovyClass, Closure.OWNER_FIRST)
-        mockClosureDelegate(GroovyClass, Closure.DELEGATE_FIRST)
-        mockClosureDelegate(GroovyClass, Closure.DELEGATE_ONLY)
+        mockClosureDelegate(GroovyClass)
     }
 
     void testMockGroovyFinalClassAsClosureDelegate() {
-        mockClosureDelegate(GroovyFinalClass, Closure.OWNER_FIRST)
-        mockClosureDelegate(GroovyFinalClass, Closure.DELEGATE_FIRST)
-        mockClosureDelegate(GroovyFinalClass, Closure.DELEGATE_ONLY)
+        mockClosureDelegate(GroovyFinalClass)
     }
 
     void testMockJavaNonFinalClassAsClosureDelegate() {
-        mockClosureDelegate(JavaLoader, Closure.OWNER_FIRST)
-        mockClosureDelegate(JavaLoader, Closure.DELEGATE_FIRST)
-        mockClosureDelegate(JavaLoader, Closure.DELEGATE_ONLY)
+        mockClosureDelegate(JavaLoader)
     }
 
     void testMockJavaFinalClassAsClosureDelegate() {
-        mockClosureDelegate(String, Closure.OWNER_FIRST)
-        mockClosureDelegate(String, Closure.DELEGATE_FIRST)
-        mockClosureDelegate(String, Closure.DELEGATE_ONLY)
+        mockClosureDelegate(String)
+    }
+
+    void testGroovyFinalMethod() {
+        GroovyLoader mock = mock(GroovyLoader)
+        mock.finalMethod(0).returns(1)
+        play {
+            assertEquals 1, mock.finalMethod(0)
+        }
+    }
+
+    void testJavaFinalMethod() {
+        JavaLoader mock = mock(JavaLoader)
+        mock.finalMethod(0).returns(2)
+        play {
+            assertEquals 2, mock.finalMethod(0)
+        }
+    }
+
+    void testClassesWithFinalMethodAsClosureDelegate() {
+        def closure = {
+            this.assertEquals 3, finalMethod(1)
+        }
+        def test = { Class clazz ->
+            def mock = mock(clazz)
+            mock.finalMethod(1).returns(3).times(3)
+            play {
+                closure.delegate = mock
+                runClosureWithDifferentResolveStrategies(closure)
+            }
+        }
+        test(GroovyLoader)
+        test(JavaLoader)
+    }
+
+    void testMockWithoutExpectationsAsClosureDelegateShouldFailed() {
+        def closure = {
+            this.assertEquals 4, load(2)
+        }
+        def test = { Class clazz ->
+            def mock = mock(clazz)
+            play {
+                closure.delegate = mock
+                [Closure.OWNER_FIRST, Closure.DELEGATE_FIRST, Closure.DELEGATE_ONLY].each { strategy ->
+                    closure.resolveStrategy = strategy
+                    def expected = "Unexpected method call 'load(2)'"
+                    def message = shouldFail(AssertionError) {
+                        closure()
+                    }
+                    assertEquals expected, message
+                }
+            }
+        }
+        test(GroovyLoader)
+        test(JavaLoader)
     }
 
 }
