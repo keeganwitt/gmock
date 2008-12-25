@@ -101,6 +101,10 @@ class MockProxyMetaClass extends ProxyMetaClass {
         }
     }
 
+    MetaMethod pickMethod(String methodName, Class[] arguments) {
+        new ProxyMetaMethod(this, methodName, arguments)
+    }
+
     void verify(){
         assert replay, "verify() must be called after replay()."
         expectations.verify()
