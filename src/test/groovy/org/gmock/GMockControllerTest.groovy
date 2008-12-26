@@ -32,7 +32,7 @@ class GMockControllerTest extends GroovyTestCase {
 
     void testMockConstructor() {
         def gmc = new GMockController()
-        def mockLoader = gmc.mock(Loader, constructor: [1, 2])
+        def mockLoader = gmc.mock(Loader, gmc.constructor(1, 2))
         mockLoader.put(3, 4)
 
         gmc.play {
@@ -40,7 +40,7 @@ class GMockControllerTest extends GroovyTestCase {
             loader.put(3, 4)
         }
 
-        gmc.mock(Loader, constructor: [1, 2])
+        gmc.mock(Loader, gmc.constructor(1, 2))
 
         shouldFail(AssertionFailedError) {
             gmc.play {}

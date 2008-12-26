@@ -13,7 +13,7 @@ import org.gmock.internal.times.AnyTimes
 class PropertyRecorderTest extends GMockTestCase {
 
     void testRecordGetProperty(){
-        def getSignature = mock(PropertyGetSignature, constructor: ["name"])
+        def getSignature = mock(PropertyGetSignature, constructor("name"))
 
         def mockExpectations = mock()
         def expectation = new Expectation(expectations: mockExpectations)
@@ -31,7 +31,7 @@ class PropertyRecorderTest extends GMockTestCase {
     }
 
     void testRecordSetProperty(){
-        def setSignature = mock(PropertySetSignature, constructor: ["name", "a value"])
+        def setSignature = mock(PropertySetSignature, constructor("name", "a value"))
 
         def mockExpectations = mock()
         def expectation = new Expectation(expectations: mockExpectations)
