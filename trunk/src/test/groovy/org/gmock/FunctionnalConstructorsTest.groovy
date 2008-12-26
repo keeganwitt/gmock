@@ -7,7 +7,7 @@ import org.gmock.utils.Loader
 class FunctionnalConstructorsTest extends GMockTestCase {
 
     void testConstructorNoArgument(){
-        def mockLoader = mock(Loader, constructor: [])
+        def mockLoader = mock(Loader, constructor())
         mockLoader.load("abc").returns("123")
 
         play {
@@ -20,8 +20,8 @@ class FunctionnalConstructorsTest extends GMockTestCase {
 
     void testConstructorMultipleArguments(){
         Date now = new Date()
-        def mockLoader1 = mock(Loader, constructor: ["1", "2"])
-        def mockLoader2 = mock(Loader, constructor: [now])
+        def mockLoader1 = mock(Loader, constructor("1", "2"))
+        def mockLoader2 = mock(Loader, constructor(now))
 
         play {
             def epectedLoader2 = new Loader(now)
@@ -32,9 +32,9 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testConstructorNoMatchFound(){
-        def mockLoader1 = mock(Loader, constructor: ["1", "2"])
-        def mockLoader2 = mock(Loader, constructor: ["1", "2"])
-        def mockLoader3 = mock(Loader, constructor: ["foo"])
+        def mockLoader1 = mock(Loader, constructor("1", "2"))
+        def mockLoader2 = mock(Loader, constructor("1", "2"))
+        def mockLoader3 = mock(Loader, constructor("foo"))
 
         try {
             play {
@@ -54,7 +54,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testMockingConstructorAllowStaticMethodCall(){
-        def mockLoader = mock(Loader, constructor: [])
+        def mockLoader = mock(Loader, constructor())
         mockLoader.load("abc").returns("123")
 
         play {
@@ -65,8 +65,8 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testConstructorNotCalled(){
-        def mockLoader1 = mock(Loader, constructor: ["1", "2"])
-        def mockLoader2 = mock(Loader, constructor: [3, 4])
+        def mockLoader1 = mock(Loader, constructor("1", "2"))
+        def mockLoader2 = mock(Loader, constructor(3, 4))
 
         try {
             play {
@@ -82,7 +82,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testConstructorDifferentClassExpected(){
-        def mockLoader1 = mock(Loader, constructor: ["1"])
+        def mockLoader1 = mock(Loader, constructor("1"))
 
         def now = new Date()
         try {
@@ -99,7 +99,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testConstructorHamcrestMatcher() {
-        def mockLoader = mock(Loader, constructor: [greaterThanOrEqualTo(5), "1"])
+        def mockLoader = mock(Loader, constructor(greaterThanOrEqualTo(5), "1"))
 
         play {
             assertSame mockLoader, new Loader(5, "1")
@@ -107,7 +107,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testConstructorHamcrestMatcherNotMatched() {
-        mock(Loader, constructor: [greaterThan(5), "2"])
+        mock(Loader, constructor(greaterThan(5), "2"))
         def expected = "Unexpected constructor call 'new Loader(5, \"2\")'\n" +
                        "  'new Loader(a value greater than <5>, \"2\")': expected 1, actual 0"
 
@@ -120,7 +120,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testConstructorClosureMatcher() {
-        def mockLoader = mock(Loader, constructor: [match { it >= 5 }, "1"])
+        def mockLoader = mock(Loader, constructor(match { it >= 5 }, "1"))
 
         play {
             assertSame mockLoader, new Loader(5, "1")
@@ -128,7 +128,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
 
     void testConstructorClosureMatcherNotMatched() {
-        mock(Loader, constructor: [match { it > 5 }, "2"])
+        mock(Loader, constructor(match { it > 5 }, "2"))
         def expected = "Unexpected constructor call 'new Loader(5, \"2\")'\n" +
                        "  'new Loader(a value matching the closure matcher, \"2\")': expected 1, actual 0"
 
@@ -139,5 +139,33 @@ class FunctionnalConstructorsTest extends GMockTestCase {
         }
         assertEquals expected, message
     }
+
+    void testConstructorThrowException(){
+        Date now = new Date()
+        def mockLoader1 = mock(Loader, constructor("1", "2"))
+        def mockLoader2 = mock(Loader, constructor(now).raises(new RuntimeException()))
+
+        play {
+            def epectedLoader1 = new Loader("1", "2")
+            assertSame epectedLoader1, mockLoader1
+            shouldFail (RuntimeException){
+                new Loader(now)
+            }
+        }
+    }
+
+    void testOldStyleConstructorStillWork(){
+        Date now = new Date()
+        def mockLoader1 = mock(Loader, constructor: ["1", "2"])
+        def mockLoader2 = mock(Loader, constructor: [now])
+
+        play {
+            def epectedLoader2 = new Loader(now)
+            def epectedLoader1 = new Loader("1", "2")
+            assertSame epectedLoader1, mockLoader1
+            assertSame epectedLoader2, mockLoader2
+        }
+    }
+
 
 }

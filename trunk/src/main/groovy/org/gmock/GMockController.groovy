@@ -16,6 +16,7 @@ import org.gmock.internal.metaclass.MockProxyMetaClass
 import org.gmock.internal.result.ReturnValue
 import org.gmock.internal.signature.ConstructorSignature
 import org.objenesis.ObjenesisHelper
+import org.gmock.internal.recorder.ConstructorRecorder
 
 class GMockController {
 
@@ -27,7 +28,12 @@ class GMockController {
     // it is a little like the kernel mode in OS
     def internal = false
 
-    def mock(Map constraints = [:], Class clazz = Object) {
+    @Deprecated()
+    def mock(Map constraints, Class clazz = Object) {
+        return mock(clazz, new ConstructorRecorder(constraints.constructor))
+    }
+    
+    def mock(Class clazz = Object, ConstructorRecorder constructorRecorder = null) {
         doInternal(this) {
             def mpmc = new MockProxyMetaClass(clazz, classExpectations, this)
             def mockInstance
@@ -38,20 +44,14 @@ class GMockController {
                 mockInstance = mockFinalClass(clazz, mpmc)
             }
 
-            if (constraints.constructor != null){
-                def signature = new ConstructorSignature(clazz, constraints.constructor)
-                def expectation = new Expectation(result: new ReturnValue(mockInstance))
+            if (constructorRecorder){
+                def expectation = constructorRecorder.generateExpectation(clazz, mockInstance)
                 classExpectations.addConstructorExpectation(clazz, expectation)
-                expectation.signature = signature
             }
 
             mocks << mpmc
             return mockInstance
         }
-    }
-
-    def mock(Class clazz){
-        return mock([:], clazz)
     }
 
     def play(Closure closure) {
@@ -79,6 +79,10 @@ class GMockController {
                 classExpectations.reset()
             }
         }
+    }
+
+    def constructor(Object[] args){
+        return new ConstructorRecorder(args)
     }
 
     def stop() {
@@ -133,7 +137,6 @@ class GMockController {
     }
 
     private newInstance(Class clazz) {
-        // use objenesis to instantiate an instance
         ObjenesisHelper.newInstance(clazz)
     }
 

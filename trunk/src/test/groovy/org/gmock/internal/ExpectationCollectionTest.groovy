@@ -48,7 +48,7 @@ class ExpectationCollectionTest extends GMockTestCase {
     }
 
     void testVerifyFailed() {
-        def mockCallState = mock(CallState, constructor: [])
+        def mockCallState = mock(CallState, constructor())
         mockCallState.append(mockExpectation1)
         mockCallState.append(mockExpectation2)
         mockCallState.append(mockExpectation3)
@@ -67,7 +67,7 @@ class ExpectationCollectionTest extends GMockTestCase {
     }
 
     void testCallState() {
-        def mockCallState = mock(CallState, constructor: [])
+        def mockCallState = mock(CallState, constructor())
         mockCallState.append(mockExpectation1)
         mockCallState.append(mockExpectation2)
         mockCallState.append(mockExpectation3)

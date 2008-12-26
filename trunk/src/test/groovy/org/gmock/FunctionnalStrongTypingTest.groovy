@@ -25,11 +25,20 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
     }
 
     void testMatchConstructor(){
-        Loader mockLoader = mock(Loader, constructor: ["a name"])
+        Loader mockLoader = mock(Loader, constructor("a name"))
         mockLoader.load("key").returns("a value")
         play {
             Loader loader = new Loader("a name")
             assertEquals "a value", loader.load("key")
+        }
+    }
+
+    void testMatchConstructorThrowException(){
+        Loader mockLoader = mock(Loader, constructor("a name").raises(new RuntimeException()))
+        play {
+            shouldFail(RuntimeException){
+                new Loader("a name")
+            }
         }
     }
 
