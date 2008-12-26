@@ -8,7 +8,7 @@ abstract class GMockTestCase extends GroovyTestCase {
 
     protected play = gMockController.&play
 
-    protected constructor = gMockController.&constructor
+    protected constructor = GMock.&constructor
 
     protected match = GMock.&match
 

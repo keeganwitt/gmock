@@ -7,16 +7,13 @@ import net.sf.cglib.proxy.Enhancer
 import net.sf.cglib.proxy.MethodInterceptor
 import net.sf.cglib.proxy.MethodProxy
 import org.gmock.internal.ClassExpectations
-import org.gmock.internal.Expectation
 import org.gmock.internal.GroovyObjectMethodFilter
 import static org.gmock.internal.InternalModeHelper.doInternal
 import org.gmock.internal.MockHelper
 import org.gmock.internal.metaclass.DispatcherProxyMetaClass
 import org.gmock.internal.metaclass.MockProxyMetaClass
-import org.gmock.internal.result.ReturnValue
-import org.gmock.internal.signature.ConstructorSignature
-import org.objenesis.ObjenesisHelper
 import org.gmock.internal.recorder.ConstructorRecorder
+import org.objenesis.ObjenesisHelper
 
 class GMockController {
 
@@ -28,11 +25,11 @@ class GMockController {
     // it is a little like the kernel mode in OS
     def internal = false
 
-    @Deprecated()
+    @Deprecated
     def mock(Map constraints, Class clazz = Object) {
         return mock(clazz, new ConstructorRecorder(constraints.constructor))
     }
-    
+
     def mock(Class clazz = Object, ConstructorRecorder constructorRecorder = null) {
         doInternal(this) {
             def mpmc = new MockProxyMetaClass(clazz, classExpectations, this)
@@ -79,10 +76,6 @@ class GMockController {
                 classExpectations.reset()
             }
         }
-    }
-
-    def constructor(Object[] args){
-        return new ConstructorRecorder(args)
     }
 
     def stop() {
