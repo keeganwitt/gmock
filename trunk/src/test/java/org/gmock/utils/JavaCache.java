@@ -26,4 +26,8 @@ public class JavaCache {
         }
     }
 
+    public String getLoaderName() {
+        return loader.getName();
+    }
+
 }

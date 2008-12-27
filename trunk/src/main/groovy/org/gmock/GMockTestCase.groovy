@@ -10,6 +10,8 @@ abstract class GMockTestCase extends GroovyTestCase {
 
     protected constructor = GMock.&constructor
 
+    protected invokeConstructor = GMock.&invokeConstructor
+
     protected match = GMock.&match
 
     public void runBare() {

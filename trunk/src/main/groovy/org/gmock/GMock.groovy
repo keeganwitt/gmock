@@ -2,6 +2,7 @@ package org.gmock
 
 import org.gmock.internal.ClosureMatcher
 import org.gmock.internal.recorder.ConstructorRecorder
+import org.gmock.internal.recorder.InvokeConstructorRecorder
 
 class GMock {
 
@@ -11,6 +12,10 @@ class GMock {
 
     static constructor(Object[] args) {
         new ConstructorRecorder(args)
+    }
+
+    static invokeConstructor(Object[] args) {
+        new InvokeConstructorRecorder(args)
     }
 
 }
