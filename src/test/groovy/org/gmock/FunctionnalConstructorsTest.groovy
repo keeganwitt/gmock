@@ -1,8 +1,11 @@
 package org.gmock
 
 import junit.framework.AssertionFailedError
-import static org.hamcrest.Matchers.*
+import org.gmock.utils.JavaCache
+import org.gmock.utils.JavaLoader
 import org.gmock.utils.Loader
+import static org.hamcrest.Matchers.greaterThan
+import static org.hamcrest.Matchers.greaterThanOrEqualTo
 
 class FunctionnalConstructorsTest extends GMockTestCase {
 
@@ -167,5 +170,38 @@ class FunctionnalConstructorsTest extends GMockTestCase {
         }
     }
 
+    void testInvokeOriginalConstructor() {
+        JavaLoader mock = mock(JavaLoader, invokeConstructor("loader"))
+        mock.getName().returns("name")
+
+        def cache = new JavaCache(mock)
+
+        play {
+            assertEquals "name", mock.getName()
+            assertEquals "loader", cache.getLoaderName()
+        }
+    }
+
+    void testInvokeOriginalConstructorAndMockConstructor() {
+        JavaLoader mock = mock(JavaLoader, invokeConstructor("loader"), constructor("name"))
+        mock.getName().returns("name")
+
+        play {
+            def cache = new JavaCache(new JavaLoader("name"))
+            assertEquals "name", mock.getName()
+            assertEquals "loader", cache.getLoaderName()
+        }
+    }
+
+    void testMockConstructorAndInvokeOriginalConstructor() {
+        JavaLoader mock = mock(JavaLoader, constructor("name"), invokeConstructor("loader"))
+        mock.getName().returns("name")
+
+        play {
+            def cache = new JavaCache(new JavaLoader("name"))
+            assertEquals "name", mock.getName()
+            assertEquals "loader", cache.getLoaderName()
+        }
+    }
 
 }

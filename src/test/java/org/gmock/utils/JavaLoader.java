@@ -16,4 +16,8 @@ public class JavaLoader implements ILoader {
         return n;
     }
 
+    public final String getName() {
+        return name;
+    }
+
 }

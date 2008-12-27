@@ -13,6 +13,7 @@ import org.gmock.internal.MockHelper
 import org.gmock.internal.metaclass.DispatcherProxyMetaClass
 import org.gmock.internal.metaclass.MockProxyMetaClass
 import org.gmock.internal.recorder.ConstructorRecorder
+import org.gmock.internal.recorder.InvokeConstructorRecorder
 import org.objenesis.ObjenesisHelper
 
 class GMockController {
@@ -27,18 +28,38 @@ class GMockController {
 
     @Deprecated
     def mock(Map constraints, Class clazz = Object) {
-        return mock(clazz, new ConstructorRecorder(constraints.constructor))
+        return doMock(clazz, new ConstructorRecorder(constraints.constructor), null)
     }
 
-    def mock(Class clazz = Object, ConstructorRecorder constructorRecorder = null) {
+    def mock(Class clazz = Object) {
+        return doMock(clazz, null, null)
+    }
+
+    def mock(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder) {
+        return doMock(clazz, null, invokeConstructorRecorder)
+    }
+
+    def mock(Class clazz, ConstructorRecorder constructorRecorder) {
+        return doMock(clazz, constructorRecorder, null)
+    }
+
+    def mock(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder, ConstructorRecorder constructorRecorder) {
+        return doMock(clazz, constructorRecorder, invokeConstructorRecorder)
+    }
+
+    def mock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder) {
+        return doMock(clazz, constructorRecorder, invokeConstructorRecorder)
+    }
+
+    private doMock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder) {
         doInternal(this) {
             def mpmc = new MockProxyMetaClass(clazz, classExpectations, this)
             def mockInstance
 
             if (!Modifier.isFinal(clazz.modifiers)) {
-                mockInstance = mockNonFinalClass(clazz, mpmc)
+                mockInstance = mockNonFinalClass(clazz, mpmc, invokeConstructorRecorder)
             } else {
-                mockInstance = mockFinalClass(clazz, mpmc)
+                mockInstance = mockFinalClass(clazz, mpmc, invokeConstructorRecorder)
             }
 
             if (constructorRecorder){
@@ -84,7 +105,7 @@ class GMockController {
         }
     }
 
-    private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc) {
+    private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder) {
         def groovyMethodInterceptor = { obj, Method method, Object[] args, MethodProxy proxy ->
             switch (method.name) {
                 case "invokeMethod": return mpmc.invokeMethod(obj, args[0], args[1])
@@ -110,27 +131,31 @@ class GMockController {
                                     callbackTypes: [MethodInterceptor, MethodInterceptor])
         def mockClass = enhancer.createClass()
 
-        def mockInstance = newInstance(mockClass)
+        def mockInstance = newInstance(mockClass, invokeConstructorRecorder)
         MockHelper.setCallbacksTo(mockInstance, [groovyMethodInterceptor, javaMethodInterceptor] as Callback[])
 
         return mockInstance
     }
 
-    private mockFinalClass(Class clazz, MockProxyMetaClass mpmc) {
-        def mockInstance = newInstance(clazz)
+    private mockFinalClass(Class clazz, MockProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder) {
+        def mockInstance = newInstance(clazz, invokeConstructorRecorder)
         if (GroovyObject.isAssignableFrom(clazz)) {
             mockInstance.metaClass = mpmc
         } else {
-            def fmc = DispatcherProxyMetaClass.getInstance(clazz)
-            fmc.controller = this
-            fmc.setMetaClassForInstance(mockInstance, mpmc)
-            dispatchers << fmc
+            def dpmc = DispatcherProxyMetaClass.getInstance(clazz)
+            dpmc.controller = this
+            dpmc.setMetaClassForInstance(mockInstance, mpmc)
+            dispatchers << dpmc
         }
         return mockInstance
     }
 
-    private newInstance(Class clazz) {
-        ObjenesisHelper.newInstance(clazz)
+    private newInstance(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder) {
+        if (invokeConstructorRecorder) {
+            return clazz.newInstance(invokeConstructorRecorder.args)
+        } else {
+            return ObjenesisHelper.newInstance(clazz)
+        }
     }
 
 }
