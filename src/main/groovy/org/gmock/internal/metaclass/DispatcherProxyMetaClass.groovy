@@ -87,11 +87,11 @@ class InstanceWrapper {
         this.instance = instance
     }
 
-    public int hashCode() {
-        instance.hashCode()
+    int hashCode() {
+        System.identityHashCode(instance)
     }
 
-    public boolean equals(Object obj) {
+    boolean equals(Object obj) {
         if (obj instanceof InstanceWrapper) {
             return instance.is(obj.instance)
         } else {
