@@ -99,12 +99,6 @@ class GMockController {
         }
     }
 
-    def stop() {
-        doInternal(this) {
-            dispatchers*.stopProxy()
-        }
-    }
-
     private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder) {
         def groovyMethodInterceptor = { obj, Method method, Object[] args, MethodProxy proxy ->
             switch (method.name) {
