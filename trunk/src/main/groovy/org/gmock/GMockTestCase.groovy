@@ -14,20 +14,4 @@ abstract class GMockTestCase extends GroovyTestCase {
 
     protected match = GMock.&match
 
-    public void runBare() {
-        Throwable exception = null
-        try {
-            super.runBare()
-        } catch (Throwable e) {
-            exception = e
-        } finally {
-            try {
-                gMockController.stop()
-            } catch (Throwable e) {
-                exception = exception ?: e
-            }
-        }
-        if (exception) throw exception
-    }
-
 }
