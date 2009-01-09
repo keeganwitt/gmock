@@ -31,7 +31,6 @@
 
   * Static property mocking (issue 23)
   * Setup expectation in mock closure (issue 35)
-  * JUnit4 support (issue 37)
 
 == Version 0.7 ==
 
