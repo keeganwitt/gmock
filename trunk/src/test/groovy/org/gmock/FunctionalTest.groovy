@@ -666,4 +666,17 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
+    void testMockingClosureCalls() {
+        def closure = mock(Closure)
+        closure.call(1, 2).returns(3)
+        play {
+            assertEquals 3, closure(1, 2)
+        }
+
+        closure.call().returns("correct")
+        play {
+            assertEquals "correct", closure()
+        }
+    }
+
 }
