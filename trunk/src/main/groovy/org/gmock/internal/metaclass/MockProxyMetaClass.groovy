@@ -121,7 +121,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     void verify(){
-        assert replay, "verify() must be called after replay()."
+        assert replay, "verify() must be called after replay()"
         expectations.verify()
     }
 

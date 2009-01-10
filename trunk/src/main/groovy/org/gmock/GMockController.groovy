@@ -36,6 +36,7 @@ class GMockController {
     def mocks = []
     def classExpectations = new ClassExpectations(this)
     def dispatchers = new HashSet()
+    def replay = false
 
     // while running in internal mode, we should not mock any methods, instead, we should invoke the original implements
     // it is a little like the kernel mode in OS
@@ -68,6 +69,10 @@ class GMockController {
 
     private doMock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder) {
         doInternal(this) {
+            if (replay) {
+                throw new IllegalStateException("Cannot create mocks in play closure.")
+            }
+
             def mpmc = new MockProxyMetaClass(clazz, classExpectations, this)
             def mockInstance
 
@@ -96,8 +101,10 @@ class GMockController {
         }
         try {
             try {
+                replay = true
                 closure.call()
             } finally {
+                replay = false
                 doInternal(this) {
                     classExpectations.stopProxy()
                 }

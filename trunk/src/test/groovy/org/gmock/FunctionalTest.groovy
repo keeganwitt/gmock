@@ -650,4 +650,12 @@ class FunctionalTest extends GMockTestCase {
         play {}
     }
 
+    void testShouldNotAllowCreatingMocksInPlayClosure() {
+        play {
+            shouldFail(IllegalStateException) {
+                mock()
+            }
+        }
+    }
+
 }
