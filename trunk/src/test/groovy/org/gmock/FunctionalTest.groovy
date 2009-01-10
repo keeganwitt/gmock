@@ -658,4 +658,12 @@ class FunctionalTest extends GMockTestCase {
         }
     }
 
+    void testShouldNotAllowNestingPlayClosures() {
+        play {
+            shouldFail(IllegalStateException) {
+                play {}
+            }
+        }
+    }
+
 }

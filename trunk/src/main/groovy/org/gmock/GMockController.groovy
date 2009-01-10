@@ -94,6 +94,10 @@ class GMockController {
 
     def play(Closure closure) {
         doInternal(this) {
+            if (replay) {
+                throw new IllegalStateException("Cannot nest play closures.")
+            }
+
             mocks*.validate()
             classExpectations.validate()
             mocks*.replay()
