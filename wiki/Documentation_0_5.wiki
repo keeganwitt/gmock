@@ -70,13 +70,12 @@ play {
 Exception can be setup using the `raises` keyword.
 {{{
 def loader = mock()
-loader.put("throw exception").raises(new RuntimeException("an exception"))
+loader.put("throw exception").raises(new RuntimeException("an exception")) // or 'raises(RuntimeException, "an exception")'
 play {
-  try {
+  def message = shouldFail(RuntimeException) {
     loader.put("throw exception") 
-  } catch (RuntimeException e){
-    assertEquals "an exception", e.message
   }
+  assertEquals "an exception", message
 }
 }}}
 
@@ -96,9 +95,9 @@ play {
 
 
 Support for exception and method stub is similar to standard method call. Ex:
-  * `loader.name.raises(new RuntimeException())`
+  * `loader.name.raises(RuntimeException)`
   * `loader.name.set("invalid).raises(new RuntimeException())`
-  *  `mockLoader.name.returns('a name').stub()`
+  * `mockLoader.name.returns('a name').stub()`
 
 
 == Mock static method call ==
@@ -135,9 +134,9 @@ play {
 
 You can expect an exception to be raised when a constructor call is matched:
 {{{
-def mockFile = mock(File, constructor("/a/path/file.txt").raises(new RuntimeException()))
+def mockFile = mock(File, constructor("/a/path/file.txt").raises(RuntimeException))
 play {
-  shouldFail (RuntimeException){
+  shouldFail(RuntimeException) {
     new File("/a/path/file.txt")
   }
 }
