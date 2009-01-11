@@ -11,15 +11,21 @@ body {
 
 }
 
-h1 {
+.header h1 {
     color: white;
     font-size: 5em;
     margin: 0;
     padding: 15px 0 22px 80px;
 }
 
+h1 {
+    font-size: 1.7em;
+    border-bottom: #d7dbe3 solid 2px;
+    padding: 0 0 0 10px;
+    margin: 15px 5px 5px 0px;
+}
 h2 {
-    font-size: 1.6em;
+    font-size: 1.4em;
     border-bottom: #d7dbe3 solid 1px;
     padding: 0 0 0 10px;
     margin: 15px 5px 5px 0px;
@@ -28,6 +34,11 @@ h2 {
 p, pre {
     padding: 0 10px 0 10px;
     margin: 0 0 7px;
+}
+
+a {
+    color: #000;
+    text-decoration: none;
 }
 
 pre.prettyprint {
@@ -117,3 +128,10 @@ pre.prettyprint {
     top: 25px;
     left: 120px;
 }
+
+.kwd { color: #000088; }
+.typ { color: #660066; }
+.str { color: #008800; }
+.pun { color: #666600; }
+.com { color: #880000; }
+.lit { color: #006666; }
