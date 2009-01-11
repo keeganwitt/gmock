@@ -1,0 +1,9 @@
+
+
+class DocumentationController {
+
+    def index = {
+        
+    }
+
+}
