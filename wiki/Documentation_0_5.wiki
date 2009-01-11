@@ -144,7 +144,7 @@ play {
 
 == Strong typing ==
 
-Gmock support out of the box java strong typing. You don't need to import any library we've worry about that for you.
+Gmock support out of the box java strong typing. You don't need to import any library we've worry about that for you. Mock objects can be used in a pure Java project which make Gmock a powerful alternative for Java testing.
 {{{
 File mockFile = mock(File)
 }}}
