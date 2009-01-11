@@ -49,7 +49,7 @@ void testBasic(){
 }
 }}}
 
-Gmock support Java strong typing the `mock()` method take an optional class. See more in the strong typing section.
+Gmock support Java strong typing. The `mock()` method takes an optional class. More in the strong typing section.
 {{{
   File mockFile = mock(File)
 }}}
