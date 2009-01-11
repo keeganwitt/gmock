@@ -2,8 +2,10 @@
 
 class DocumentationController {
 
-    def index = {
-        
+    def dispatch = {
+        render(view: params.version)
     }
+
+
 
 }

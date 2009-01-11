@@ -16,10 +16,10 @@
     </div>
     <div class="span-4">&nbsp;</div>
     <div class="span-7 last" id="download">
-        <a href="http://gmock.googlecode.com/files/gmock-0.4.0.jar">
+        <a href="http://gmock.googlecode.com/files/gmock-<g:currentVersion/>.jar">
             <h3>Download</h3>
 
-            <div>Gmock release 0.5</div>
+            <div>Gmock release <g:currentVersion/></div>
         </a>
 
     </div>
@@ -32,7 +32,7 @@
             framework and more writing code. To use Gmock just drop the gmock jar file in your classpath.
         </p>
 
-        <p>The current version is gmock-0.5.0 and is already packed with tons of feature.</p>
+        <p>The current version is gmock-<g:currentVersion/> and is already packed with tons of feature.</p>
 
         <p>Checkout our documentation to get the full picture and visit our roadmap to see what's coming next.</p>
 

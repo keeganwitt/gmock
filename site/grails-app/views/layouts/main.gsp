@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Gmock: Home</title>
+    <title><g:layoutTitle default="Gmock" /></title>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'screen.css')}" media="screen, projection"/>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'print.css')}" media="print"/>
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'main.css')}" media="screen, projection"/>
@@ -23,7 +23,7 @@
     <div class="container">
         <ul>
             <li><g:link controller="home">Home</g:link></li>
-            <li><g:link controller="documentation">Documentation</g:link></li>
+            <li><g:link controller="documentation" action="${currentVersion()}">Documentation</g:link></li>
             <li><g:link controller="download">Download</g:link></li>
         </ul>
     </div>

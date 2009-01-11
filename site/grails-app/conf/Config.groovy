@@ -38,6 +38,9 @@ environments {
     }
 }
 
+gmock.version = "0.5.0"
+
+
 // log4j configuration
 log4j {
     appender.stdout = "org.apache.log4j.ConsoleAppender"
