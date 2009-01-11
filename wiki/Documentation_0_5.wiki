@@ -49,6 +49,13 @@ void testBasic(){
 }
 }}}
 
+Gmock support Java strong typing the `mock()` method take an optional class. See more in the strong typing section.
+{{{
+  File mockFile = mock(File)
+}}}
+
+
+
 == Mock method call ==
 
 Method call expectation are created when calling method on Mock. Return value can be setup using the `returns` keyword. 
@@ -126,7 +133,7 @@ play {
 }
 }}}
 
-You can expect exception to be raised when a constructor call is matched:
+You can expect an exception to be raised when a constructor call is matched:
 {{{
 def mockFile = mock(File, constructor("/a/path/file.txt").raises(new RuntimeException()))
 play {
@@ -135,6 +142,29 @@ play {
   }
 }
 }}}
+
+== Strong typing ==
+
+Gmock support out of the box java strong typing. You don't need to import any library we've worry about that for you.
+{{{
+File mockFile = mock(File)
+}}}
+
+Strong typing works well with constructor call expectation:
+{{{
+File mockFile = mock(File, constructor("/a/path/file.txt"))
+mockFile.getName().returns("file.txt")
+play {
+  def file = new File("/a/path/file.txt")
+  assertEquals "file.txt", file.getName()
+}
+}}}
+
+Sometime you need to call the original constructor when mocking an object. Use the `invokeConstructor` for that purpose:
+{{{
+JavaLoader mock = mock(JavaLoader, invokeConstructor("loader"), constructor("name"))
+}}}
+This would create a `JavaLoader` using its constructor with "loader" during the process of creation of the mock. 
 
 == Time matching ==
 
