@@ -126,6 +126,16 @@ play {
 }
 }}}
 
+You can expect exception to be raised when a constructor call is matched:
+{{{
+def mockFile = mock(File, constructor("/a/path/file.txt").raises(new RuntimeException()))
+play {
+  shouldFail (RuntimeException){
+    new File("/a/path/file.txt")
+  }
+}
+}}}
+
 == Time matching ==
 
 Gmock let you specify how many times an expectation can be call. Like here:
