@@ -75,7 +75,7 @@
                                 <copy todir="target/archive/src"><fileset dir="src"/></copy>
                                 <copy todir="target/archive/lib" file="target/gmock-${project.version}.jar"/>
                                 <copy todir="target/archive/license" file="apache-license-2.0.txt"/>
-                                <zip destfile="target/gmock-all.zip" basedir="target/archive"/>
+                                <zip destfile="target/gmock-${project.version}-all.zip" basedir="target/archive"/>
                             </tasks>
                         </configuration>
                         <goals>
