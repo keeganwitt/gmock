@@ -3,7 +3,7 @@ package org.gmock.sample
 import org.gmock.GMockTestCase
 import static org.hamcrest.Matchers.anything
 
-public class CacheTest extends GMockTestCase {
+class CacheTest extends GMockTestCase {
 
     def respository
     def strategy
@@ -42,12 +42,20 @@ public class CacheTest extends GMockTestCase {
         }
     }
 
+    void testGetButNotFound() {
+        respository.get("not exist").raises(NotFoundException, "not exist")
+        strategy.onAccess("not exist")
+        play {
+            assertNull cache.get("not exist")
+        }
+    }
+
     void testGetAndSwapOutDirtyItem() {
         respository.get("key 1").returns(1)
         respository.get("key 3").returns(3)
         respository.get("key 4").returns(4)
         respository.put("key 2", 2)
-        strategy.onAccess(anything()).stub()
+        strategy.onAccess(anything()).times(4)
         strategy.getKeyToRemove().returns("key 2")
         play {
             assertEquals 1, cache.get("key 1")

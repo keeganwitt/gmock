@@ -25,7 +25,11 @@ public class Cache implements Respository {
         if (cache.containsKey(key)) {
             value = cache.get(key).value;
         } else {
-            value = respository.get(key);
+            try {
+                value = respository.get(key);
+            } catch (NotFoundException e) {
+                value = null;
+            }
             putValueToCacheMap(key, value, false);
         }
         strategy.onAccess(key);
