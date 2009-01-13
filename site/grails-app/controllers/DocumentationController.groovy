@@ -7,5 +7,4 @@ class DocumentationController {
     }
 
 
-
 }

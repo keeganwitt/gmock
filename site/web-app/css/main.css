@@ -36,9 +36,23 @@ p, pre {
     margin: 0 0 7px;
 }
 
-a {
+.source a {
     color: #000;
     text-decoration: none;
+}
+
+.source a:hover {
+    text-decoration: none;
+}
+
+a:link, a:visited {
+    color: #000;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #000;
+    text-decoration: underline;
 }
 
 pre.prettyprint {
