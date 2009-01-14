@@ -55,6 +55,15 @@ a:hover {
     text-decoration: underline;
 }
 
+a.done, h2.done {
+    text-decoration: line-through;
+}
+
+h2.here {
+    background-image: url( ../images/here.jpg );
+    background-position: top left;
+}
+
 pre.prettyprint {
     margin: 0 0 7px 20px;
     border-left: #d7dbe3 solid 5px;

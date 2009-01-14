@@ -32,6 +32,8 @@
             framework and more writing code. To use Gmock just drop the gmock jar file in your classpath.
         </p>
 
+        <p>Gmock support Java strong typing and make it perfectly suitable to test an full Java project.</p>
+
         <p>The current version is gmock-<g:currentVersion/> and is already packed with tons of feature.</p>
 
         <p>Checkout our documentation to get the full picture and visit our roadmap to see what's coming next.</p>

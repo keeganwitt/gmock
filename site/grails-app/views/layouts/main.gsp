@@ -25,6 +25,7 @@
             <li><g:link controller="home">Home</g:link></li>
             <li><g:link controller="documentation" action="${currentVersion()}">Documentation</g:link></li>
             <li><g:link controller="download">Download</g:link></li>
+            <li><g:link controller="roadmap">Roadmap</g:link></li>
         </ul>
     </div>
 </div>
