@@ -7,7 +7,21 @@
     <artifactId>gmock</artifactId>
     <packaging>jar</packaging>
     <version>0.5.0</version>
-    <name>GMock</name>
+    <name>Gmock</name>
+    <description>Mocking Framework for Groovy</description>
+    <url>http://www.gmock.org</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:svn:http://gmock.googlecode.com/svn/trunk/</connection>
+        <developerConnection>scm:svn:https://gmock.googlecode.com/svn/trunk/</developerConnection>
+        <url>http://code.google.com/p/gmock/source/browse/</url>
+    </scm>
 
     <build>
         <plugins>
@@ -72,7 +86,9 @@
                                     <rule pattern="org.objenesis.**" result="org.gmock.internal.objenesis.@1"/>
                                     <rule pattern="org.objectweb.asm.**" result="org.gmock.internal.asm.@1"/>
                                 </jarjar>
-                                <copy todir="target/archive/src"><fileset dir="src"/></copy>
+                                <copy todir="target/archive/src">
+                                    <fileset dir="src"/>
+                                </copy>
                                 <copy todir="target/archive/lib" file="target/gmock-${project.version}.jar"/>
                                 <copy todir="target/archive/license" file="apache-license-2.0.txt"/>
                                 <zip destfile="target/gmock-${project.version}-all.zip" basedir="target/archive"/>
