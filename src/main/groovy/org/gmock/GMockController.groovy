@@ -136,7 +136,9 @@ class GMockController {
             }
         } as MethodInterceptor
         def javaMethodInterceptor = { obj, Method method, Object[] args, MethodProxy proxy ->
-            if (internal) {
+            if ("toString" == method.name && !replay) {
+                return "Mock for " + clazz.name
+            } else if (internal) {
                 return proxy.invokeSuper(obj, args)
             } else {
                 return mpmc.invokeMethod(obj, method.name, args)

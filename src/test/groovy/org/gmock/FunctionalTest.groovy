@@ -16,6 +16,10 @@
 package org.gmock
 
 import junit.framework.AssertionFailedError
+import org.codehaus.groovy.runtime.typehandling.GroovyCastException
+import org.gmock.utils.JavaCache
+import org.gmock.utils.JavaLoader
+import org.gmock.utils.NotFoundException
 import static org.hamcrest.Matchers.*
 
 class FunctionalTest extends GMockTestCase {
@@ -677,6 +681,15 @@ class FunctionalTest extends GMockTestCase {
         play {
             assertEquals "correct", closure()
         }
+    }
+
+    void testAssigningANonTypeVariableToATypeVariableGiveBadErrorMessage() {
+        def expected = /Cannot cast object 'Mock for java\.lang\.Object' with class 'groovy\.lang\.GroovyObject.*' / +
+                       /to class 'java\.util\.Date'/
+        def message = shouldFail(GroovyCastException) {
+            Date date = mock()
+        }
+        assert message ==~ expected
     }
 
 }
