@@ -35,7 +35,12 @@ public class JavaCache {
         if (cache.containsKey(key)) {
             return cache.get(key);
         } else {
-            String value = loader.load(key);
+            String value;
+            try {
+                value = loader.load(key);
+            } catch (NotFoundException e) {
+                value = null;
+            }
             cache.put(key, value);
             return value;
         }

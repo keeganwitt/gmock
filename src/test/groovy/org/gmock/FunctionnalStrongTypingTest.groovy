@@ -220,4 +220,13 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
         test(JavaLoader)
     }
 
+    void testExceptionsShouldNotBeWrappedByInvokerInvocationException() {
+        def loader = mock(JavaLoader)
+        loader.load("key").raises(NotFoundException)
+        def cache = new JavaCache(loader)
+        play {
+            assertNull cache.load("key")
+        }
+    }
+
 }
