@@ -17,9 +17,6 @@ package org.gmock
 
 import junit.framework.AssertionFailedError
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException
-import org.gmock.utils.JavaCache
-import org.gmock.utils.JavaLoader
-import org.gmock.utils.NotFoundException
 import static org.hamcrest.Matchers.*
 
 class FunctionalTest extends GMockTestCase {

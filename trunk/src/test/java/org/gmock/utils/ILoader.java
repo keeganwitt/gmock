@@ -17,6 +17,6 @@ package org.gmock.utils;
 
 public interface ILoader {
 
-    String load(String key);
+    String load(String key) throws NotFoundException;
 
 }
