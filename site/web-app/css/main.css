@@ -118,6 +118,16 @@ pre.prettyprint {
     background-color: #eff0f1;
 }
 
+.footer .container {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    padding: 3px 10px 3px 10px;
+    border: #d7dbe3 solid 1px;
+    background-color: #eff0f1;
+    font-size: 10px;
+}
+
+
 #disclaimer {
     background-image: url( ../images/disclaimer-background.gif );
     background-repeat: no-repeat;

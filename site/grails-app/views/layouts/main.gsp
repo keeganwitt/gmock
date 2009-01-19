@@ -33,6 +33,20 @@
 <div class="page">
         <g:layoutBody/>
 </div>
+
+<div class="footer">
+    <div class="container">
+        <div>&copy; Gmock - 2008-2009 - All right reserved</div>
+    </div>
+</div>
+
 </body>
+
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+    _uacct = "UA-82985-10";
+    urchinTracker();
+</script>
 
 </html>
