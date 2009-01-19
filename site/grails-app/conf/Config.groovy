@@ -39,6 +39,7 @@ environments {
 }
 
 gmock.version = "0.5.0"
+grails.war.destFile = "gmock.war"
 
 
 // log4j configuration
