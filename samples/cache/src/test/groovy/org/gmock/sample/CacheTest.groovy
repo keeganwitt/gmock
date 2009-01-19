@@ -67,13 +67,5 @@ class CacheTest extends GMockTestCase {
         }
     }
 
-    void testDoNew(){
-        Date mockDate = mock(Date, constructor())
-        play {
-            Date result = cache.doNew()
-            assertSame(mockDate, result)
-
-        }
-    }
 
 }

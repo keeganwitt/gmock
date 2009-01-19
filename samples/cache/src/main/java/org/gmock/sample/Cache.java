@@ -21,10 +21,6 @@ public class Cache implements Respository {
         cache = new HashMap<String, Item>();
     }
 
-    public Date doNew(){
-        return new Date();
-    }
-
     public Object get(String key) {
         Object value;
         if (cache.containsKey(key)) {
