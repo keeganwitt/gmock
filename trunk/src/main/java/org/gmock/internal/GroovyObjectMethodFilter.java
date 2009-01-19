@@ -16,8 +16,6 @@
 package org.gmock.internal;
 
 import groovy.lang.GroovyObject;
-import groovy.lang.GroovySystem;
-import groovy.lang.MetaClass;
 import net.sf.cglib.proxy.CallbackFilter;
 
 import java.lang.reflect.Method;
@@ -30,8 +28,17 @@ public class GroovyObjectMethodFilter implements CallbackFilter {
     }
 
     public int accept(Method method) {
-        MetaClass metaClass = GroovySystem.getMetaClassRegistry().getMetaClass(GroovyObject.class);
-        return metaClass.pickMethod(method.getName(), method.getParameterTypes()) != null ? 0 : 1;
+        return hasMethod(GroovyObject.class, method) ? 0 : 1;
+    }
+
+    private boolean hasMethod(Class<?> clazz, Method method) {
+        try {
+            clazz.getMethod(method.getName(), method.getParameterTypes());
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+
     }
 
 }
