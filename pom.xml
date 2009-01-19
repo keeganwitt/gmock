@@ -134,4 +134,11 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>gmock.website</id>
+            <name>Gmock Website</name>
+            <url>scp://gmock.org/home/rsync/gmock/releases</url>
+        </repository>
+    </distributionManagement>
 </project>
