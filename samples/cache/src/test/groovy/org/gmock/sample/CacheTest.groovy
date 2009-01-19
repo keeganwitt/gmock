@@ -41,6 +41,7 @@ class CacheTest extends GMockTestCase {
             cache.flush()
         }
     }
+    
 
     void testGetButNotFound() {
         respository.get("not exist").raises(NotFoundException, "not exist")
@@ -63,6 +64,15 @@ class CacheTest extends GMockTestCase {
             assertEquals 3, cache.get("key 3")
 
             assertEquals 4, cache.get("key 4") // "key 2" should be swapped out here
+        }
+    }
+
+    void testDoNew(){
+        Date mockDate = mock(Date, constructor())
+        play {
+            Date result = cache.doNew()
+            assertSame(mockDate, result)
+
         }
     }
 

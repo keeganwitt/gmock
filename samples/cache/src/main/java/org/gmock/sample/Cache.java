@@ -2,6 +2,7 @@ package org.gmock.sample;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Date;
 
 public class Cache implements Respository {
 
@@ -18,6 +19,10 @@ public class Cache implements Respository {
         this.strategy = strategy;
         this.capacity = capacity;
         cache = new HashMap<String, Item>();
+    }
+
+    public Date doNew(){
+        return new Date();
     }
 
     public Object get(String key) {
