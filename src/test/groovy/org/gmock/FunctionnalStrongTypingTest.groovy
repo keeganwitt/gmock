@@ -229,4 +229,15 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
         }
     }
 
+    void testAddingAMethodToGroovyObjectShouldNotAffectMockingThatMethod() {
+        GroovyObject.metaClass.load = { String key -> "" }
+
+        JavaLoader loader = mock(OnceLoader)
+        loader.load("key").returns("value")
+        JavaCache cache = new JavaCache(loader)
+        play {
+            assertEquals "value", cache.load("key")
+        }
+    }
+
 }
