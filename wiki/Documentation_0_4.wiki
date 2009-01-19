@@ -1,5 +1,4 @@
 #summary Gmock documentation for gmock-0.4
-#labels Featured
 
 = Introduction =
 
