@@ -4,10 +4,10 @@
 
 Gmock is a mocking framework for the Groovy language. 
 
-Gmock is all about simple syntax and readability of your tests so you spend less time learning the framework and more writing code. To use Gmock just drop the gmock jar file in your classpath and make sure you also have junit.
+Gmock is all about simple syntax and readability of your tests so you spend less time learning the framework and more time writing code. To use Gmock just drop the gmock jar file into your classpath and make sure you also have junit.
 
 
-This documention describe the version 0.4 of Gmock.
+This documention describes the version 0.4 of Gmock.
 
 
 = Getting Started =
@@ -26,9 +26,9 @@ class LoaderTest extends GMockTestCase {
 }  
 }}}
 
-  * First extends the `GMockTestCase`
-  * Create mock object using the `mock()` method
-  * Setup expectation by calling the method you expect on your mock
+  * First extend the `GMockTestCase`
+  * Create mock objects using the `mock()` method
+  * Set up expectations by calling the methods you expect on your mock
   * Run the code you are testing within the `play` closure
 
 
@@ -36,13 +36,13 @@ class LoaderTest extends GMockTestCase {
 
 == Expectation and Play mode == 
 
-Mock object are created using the `mock()` method available in `GMockTestCase`. By default mock object will record method call and generate expectation. 
+Mock objects are created using the `mock()` method available in `GMockTestCase`. By default mock objects will record method calls and generate expectations.
 
 The code under test should run through the `play` closure. 
 {{{
 void testBasic(){
   def aMock = mock()
-  // setup expectation
+  // set up expectation
   play {
     // run your code 
   }
@@ -51,7 +51,7 @@ void testBasic(){
 
 == Mock method call ==
 
-Method call expectation are created when calling method on Mock. Return value can be setup using the `returns` keyword. 
+Method call expectations are created when calling methods on Mock. Return values can be set up using the `returns` keyword.
 {{{
 def loader = mock()
 loader.put("fruit").returns("apple")
@@ -60,7 +60,7 @@ play {
 }
 }}}
 
-Exception can be setup using the `raises` keyword.
+Exceptions can be set up using the `raises` keyword.
 {{{
 def loader = mock()
 loader.put("throw exception").raises(new RuntimeException("an exception"))
@@ -76,7 +76,7 @@ play {
 
 == Mock property call ==
 
-Property call should be mock using the following syntax. For Setter and getter
+Property calls should be mocked using the following syntax. For Setters and getters
 {{{
 def loader = mock()
 loader.name.set("a name")
@@ -88,7 +88,7 @@ play {
 }}}
 
 
-Support for exception and method stub is similar to standard method call. Ex:
+Support for exceptions and method stubs are similar to standard method calls. Ex:
   * `loader.name.raises(new RuntimeException())`
   * `loader.name.set("invalid).raises(new RuntimeException())`
   *  `mockLoader.name.returns('a name').stub()`
@@ -96,7 +96,7 @@ Support for exception and method stub is similar to standard method call. Ex:
 
 == Mock static method call ==
 
-Mocking static method call is similar to standard method call, just add the static keyword:
+Mocking static method calls is similar to standard method calls, just add the static keyword:
 {{{
 def mockMath = mock(Math)
 mockMath.static.random().returns(0.5)
@@ -110,11 +110,11 @@ play {
 
 == Mock constructor call ==
 
-Constructor call are mocked using the following syntax:
+Constructor calls are mocked using the following syntax:
 {{{
-def mockFile = mock(File, constructor: ["/a/path/file.txt"])
+def mockFile = mock(File, constructor("/a/path/file.txt"))
 }}}
-This would match: `new File("/a/path/file.txt")`. The mockFile can then be used to setup further expectation.
+This would match: `new File("/a/path/file.txt")`. The mockFile can then be used to set up further expectations.
 
 Here is the full picture:
 {{{
@@ -128,7 +128,7 @@ play {
 
 == Time matching ==
 
-Gmock let you specify how many times an expectation can be call. Like here:
+Gmock lets you specify how many times an expectation can be called. Like here:
 {{{
 mockLoader.load(2).returns(3).atLeastOnce()
 play {
@@ -137,21 +137,20 @@ play {
 }
 }}}
 
-The supported time matcher are:
+The supported times matchers are:
   * *never()* the expectation should never be called
   * *once()* one time expectation (this is the implicit default)
-  * *atLeastOnce()* one time or more
+  * *atLeastOnce()* one or more times
   * *atMostOnce()* zero or one time expectation
-  * *stub()* the expectation can be call anytime
-  * *times(3)* the expectation need to be call n times
-  * *times(2..4)* the expectation need to be call n times within the range
-  * *atLeast(4)* the expectation need to be call at least n time
-  * *atMost(4)* the expectation need to be call at most n time
-
+  * *stub()* the expectation can be called anytime
+  * *times(3)* the expectation needs to be call n times
+  * *times(2..4)* the expectation needs to be called n times within the range
+  * *atLeast(4)* the expectation needs to be called at least n times
+  * *atMost(4)* the expectation needs to be called at most n times
 
 == Using matcher == 
 
-You can setup customised matcher in your expectation using the `match` syntax. The argument get passed to match closure and you should return true if it match.
+You can set up a customised matcher in your expectation using the `match` syntax. The argument gets passed to match closure and will return true if it matches.
 
 Here is the idea:
 {{{
@@ -161,7 +160,7 @@ play {
 }
 }}}
 
-Gmock is also fully compatible with [http://code.google.com/p/hamcrest/ Hamcrest] matcher. You will have to include the optional Hamcrest library in your classpath 
+Gmock is also fully compatible with the [http://code.google.com/p/hamcrest/ Hamcrest] matcher. You will have to include the optional Hamcrest library in your classpath
 
 Here is an example:
 {{{
@@ -171,11 +170,12 @@ play {
     assertEquals "correct", mockLoader.put("test", 10)
 }
 }}}
+
 == Not extending the GMockTestCase ==
 
-If you don't want or can't extends the `GMockTestCase` in your test you can use the GMockController. 
+If you don't want to or can't extend the `GMockTestCase` in your test, you can use the GMockController.
 
-In the beginning of your test create a new `GMockController`. You then can use its `mock()` method an `play` closure as a usual Gmock test.
+At the beginning of your test, create a new `GMockController`. You then can use its `mock()` method and `play` closure as per a usual Gmock test.
 
 {{{
 void testController(){
