@@ -39,12 +39,12 @@
             <li>Setup expectation in mock closure <g:issue number="35"/></li>
         </ul>
 
-        <h2>Version 0.5.0</h2>
+        <h2  class="done here">Version 0.5.0</h2>
         <ul>
             <li>Strong typing support <g:issue number="14" done="true"/></li>
         </ul>
 
-        <h2 class="done here">Version 0.4.0</h2>
+        <h2 class="done">Version 0.4.0</h2>
         <ul>
             <li>Closure matcher <g:issue number="12" done="true"/></li>
             <li>Time matching <g:issue number="13" done="true"/></li>
