@@ -4,10 +4,10 @@
 
 Gmock is a mocking framework for the Groovy language. 
 
-Gmock is all about simple syntax and readability of your tests so you spend less time learning the framework and more writing code. To use Gmock just drop the gmock jar file in your classpath and make sure you also have junit.
+Gmock is all about simple syntax and readability of your tests so you spend less time learning the framework and more time writing code. To use Gmock just drop the gmock jar file into your classpath and make sure you also have junit.
 
 
-This documention describe the version 0.2 of Gmock.
+This documention describes the version 0.2 of Gmock.
 
 
 = Getting Started =
@@ -26,9 +26,9 @@ class LoaderTest extends GMockTestCase {
 }  
 }}}
 
-  * First extends the `GMockTestCase`
-  * Create mock object using the `mock()` method
-  * Setup expectation by calling the method you expect on your mock
+  * First extend the `GMockTestCase`
+  * Create mock objects using the `mock()` method
+  * Set up expectations by calling the methods you expect on your mock
   * Run the code you are testing within the `play` closure
 
 
@@ -36,13 +36,13 @@ class LoaderTest extends GMockTestCase {
 
 == Expectation and Play mode == 
 
-Mock object are created using the `mock()` method available in `GMockTestCase`. By default mock object will record method call and generate expectation. 
+Mock objects are created using the `mock()` method available in `GMockTestCase`. By default mock objects will record method calls and generate expectations.
 
 The code under test should run through the `play` closure. 
 {{{
 void testBasic(){
   def aMock = mock()
-  // setup expectation
+  // set up expectation
   play {
     // run your code 
   }
@@ -51,7 +51,7 @@ void testBasic(){
 
 == Mock method call ==
 
-Method call expectation are created when calling method on Mock. Return value can be setup using the `returns` keyword. 
+Method call expectations are created when calling methods on Mock. Return values can be set up using the `returns` keyword.
 {{{
 def loader = mock()
 loader.put("fruit").returns("apple")
@@ -60,7 +60,7 @@ play {
 }
 }}}
 
-Exception can be setup using the `raises` keyword.
+Exceptions can be set up using the `raises` keyword.
 {{{
 def loader = mock()
 loader.put("throw exception").raises(new RuntimeException("an exception"))
@@ -85,11 +85,11 @@ play {
 
 == Mock constructor call ==
 
-Constructor call are mocked using the following syntax:
+Constructor calls are mocked using the following syntax:
 {{{
-def mockFile = mock(File, constructor: ["/a/path/file.txt"])
+def mockFile = mock(File, constructor("/a/path/file.txt"))
 }}}
-This would match: `new File("/a/path/file.txt")`. The mockFile can then be used to setup further expectation.
+This would match: `new File("/a/path/file.txt")`. The mockFile can then be used to set up further expectations.
 
 Here is the full picture:
 {{{
@@ -104,9 +104,9 @@ play {
 
 == Not extending the GMockTestCase ==
 
-If you don't want or can't extends the `GMockTestCase` in your test you can use the GMockController. 
+If you don't want to or can't extend the `GMockTestCase` in your test, you can use the GMockController.
 
-In the beginning of your test create a new `GMockController`. You then can use its `mock()` method an `play` closure as a usual Gmock test.
+At the beginning of your test, create a new `GMockController`. You then can use its `mock()` method and `play` closure as per a usual Gmock test.
 
 {{{
 void testController(){
