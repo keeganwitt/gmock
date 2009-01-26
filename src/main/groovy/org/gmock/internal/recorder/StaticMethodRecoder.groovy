@@ -33,4 +33,13 @@ class StaticMethodRecoder implements GroovyInterceptable {
         return new ReturnMethodRecorder(expectation)
     }
 
+    Object getProperty(String property) {
+        return new StaticPropertyRecorder(aClass, property, expectation)
+    }
+
+    void setProperty(String property, Object value) {
+        throw new MissingPropertyException("Cannot use property setter in record mode. " +
+                "Are you trying to mock a setter? Use 'static.${property}.set(${value.inspect()})' instead.")
+    }
+
 }

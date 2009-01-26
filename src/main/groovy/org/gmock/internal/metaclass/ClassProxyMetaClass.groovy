@@ -16,10 +16,12 @@
 package org.gmock.internal.metaclass
 
 import java.beans.IntrospectionException
-import static junit.framework.Assert.fail
 import org.gmock.internal.ExpectationCollection
 import static org.gmock.internal.InternalModeHelper.doInternal
+import static org.gmock.internal.metaclass.MetaClassHelper.findExpectation
 import org.gmock.internal.signature.ConstructorSignature
+import org.gmock.internal.signature.StaticPropertyGetSignature
+import org.gmock.internal.signature.StaticPropertySetSignature
 import org.gmock.internal.signature.StaticSignature
 
 /**
@@ -64,39 +66,39 @@ class ClassProxyMetaClass extends ProxyMetaClass {
         staticExpectations = new ExpectationCollection()
     }
 
-    public Object invokeConstructor(Object[] arguments) {
-        if (!constructorExpectations.empty()) {
-            return doInternal(controller, { adaptee.invokeConstructor(arguments) }) {
-                def signature = new ConstructorSignature(theClass, arguments)
-                def expectation = constructorExpectations.findMatching(signature)
-                if (expectation){
-                    return expectation.answer()
-                } else {
-                    def callState = constructorExpectations.callState(signature).toString()
-                    if (callState){ callState = "\n$callState" }
-                    fail("Unexpected constructor call '${signature}'$callState")
-                }
-            }
-        } else {
-            return adaptee.invokeConstructor( arguments )
+    Object invokeConstructor(Object[] arguments) {
+        checkExpectationsAndDo constructorExpectations, { adaptee.invokeConstructor(arguments) }, {
+            def signature = new ConstructorSignature(theClass, arguments)
+            return findExpectation(constructorExpectations, signature, "Unexpected constructor call")
         }
     }
 
-    public Object invokeStaticMethod(Object aClass, String method, Object[] arguments) {
-        if (staticExpectations.empty()) {
-            return adaptee.invokeStaticMethod(aClass, method, arguments)
+    Object invokeStaticMethod(Object aClass, String method, Object[] arguments) {
+        checkExpectationsAndDo staticExpectations, { adaptee.invokeStaticMethod(aClass, method, arguments) }, {
+            def signature = new StaticSignature(aClass, method, arguments)
+            return findExpectation(staticExpectations, signature, "Unexpected static method call")
+        }
+    }
+
+    Object getProperty(Object clazz, String property) {
+        checkExpectationsAndDo staticExpectations, { adaptee.getProperty(clazz, property) }, {
+            def signature = new StaticPropertyGetSignature(clazz, property)
+            return findExpectation(staticExpectations, signature, "Unexpected static property getter call")
+        }
+    }
+
+    void setProperty(Object clazz, String property, Object value) {
+        checkExpectationsAndDo staticExpectations, { adaptee.setProperty(clazz, property, value) }, {
+            def signature = new StaticPropertySetSignature(clazz, property, value)
+            findExpectation(staticExpectations, signature, "Unexpected static property setter call")
+        }
+    }
+
+    private checkExpectationsAndDo(expectations, Closure invokeOriginal, Closure work) {
+        if (expectations.empty()) {
+            return invokeOriginal()
         } else {
-            return doInternal(controller, { adaptee.invokeStaticMethod(aClass, method, arguments) }) {
-                def signature = new StaticSignature(aClass, method, arguments)
-                def expectation = staticExpectations.findMatching(signature)
-                if (expectation){
-                    return expectation.answer()
-                } else {
-                    def callState = staticExpectations.callState(signature).toString()
-                    if (callState){ callState = "\n$callState" }
-                    fail("Unexpected static method call '${signature}'$callState")
-                }
-            }
+            return doInternal(controller, invokeOriginal, work)
         }
     }
 

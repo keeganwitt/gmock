@@ -15,10 +15,10 @@
  */
 package org.gmock.internal.metaclass
 
-import static junit.framework.Assert.fail
 import org.gmock.internal.Expectation
 import org.gmock.internal.ExpectationCollection
 import static org.gmock.internal.InternalModeHelper.doInternal
+import static org.gmock.internal.metaclass.MetaClassHelper.findExpectation
 import org.gmock.internal.recorder.PropertyRecorder
 import org.gmock.internal.recorder.ReturnMethodRecorder
 import org.gmock.internal.recorder.StaticMethodRecoder
@@ -47,14 +47,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal controller, { adaptee.invokeMethod(receiver, methodName, arguments) }, {
             def signature = new MethodSignature(methodName, arguments)
             if (replay){
-                def expectation = expectations.findMatching(signature)
-                if (expectation){
-                    return expectation.answer()
-                } else {
-                    def callState = expectations.callState(signature).toString()
-                    if (callState){ callState = "\n$callState" }
-                    fail("Unexpected method call '${signature}'$callState")
-                }
+                return findExpectation(expectations, signature, "Unexpected method call")
             } else {
                 def expectation = new Expectation(expectations: expectations, signature: signature)
                 expectations.add( expectation )
@@ -71,14 +64,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal controller, { adaptee.getProperty(receiver, property) }, {
             if (replay){
                 def signature = new PropertyGetSignature(property)
-                def expectation = expectations.findMatching(signature)
-                if (expectation){
-                    return expectation.answer()
-                } else {
-                    def callState = expectations.callState(signature).toString()
-                    if (callState){ callState = "\n$callState" }
-                    fail("Unexpected property getter call '${signature}'$callState")
-                }
+                return findExpectation(expectations, signature, "Unexpected property getter call")
             } else {
                 if (property == "static"){
                     def expectation = new Expectation()
@@ -101,17 +87,10 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal controller, { adaptee.setProperty(receiver, property, value) }, {
             if (replay){
                 def signature = new PropertySetSignature(property, value)
-                def expectation = expectations.findMatching(signature)
-                if (expectation){
-                    expectation.answer()
-                } else {
-                    def callState = expectations.callState(signature).toString()
-                    if (callState){ callState = "\n$callState" }
-                    fail("Unexpected property setter call '${signature}'$callState")
-                }
+                findExpectation(expectations, signature, "Unexpected property setter call")
             } else {
                 throw new MissingPropertyException("Cannot use property setter in record mode. " +
-                        "Are you trying to mock a setter? Use '${property}.set($value)' instead.")
+                        "Are you trying to mock a setter? Use '${property}.set(${value.inspect()})' instead.")
             }
         }
     }
