@@ -16,6 +16,7 @@
 package org.gmock
 
 import junit.framework.AssertionFailedError
+import org.gmock.utils.Loader
 import static org.hamcrest.Matchers.*
 
 class FunctionnalPropertyTest extends GMockTestCase {
@@ -442,9 +443,9 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testAssignPropertyInRecordState() {
         def mockLoader = mock()
-        def expected = "Cannot use property setter in record mode. Are you trying to mock a setter? Use 'id.set(1)' instead."
+        def expected = "Cannot use property setter in record mode. Are you trying to mock a setter? Use 'id.set(\"1\")' instead."
         def message = shouldFail(MissingPropertyException) {
-            mockLoader.id = 1
+            mockLoader.id = "1"
         }
         assertEquals expected, message
     }
@@ -460,5 +461,63 @@ class FunctionnalPropertyTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testStaticProperty() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.name.set("name")
+        mockLoader.static.name.returns("another name")
+        mockLoader.static.number.set(match { it > 1 })
+        mockLoader.static.something.returns(1).times(3)
+        mockLoader.static.error.raises(RuntimeException)
+        mockLoader.static.error.set(0).raises(IllegalStateException)
+
+        play {
+            Loader.name = "name"
+            assertEquals "another name", Loader.name
+            Loader.number = 10
+            3.times {
+                assertEquals 1, Loader.something
+            }
+            shouldFail(RuntimeException) {
+                Loader.error
+            }
+            shouldFail(IllegalStateException) {
+                Loader.error = 0
+            }
+        }
+    }
+
+    void testStaticPropertyFailed() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.a.returns(1)
+        mockLoader.static.b.set(2)
+
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'Loader.a': expected 1, actual 0\n" +
+                       "  'Loader.b = 2': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
+    void testNonCompleteStaticPropertyExpectationsAreInvalid() {
+        def mockLoader = mock(Loader)
+        mockLoader.static.something
+
+        def expected = "Missing property expectation for 'Loader.something'"
+        def message = shouldFail(IllegalStateException) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
+    void testAssignStaticPropertyInRecordState() {
+        def mockLoader = mock(Loader)
+        def expected = "Cannot use property setter in record mode. Are you trying to mock a setter? Use 'static.something.set([:])' instead."
+        def message = shouldFail(MissingPropertyException) {
+            mockLoader.static.something = [:]
+        }
+        assertEquals expected, message
+    }
 
 }
