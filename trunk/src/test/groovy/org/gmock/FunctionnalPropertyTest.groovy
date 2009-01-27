@@ -520,4 +520,15 @@ class FunctionnalPropertyTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testFinalJavaClassProperty() {
+        def mockString = mock(String)
+        mockString.static.a.returns(1)
+        mockString.a.returns(2)
+
+        play {
+            assertEquals 2, mockString.a
+            assertEquals 1, String.a
+        }
+    }
+
 }
