@@ -44,12 +44,16 @@ class ClassProxyMetaClass extends ProxyMetaClass {
     }
 
     def startProxy(){
-        adaptee = registry.getMetaClass(theClass)
-        registry.setMetaClass(theClass, this)
+        if (!empty()) {
+            adaptee = registry.getMetaClass(theClass)
+            registry.setMetaClass(theClass, this)
+        }
     }
 
     def stopProxy(){
-        registry.setMetaClass(theClass, adaptee)
+        if (!empty()) {
+            registry.setMetaClass(theClass, adaptee)
+        }
     }
 
     def validate(){
@@ -67,39 +71,43 @@ class ClassProxyMetaClass extends ProxyMetaClass {
     }
 
     Object invokeConstructor(Object[] arguments) {
-        checkExpectationsAndDo constructorExpectations, { adaptee.invokeConstructor(arguments) }, {
+        checkAndDo constructorExpectations.empty(), { adaptee.invokeConstructor(arguments) }, {
             def signature = new ConstructorSignature(theClass, arguments)
             return findExpectation(constructorExpectations, signature, "Unexpected constructor call")
         }
     }
 
     Object invokeStaticMethod(Object aClass, String method, Object[] arguments) {
-        checkExpectationsAndDo staticExpectations, { adaptee.invokeStaticMethod(aClass, method, arguments) }, {
+        checkAndDo staticExpectations.empty(), { adaptee.invokeStaticMethod(aClass, method, arguments) }, {
             def signature = new StaticSignature(aClass, method, arguments)
             return findExpectation(staticExpectations, signature, "Unexpected static method call")
         }
     }
 
     Object getProperty(Object clazz, String property) {
-        checkExpectationsAndDo staticExpectations, { adaptee.getProperty(clazz, property) }, {
+        checkAndDo staticExpectations.empty() || !(clazz instanceof Class), { adaptee.getProperty(clazz, property) }, {
             def signature = new StaticPropertyGetSignature(clazz, property)
             return findExpectation(staticExpectations, signature, "Unexpected static property getter call")
         }
     }
 
     void setProperty(Object clazz, String property, Object value) {
-        checkExpectationsAndDo staticExpectations, { adaptee.setProperty(clazz, property, value) }, {
+        checkAndDo staticExpectations.empty() || !(clazz instanceof Class), { adaptee.setProperty(clazz, property, value) }, {
             def signature = new StaticPropertySetSignature(clazz, property, value)
             findExpectation(staticExpectations, signature, "Unexpected static property setter call")
         }
     }
 
-    private checkExpectationsAndDo(expectations, Closure invokeOriginal, Closure work) {
-        if (expectations.empty()) {
+    private checkAndDo(condition, Closure invokeOriginal, Closure work) {
+        if (condition) {
             return invokeOriginal()
         } else {
             return doInternal(controller, invokeOriginal, work)
         }
+    }
+
+    private empty() {
+        constructorExpectations.empty() && staticExpectations.empty()
     }
 
 }
