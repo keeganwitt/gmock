@@ -19,10 +19,10 @@ import java.beans.IntrospectionException
 import org.gmock.internal.ExpectationCollection
 import static org.gmock.internal.InternalModeHelper.doInternal
 import static org.gmock.internal.metaclass.MetaClassHelper.findExpectation
+import static org.gmock.internal.metaclass.MetaClassHelper.newSignatureForStaticMethod
 import org.gmock.internal.signature.ConstructorSignature
 import org.gmock.internal.signature.StaticPropertyGetSignature
 import org.gmock.internal.signature.StaticPropertySetSignature
-import org.gmock.internal.signature.StaticSignature
 
 /**
  * ClassProxyMetaClass capture all static and constructor call in replay mode.
@@ -79,7 +79,7 @@ class ClassProxyMetaClass extends ProxyMetaClass {
 
     Object invokeStaticMethod(Object aClass, String method, Object[] arguments) {
         checkAndDo staticExpectations.empty(), { adaptee.invokeStaticMethod(aClass, method, arguments) }, {
-            def signature = new StaticSignature(aClass, method, arguments)
+            def signature = newSignatureForStaticMethod(aClass, method, arguments)
             return findExpectation(staticExpectations, signature, "Unexpected static method call")
         }
     }

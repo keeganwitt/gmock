@@ -20,34 +20,45 @@ class StaticPropertySetSignature {
     def clazz
     def property
     def argument
+    def method
 
-    StaticPropertySetSignature(clazz, property, argument) {
+    StaticPropertySetSignature(clazz, property, argument, method = null) {
         this.clazz = clazz
         this.property = property
         this.argument = new ParameterSignature([argument])
+        this.method = method
     }
 
     def validate() {}
 
     String toString() {
-        "${clazz.simpleName}.$property = $argument"
+        if (method) {
+            return "${clazz.simpleName}.$method($argument)"
+        } else {
+            return "${clazz.simpleName}.$property = $argument"
+        }
     }
 
     private boolean equalsWithoutArgument(Object signature) {
         if (signature == null || getClass() != signature.getClass()) return false
         if (clazz != signature.clazz) return false
-        if (property != signature.property) return false
         return true
     }
 
     boolean equals(Object signature) {
         if (!equalsWithoutArgument(signature)) return false
+        if (method || signature.method) {
+            if (method != signature.method) return false
+        } else {
+            if (property != signature.property) return false
+        }
         if (argument != signature.argument) return false
         return true
     }
 
     boolean match(Object signature) {
         if (!equalsWithoutArgument(signature)) return false
+        if (property != signature.property) return false
         if (!argument.match(signature.argument)) return false
         return true
     }

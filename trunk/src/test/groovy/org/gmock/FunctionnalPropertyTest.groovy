@@ -531,4 +531,100 @@ class FunctionnalPropertyTest extends GMockTestCase {
         }
     }
 
+    void testMockingPropertySetterCrossUsage() {
+        def mock = mock()
+        mock.setIt(0)
+        mock.something.set(1)
+        play {
+            mock.it = 0
+            mock.setSomething(1)
+        }
+
+        mock.setIt(1)
+        mock.it.set(1)
+        mock.something.set(2)
+        def expected = "Unexpected method call 'setOther(0)'\n" +
+                       "  'setIt(1)': expected 1, actual 0\n" +
+                       "  'it = 1': expected 1, actual 0\n" +
+                       "  'something = 2': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                mock.setOther(0)
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testMockingPropertyGetterCrossUsage() {
+        def mock = mock()
+        mock.it.returns(0)
+        mock.getSomething().returns(1)
+        play {
+            assertEquals 0, mock.getIt()
+            assertEquals 1, mock.something
+        }
+
+        mock.it.returns(1)
+        mock.getIt().returns(1)
+        mock.getSomething().returns(2)
+        def expected = "Unexpected method call 'getOther()'\n" +
+                       "  'it': expected 1, actual 0\n" +
+                       "  'getIt()': expected 1, actual 0\n" +
+                       "  'getSomething()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                mock.getOther()
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testMockingStaticPropertySetterCrossUsage() {
+        def mock = mock(Loader)
+        mock.static.setIt(0)
+        mock.static.something.set(1)
+        play {
+            Loader.it = 0
+            Loader.setSomething(1)
+        }
+
+        mock.static.setIt(1)
+        mock.static.it.set(1)
+        mock.static.something.set(2)
+        def expected = "Unexpected static method call 'Loader.setOther(0)'\n" +
+                       "  'Loader.setIt(1)': expected 1, actual 0\n" +
+                       "  'Loader.it = 1': expected 1, actual 0\n" +
+                       "  'Loader.something = 2': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.setOther(0)
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testMockingStaticPropertyGetterCrossUsage() {
+        def mock = mock(Loader)
+        mock.static.it.returns(0)
+        mock.static.getSomething().returns(1)
+        play {
+            assertEquals 0, Loader.getIt()
+            assertEquals 1, Loader.something
+        }
+
+        mock.static.it.returns(1)
+        mock.static.getIt().returns(1)
+        mock.static.getSomething().returns(2)
+        def expected = "Unexpected static method call 'Loader.getOther()'\n" +
+                       "  'Loader.it': expected 1, actual 0\n" +
+                       "  'Loader.getIt()': expected 1, actual 0\n" +
+                       "  'Loader.getSomething()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.getOther()
+            }
+        }
+        assertEquals expected, message
+    }
+
 }

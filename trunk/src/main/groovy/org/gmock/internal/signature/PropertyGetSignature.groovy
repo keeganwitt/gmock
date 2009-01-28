@@ -18,13 +18,19 @@ package org.gmock.internal.signature
 class PropertyGetSignature {
 
     def propertyName
+    def methodName
 
-    PropertyGetSignature(propertyName) {
+    PropertyGetSignature(propertyName, methodName = null) {
         this.propertyName = propertyName
+        this.methodName = methodName
     }
 
     String toString() {
-        "${propertyName}"
+        if (methodName) {
+            return "$methodName()"
+        } else {
+            return propertyName
+        }
     }
 
     def validate(){
@@ -32,12 +38,18 @@ class PropertyGetSignature {
 
     boolean equals(Object getSignature) {
         if (getSignature == null || getClass() != getSignature.getClass()) return false
-        if (propertyName != getSignature.propertyName) return false
+        if (methodName || getSignature.methodName) {
+            if (methodName != getSignature.methodName) return false
+        } else {
+            if (propertyName != getSignature.propertyName) return false
+        }
         return true
     }
 
     boolean match(Object getSignature) {
-        return equals(getSignature)
+        if (getSignature == null || getClass() != getSignature.getClass()) return false
+        if (propertyName != getSignature.propertyName) return false
+        return true
     }
 
     int hashCode() {
