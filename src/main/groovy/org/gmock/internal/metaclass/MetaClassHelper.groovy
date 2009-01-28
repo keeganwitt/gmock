@@ -16,6 +16,7 @@
 package org.gmock.internal.metaclass
 
 import static junit.framework.Assert.fail
+import org.gmock.internal.signature.*
 
 class MetaClassHelper {
 
@@ -28,6 +29,58 @@ class MetaClassHelper {
             if (callState) { callState = "\n$callState" }
             fail("$message '${signature}'$callState")
         }
+    }
+
+    static newSignatureForMethod(methodName, arguments) {
+        if (isGetter(methodName, arguments)) {
+            return new PropertyGetSignature(getPropertyForGetter(methodName), methodName)
+        } else if (isSetter(methodName, arguments)) {
+            return new PropertySetSignature(getPropertyForSetter(methodName), arguments[0], methodName)
+        } else {
+            return new MethodSignature(methodName, arguments)
+        }
+    }
+
+    static newSignatureForStaticMethod(aClass, methodName, arguments) {
+        if (isGetter(methodName, arguments)) {
+            return new StaticPropertyGetSignature(aClass, getPropertyForGetter(methodName), methodName)
+        } else if (isSetter(methodName, arguments)) {
+            return new StaticPropertySetSignature(aClass, getPropertyForSetter(methodName), arguments[0], methodName)
+        } else {
+            return new StaticSignature(aClass, methodName, arguments)
+        }
+    }
+
+    private static isSetter(method, arguments) {
+        return method.startsWith("set") && method.size() > 3 && Character.isUpperCase(method.charAt(3)) && arguments.size() == 1
+    }
+
+    private static isGetter(method, arguments) {
+        def firstChar
+        if (method.startsWith("get") && method.size() > 3) {
+            firstChar = method.charAt(3)
+        } else if (method.startsWith("is") && method.size() > 2) {
+            firstChar = method.charAt(2)
+        } else {
+            return false
+        }
+        return Character.isUpperCase(firstChar) && arguments.size() == 0
+    }
+
+    private static getPropertyForSetter(method) {
+        return convertPropertyName(method.substring(3))
+    }
+
+    private static getPropertyForGetter(method) {
+        if (method.startsWith("get")) {
+            return convertPropertyName(method.substring(3))
+        } else {
+            return convertPropertyName(method.substring(2))
+        }
+    }
+
+    private static convertPropertyName(method) {
+        method[0].toLowerCase() + method.substring(1)
     }
 
 }

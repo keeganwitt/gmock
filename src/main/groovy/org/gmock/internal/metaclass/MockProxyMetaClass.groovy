@@ -19,10 +19,10 @@ import org.gmock.internal.Expectation
 import org.gmock.internal.ExpectationCollection
 import static org.gmock.internal.InternalModeHelper.doInternal
 import static org.gmock.internal.metaclass.MetaClassHelper.findExpectation
+import static org.gmock.internal.metaclass.MetaClassHelper.newSignatureForMethod
 import org.gmock.internal.recorder.PropertyRecorder
 import org.gmock.internal.recorder.ReturnMethodRecorder
 import org.gmock.internal.recorder.StaticMethodRecoder
-import org.gmock.internal.signature.MethodSignature
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
 
@@ -45,7 +45,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
 
     Object invokeMethod(Class sender, Object receiver, String methodName, Object[] arguments, boolean isCallToSuper, boolean fromInsideClass) {
         doInternal controller, { adaptee.invokeMethod(receiver, methodName, arguments) }, {
-            def signature = new MethodSignature(methodName, arguments)
+            def signature = newSignatureForMethod(methodName, arguments)
             if (replay){
                 return findExpectation(expectations, signature, "Unexpected method call")
             } else {

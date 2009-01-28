@@ -19,33 +19,39 @@ class PropertySetSignature {
 
     def propertyName
     def argument
+    def methodName
 
-    PropertySetSignature(propertyName, argument) {
+    PropertySetSignature(propertyName, argument, methodName = null) {
         this.propertyName = propertyName
         this.argument = new ParameterSignature([argument])
+        this.methodName = methodName
     }
 
     String toString() {
-        "${propertyName} = ${argument}"
+        if (methodName) {
+            return "$methodName($argument)"
+        } else {
+            return "$propertyName = $argument"
+        }
     }
 
     def validate(){
     }
 
-    private boolean equalsWithoutArgument(Object setSignature) {
-        if (setSignature == null || getClass() != setSignature.getClass()) return false
-        if (propertyName != setSignature.propertyName) return false
-        return true
-    }
-
     boolean equals(Object setSignature) {
-        if (!equalsWithoutArgument(setSignature)) return false
+        if (setSignature == null || getClass() != setSignature.getClass()) return false
+        if (methodName || setSignature.methodName) {
+            if (methodName != setSignature.methodName) return false
+        } else {
+            if (propertyName != setSignature.propertyName) return false
+        }
         if (argument != setSignature.argument) return false
         return true
     }
 
     boolean match(Object setSignature) {
-        if (!equalsWithoutArgument(setSignature)) return false
+        if (setSignature == null || getClass() != setSignature.getClass()) return false
+        if (propertyName != setSignature.propertyName) return false
         if (!argument.match(setSignature.argument)) return false
         return true
     }

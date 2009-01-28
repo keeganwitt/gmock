@@ -19,27 +19,44 @@ class StaticPropertyGetSignature {
 
     def clazz
     def property
+    def method
 
-    StaticPropertyGetSignature(clazz, property) {
+    StaticPropertyGetSignature(clazz, property, method = null) {
         this.clazz = clazz
         this.property = property
+        this.method = method
     }
 
     def validate() {}
 
     String toString() {
-        "${clazz.simpleName}.$property"
+        if (method) {
+            return "${clazz.simpleName}.$method()"
+        } else {
+            return "${clazz.simpleName}.$property"
+        }
+    }
+
+    private boolean equalsWithoutArguments(Object signature) {
+        if (signature == null || getClass() != signature.getClass()) return false
+        if (clazz != signature.clazz) return false
+        return true
     }
 
     boolean equals(Object signature) {
-        if (signature == null || getClass() != signature.getClass()) return false
-        if (clazz != signature.clazz) return false
-        if (property != signature.property) return false
+        if (!equalsWithoutArguments(signature)) return false
+        if (method || signature.method) {
+            if (method != signature.method) return false
+        } else {
+            if (property != signature.property) return false
+        }
         return true
     }
 
     boolean match(Object signature) {
-        return equals(signature)
+        if (!equalsWithoutArguments(signature)) return false
+        if (property != signature.property) return false
+        return true
     }
 
     int hashCode() {
