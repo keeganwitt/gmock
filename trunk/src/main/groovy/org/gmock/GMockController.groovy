@@ -39,38 +39,46 @@ class GMockController {
     boolean internal = false
 
     @Deprecated
-    def mock(Map constraints, Class clazz = Object) {
-        return doMock(clazz, new ConstructorRecorder(constraints.constructor), null)
+    def mock(Map constraints, Class clazz = Object, Closure expectationClosure = null) {
+        return doMock(clazz, new ConstructorRecorder(constraints.constructor), null, expectationClosure)
+    }
+    def mock() {
+        return doMock(Object, null, null, null)
+    }
+    def mock(Class clazz) {
+        return doMock(clazz, null, null, null)
+    }
+    def mock(Closure expectationClosure) {
+        return doMock(Object, null, null, expectationClosure)
+    }
+    def mock(Class clazz, Closure expectationClosure) {
+        return doMock(clazz, null, null, expectationClosure)
     }
 
-    def mock(Class clazz = Object) {
-        return doMock(clazz, null, null)
+    def mock(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder, Closure expectationClosure = null) {
+        return doMock(clazz, null, invokeConstructorRecorder, expectationClosure)
     }
 
-    def mock(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder) {
-        return doMock(clazz, null, invokeConstructorRecorder)
+    def mock(Class clazz, ConstructorRecorder constructorRecorder, Closure expectationClosure = null) {
+        return doMock(clazz, constructorRecorder, null, expectationClosure)
     }
 
-    def mock(Class clazz, ConstructorRecorder constructorRecorder) {
-        return doMock(clazz, constructorRecorder, null)
+    def mock(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder, ConstructorRecorder constructorRecorder, Closure expectationClosure = null) {
+        return doMock(clazz, constructorRecorder, invokeConstructorRecorder, expectationClosure)
     }
 
-    def mock(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder, ConstructorRecorder constructorRecorder) {
-        return doMock(clazz, constructorRecorder, invokeConstructorRecorder)
+    def mock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder, Closure expectationClosure = null) {
+        return doMock(clazz, constructorRecorder, invokeConstructorRecorder, expectationClosure)
     }
 
-    def mock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder) {
-        return doMock(clazz, constructorRecorder, invokeConstructorRecorder)
-    }
-
-    private doMock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder) {
+    private doMock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder, Closure expectationClosure) {
+        def mockInstance
         doInternal(this) {
             if (replay) {
                 throw new IllegalStateException("Cannot create mocks in play closure.")
             }
 
             def mpmc = new MockProxyMetaClass(clazz, classExpectations, this)
-            def mockInstance
 
             if (!Modifier.isFinal(clazz.modifiers)) {
                 mockInstance = mockNonFinalClass(clazz, mpmc, invokeConstructorRecorder)
@@ -84,8 +92,14 @@ class GMockController {
             }
 
             mocks << mpmc
-            return mockInstance
         }
+        if (expectationClosure){
+            expectationClosure.setDelegate(mockInstance)
+            expectationClosure(mockInstance)
+        }
+        
+        return mockInstance
+
     }
 
     def play(Closure closure) {
