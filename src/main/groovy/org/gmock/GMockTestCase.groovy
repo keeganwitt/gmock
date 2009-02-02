@@ -19,14 +19,24 @@ abstract class GMockTestCase extends GroovyTestCase {
 
     protected gMockController = new GMockController()
 
-    protected mock = gMockController.&mock
+    protected mock(Object... args) {
+        gMockController.mock(*args)
+    }
 
-    protected play = gMockController.&play
+    protected play(Closure closure) {
+        gMockController.play(closure)
+    }
 
-    protected constructor = GMock.&constructor
+    protected constructor(Object... args) {
+        GMock.constructor(args)
+    }
 
-    protected invokeConstructor = GMock.&invokeConstructor
+    protected invokeConstructor(Object... args) {
+        GMock.invokeConstructor(args)
+    }
 
-    protected match = GMock.&match
+    protected match(Closure matcher) {
+        GMock.match(matcher)
+    }
 
 }

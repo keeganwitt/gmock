@@ -42,15 +42,19 @@ class GMockController {
     def mock(Map constraints, Class clazz = Object, Closure expectationClosure = null) {
         return doMock(clazz, new ConstructorRecorder(constraints.constructor), null, expectationClosure)
     }
+
     def mock() {
         return doMock(Object, null, null, null)
     }
+
     def mock(Class clazz) {
         return doMock(clazz, null, null, null)
     }
+
     def mock(Closure expectationClosure) {
         return doMock(Object, null, null, expectationClosure)
     }
+
     def mock(Class clazz, Closure expectationClosure) {
         return doMock(clazz, null, null, expectationClosure)
     }
@@ -94,10 +98,11 @@ class GMockController {
             mocks << mpmc
         }
         if (expectationClosure){
+            expectationClosure.resolveStrategy = Closure.OWNER_FIRST
             expectationClosure.setDelegate(mockInstance)
             expectationClosure(mockInstance)
         }
-        
+
         return mockInstance
 
     }

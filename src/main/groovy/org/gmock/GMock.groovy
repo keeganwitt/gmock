@@ -25,11 +25,11 @@ class GMock {
         new ClosureMatcher(matcher)
     }
 
-    static constructor(Object[] args) {
+    static constructor(Object... args) {
         new ConstructorRecorder(args)
     }
 
-    static invokeConstructor(Object[] args) {
+    static invokeConstructor(Object... args) {
         new InvokeConstructorRecorder(args)
     }
 
