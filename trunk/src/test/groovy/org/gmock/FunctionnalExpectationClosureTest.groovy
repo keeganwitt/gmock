@@ -16,6 +16,9 @@
 
 package org.gmock
 
+import org.gmock.utils.JavaLoader
+import static org.hamcrest.Matchers.lessThan
+
 class FunctionnalExpectationClosureTest extends GMockTestCase {
 
     void testExpectationClosure(){
@@ -102,6 +105,32 @@ class FunctionnalExpectationClosureTest extends GMockTestCase {
         play {
             Date date = new Date("arg1")
             assertEquals "NOW", date.now()
+        }
+    }
+
+    void testExpectationClosureWithMatcher() {
+        def mock = mock {
+            load(match { it > 3 }).returns(2)
+            load(lessThan(3)).returns(1)
+        }
+        play {
+            assertEquals 1, mock.load(2)
+            assertEquals 2, mock.load(5)
+        }
+    }
+
+    void testExpectationClosureWithExistingMethods() {
+        mock(JavaLoader, constructor("test"), invokeConstructor("original")) {
+            load("yes").returns("no")
+            finalMethod(1).returns(2)
+            it.name.returns("test")
+        }
+        play {
+            def loader = new JavaLoader("test")
+            assertEquals "no", loader.load("yes")
+            assertEquals 2, loader.finalMethod(1)
+            assertEquals "test", loader.getName()
+            assertEquals "original", loader.@name
         }
     }
 
