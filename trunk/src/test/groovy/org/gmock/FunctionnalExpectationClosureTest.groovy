@@ -16,8 +16,7 @@
 
 package org.gmock
 
-
-class FunctionnalExpectationClosure extends GMockTestCase {
+class FunctionnalExpectationClosureTest extends GMockTestCase {
 
     void testExpectationClosure(){
         def mock = mock {
@@ -28,6 +27,7 @@ class FunctionnalExpectationClosure extends GMockTestCase {
             assertEquals "a value", mock.amethod()
         }
     }
+
     void testExpectationClosureUsingIt(){
         def mock = mock {
             it.amethod().returns("a value")
@@ -104,5 +104,5 @@ class FunctionnalExpectationClosure extends GMockTestCase {
             assertEquals "NOW", date.now()
         }
     }
-    
+
 }
