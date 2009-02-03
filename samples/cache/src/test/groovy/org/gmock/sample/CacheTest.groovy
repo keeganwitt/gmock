@@ -41,7 +41,6 @@ class CacheTest extends GMockTestCase {
             cache.flush()
         }
     }
-    
 
     void testGetButNotFound() {
         respository.get("not exist").raises(NotFoundException, "not exist")
@@ -66,6 +65,5 @@ class CacheTest extends GMockTestCase {
             assertEquals 4, cache.get("key 4") // "key 2" should be swapped out here
         }
     }
-
 
 }

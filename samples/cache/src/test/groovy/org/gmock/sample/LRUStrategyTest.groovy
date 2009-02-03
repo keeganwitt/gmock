@@ -5,9 +5,10 @@ import org.gmock.GMockTestCase
 class LRUStrategyTest extends GMockTestCase {
 
     void testOnAccess() {
-        def list = mock(LinkedList, constructor())
-        list.remove("key")
-        list.leftShift("key")
+        mock(LinkedList, constructor()) {
+            remove("key")
+            leftShift("key")
+        }
         play {
             def ls = new LRUStrategy()
             ls.onAccess "key"
@@ -15,9 +16,10 @@ class LRUStrategyTest extends GMockTestCase {
     }
 
     void testGetKeyToRemove() {
-        def list = mock(LinkedList, constructor())
-        list.first().returns("key")
-        list.remove("key")
+        mock(LinkedList, constructor()) {
+            first().returns("key")
+            remove("key")
+        }
         play {
             def ls = new LRUStrategy()
             assertEquals "key", ls.getKeyToRemove()

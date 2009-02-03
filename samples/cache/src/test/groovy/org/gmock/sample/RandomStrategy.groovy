@@ -19,8 +19,7 @@ class RandomStrategyTest extends GMockTestCase {
     }
 
     void testGetKeyToRemove() {
-        def rand = mock(Random, constructor())
-        rand.nextInt(5).returns(2)
+        mock(Random, constructor()).nextInt(5).returns(2)
         play {
             ["key 1", "key 2", "key 1", "key 3", "key 2"].each {
                 rs.onAccess it

@@ -53,8 +53,7 @@ class FunctionalTest extends GMockTestCase {
 
     void testRandomCache() {
         [3, 2].each { i ->
-            Random rand = mock(Random, constructor())
-            rand.nextInt(anything()).returns(i)
+            mock(Random, constructor()).nextInt(anything()).returns(i)
         }
 
         Respository hr = new HSQLDBRespository()
