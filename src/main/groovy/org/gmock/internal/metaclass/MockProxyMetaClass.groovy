@@ -44,7 +44,9 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     Object invokeMethod(Class sender, Object receiver, String methodName, Object[] arguments, boolean isCallToSuper, boolean fromInsideClass) {
-        doInternal controller, { adaptee.invokeMethod(receiver, methodName, arguments) }, {
+        doInternal(controller) {
+            adaptee.invokeMethod(receiver, methodName, arguments)
+        } {
             def signature = newSignatureForMethod(methodName, arguments)
             if (replay){
                 return findExpectation(expectations, signature, "Unexpected method call")
@@ -61,7 +63,9 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     Object getProperty(Class sender, Object receiver, String property, boolean isCallToSuper, boolean fromInsideClass) {
-        doInternal controller, { adaptee.getProperty(receiver, property) }, {
+        doInternal(controller) {
+            adaptee.getProperty(receiver, property)
+        } {
             if (replay){
                 def signature = new PropertyGetSignature(property)
                 return findExpectation(expectations, signature, "Unexpected property getter call")
@@ -84,7 +88,9 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     void setProperty(Class sender, Object receiver, String property, Object value, boolean isCallToSuper, boolean fromInsideClass) {
-        doInternal controller, { adaptee.setProperty(receiver, property, value) }, {
+        doInternal(controller) {
+            adaptee.setProperty(receiver, property, value)
+        } {
             if (replay){
                 def signature = new PropertySetSignature(property, value)
                 findExpectation(expectations, signature, "Unexpected property setter call")
