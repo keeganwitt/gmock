@@ -73,7 +73,9 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
     }
 
     MetaClass getMetaClassForInstance(Object instance) {
-        doInternal(controller, { adaptee }) {
+        doInternal(controller) {
+            adaptee
+        } {
             MetaClass mc = metaClasses.get(new InstanceWrapper(instance))
             return mc ?: adaptee
         }
