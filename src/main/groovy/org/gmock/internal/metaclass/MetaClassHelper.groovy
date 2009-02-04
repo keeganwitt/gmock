@@ -51,6 +51,10 @@ class MetaClassHelper {
         }
     }
 
+    static isGMockMethod(String methodName, Class[] arguments) {
+        methodName == "match" && arguments.length == 1 && Closure.isAssignableFrom(arguments[0])
+    }
+
     private static isSetter(method, arguments) {
         return method.startsWith("set") && method.size() > 3 && Character.isUpperCase(method.charAt(3)) && arguments.size() == 1
     }

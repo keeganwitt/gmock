@@ -18,8 +18,7 @@ package org.gmock.internal.metaclass
 import org.gmock.internal.Expectation
 import org.gmock.internal.ExpectationCollection
 import static org.gmock.internal.InternalModeHelper.doInternal
-import static org.gmock.internal.metaclass.MetaClassHelper.findExpectation
-import static org.gmock.internal.metaclass.MetaClassHelper.newSignatureForMethod
+import static org.gmock.internal.metaclass.MetaClassHelper.*
 import org.gmock.internal.recorder.PropertyRecorder
 import org.gmock.internal.recorder.ReturnMethodRecorder
 import org.gmock.internal.recorder.StaticMethodRecoder
@@ -30,7 +29,6 @@ class MockProxyMetaClass extends ProxyMetaClass {
 
     def expectations = new ExpectationCollection()
     def classExpectations
-    def replay = false
     def controller
 
     MockProxyMetaClass(Class clazz, classExpectations, controller) {
@@ -48,7 +46,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
             adaptee.invokeMethod(receiver, methodName, arguments)
         } {
             def signature = newSignatureForMethod(methodName, arguments)
-            if (replay){
+            if (controller.replay){
                 return findExpectation(expectations, signature, "Unexpected method call")
             } else {
                 def expectation = new Expectation(expectations: expectations, signature: signature)
@@ -66,7 +64,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee.getProperty(receiver, property)
         } {
-            if (replay){
+            if (controller.replay){
                 def signature = new PropertyGetSignature(property)
                 return findExpectation(expectations, signature, "Unexpected property getter call")
             } else {
@@ -91,7 +89,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee.setProperty(receiver, property, value)
         } {
-            if (replay){
+            if (controller.replay){
                 def signature = new PropertySetSignature(property, value)
                 findExpectation(expectations, signature, "Unexpected property setter call")
             } else {
@@ -102,11 +100,14 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     MetaMethod pickMethod(String methodName, Class[] arguments) {
-        new ProxyMetaMethod(this, methodName, arguments)
+        if (!controller.replay && isGMockMethod(methodName, arguments)) {
+            return null
+        } else {
+            return new ProxyMetaMethod(this, methodName, arguments)
+        }
     }
 
     void verify(){
-        assert replay, "verify() must be called after replay()"
         expectations.verify()
     }
 
@@ -116,11 +117,6 @@ class MockProxyMetaClass extends ProxyMetaClass {
 
     void reset(){
         this.expectations = new ExpectationCollection()
-        replay = false
-    }
-
-    void replay(){
-        replay = true
     }
 
 }

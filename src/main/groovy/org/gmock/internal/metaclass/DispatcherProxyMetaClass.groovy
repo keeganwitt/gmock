@@ -16,6 +16,7 @@
 package org.gmock.internal.metaclass
 
 import static org.gmock.internal.InternalModeHelper.doInternal
+import static org.gmock.internal.metaclass.MetaClassHelper.isGMockMethod
 
 class DispatcherProxyMetaClass extends ProxyMetaClass {
 
@@ -63,7 +64,11 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
     }
 
     MetaMethod pickMethod(String methodName, Class[] arguments) {
-        new ProxyMetaMethod(this, methodName, arguments)
+        if (!controller.replay && isGMockMethod(methodName, arguments)) {
+            return null
+        } else {
+            return new ProxyMetaMethod(this, methodName, arguments)
+        }
     }
 
     void setMetaClassForInstance(Object instance, MetaClass mc) {
