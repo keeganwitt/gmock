@@ -98,13 +98,12 @@ class GMockController {
             mocks << mpmc
         }
         if (expectationClosure){
-            expectationClosure.resolveStrategy = Closure.OWNER_FIRST
+            expectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
             expectationClosure.setDelegate(mockInstance)
             expectationClosure(mockInstance)
         }
 
         return mockInstance
-
     }
 
     def play(Closure closure) {
@@ -115,7 +114,6 @@ class GMockController {
 
             mocks*.validate()
             classExpectations.validate()
-            mocks*.replay()
             classExpectations.startProxy()
         }
         try {

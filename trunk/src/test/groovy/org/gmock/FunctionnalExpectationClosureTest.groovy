@@ -123,14 +123,44 @@ class FunctionnalExpectationClosureTest extends GMockTestCase {
         mock(JavaLoader, constructor("test"), invokeConstructor("original")) {
             load("yes").returns("no")
             finalMethod(1).returns(2)
-            it.name.returns("test")
+            setUp().returns(0)
+            name.returns("test")
         }
         play {
             def loader = new JavaLoader("test")
             assertEquals "no", loader.load("yes")
             assertEquals 2, loader.finalMethod(1)
+            assertEquals 0, loader.setUp()
             assertEquals "test", loader.getName()
             assertEquals "original", loader.@name
+        }
+    }
+
+    void testMockMatchMethodUsingIt() {
+        def m = mock {
+            it.match(match { it() }).returns("yes").stub()
+        }
+        play {
+            assertEquals "yes", m.match { true }
+            { ->
+                delegate = m
+                resolveStrategy = Closure.DELEGATE_FIRST
+                this.assertEquals "yes", match { true }
+            }()
+        }
+    }
+
+    void testMockMatchMethodOfFinalJavaClassUsingIt() {
+        def s = mock(String) {
+            it.match(match { it() }).returns("yes").stub()
+        }
+        play {
+            assertEquals "yes", s.match { true }
+            { ->
+                delegate = s
+                resolveStrategy = Closure.DELEGATE_FIRST
+                this.assertEquals "yes", match { true }
+            }()
         }
     }
 
