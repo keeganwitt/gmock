@@ -347,18 +347,6 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         }
     }
 
-    void testEmptyStaticExpectationsShouldNotAppearInErrorMessages() {
-        def mockLoader = mock(Loader)
-        mockLoader.static.one()
-        mockLoader.static
-
-        def expected = "Missing static expectation for Loader"
-        def message = shouldFail(IllegalStateException) {
-            play {}
-        }
-        assertEquals expected, message
-    }
-
     void testMockStaticHashCode() {
         Loader mockLoader = mock(Loader)
         mockLoader.static.hashCode().returns(1)
@@ -383,6 +371,67 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
             }
         }
         assertEquals expected, message
+    }
+
+    void testStaticClosure() {
+        mock(Loader).static {
+            one().returns("one")
+            it.hashCode().returns(3)
+            two(match { it in ["two", 2] }).returns("two")
+            setUp().returns("set up")
+            name.set("test")
+            name.returns("loader")
+        }
+        play {
+            assertEquals "one", Loader.one()
+            assertEquals 3, Loader.hashCode()
+            assertEquals "two", Loader.two(2)
+            assertEquals "set up", Loader.setUp()
+            Loader.name = "test"
+            assertEquals "loader", Loader.name
+        }
+    }
+
+    void testMockMatchMethodInStaticClosure() {
+        def closure = { -> }
+        mock(Loader) {
+            'static' {
+                it.match(closure).returns("yes")
+            }
+            it.static {
+                it.match(closure).returns("no")
+            }
+        }
+        play {
+            assertEquals "yes", Loader.match(closure)
+            assertEquals "no", Loader.match(closure)
+        }
+    }
+
+    void testMockMethodsAndPropertiesNamedStaticInStaticClosure() {
+        def closure = { -> }
+        mock(Loader).static {
+            it.static().returns(true)
+            it.static(closure).returns(true)
+            it.static.returns(true)
+        }
+        play {
+            assert Loader.static()
+            assert Loader.static(closure)
+            assert Loader.static
+        }
+    }
+
+    void testMockMethodsNamedMockInStaticClosure() {
+        def closure = { -> }
+        mock(Loader).static {
+            mock().returns("yes")
+            mock(closure).returns("no")
+        }
+        play {
+            assertEquals "yes", Loader.mock()
+            assertEquals "no", Loader.mock(closure)
+        }
     }
 
 }

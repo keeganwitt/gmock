@@ -64,10 +64,14 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
     }
 
     MetaMethod pickMethod(String methodName, Class[] arguments) {
-        if (!controller.replay && isGMockMethod(methodName, arguments)) {
-            return null
-        } else {
-            return new ProxyMetaMethod(this, methodName, arguments)
+        doInternal(controller) {
+            adaptee.pickMethod(methodName, arguments)
+        } {
+            if (!controller.replay && isGMockMethod(methodName, arguments)) {
+                return null
+            } else {
+                return new ProxyMetaMethod(this, methodName, arguments)
+            }
         }
     }
 
