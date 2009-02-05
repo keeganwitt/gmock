@@ -15,32 +15,74 @@
  */
 package org.gmock.internal.recorder
 
+import org.gmock.internal.Expectation
+import static org.gmock.internal.InternalModeHelper.doInternal
+import static org.gmock.internal.metaclass.MetaClassHelper.isGMockMethod
 import static org.gmock.internal.metaclass.MetaClassHelper.newSignatureForStaticMethod
-import org.gmock.internal.signature.StaticSignature
+import org.gmock.internal.metaclass.ProxyMetaMethod
 
 class StaticMethodRecoder implements GroovyInterceptable {
 
-    def expectation
+    def classExpectations
     def aClass
 
-    StaticMethodRecoder(aClass, expectation){
-        this.expectation = expectation
+    StaticMethodRecoder(aClass, classExpectations, controller){
+        this.classExpectations = classExpectations
         this.aClass = aClass
-        this.expectation.signature = new StaticSignature(aClass)
+        this.metaClass = new StaticMethodRecorderProxyMetaClass(StaticMethodRecoder, controller)
     }
 
     Object invokeMethod(String name, Object args) {
+        def expectation = new Expectation()
+        classExpectations.addStaticExpectation(aClass, expectation)
         expectation.signature = newSignatureForStaticMethod(aClass, name, args)
         return new ReturnMethodRecorder(expectation)
     }
 
     Object getProperty(String property) {
+        def expectation = new Expectation()
+        classExpectations.addStaticExpectation(aClass, expectation)
         return new StaticPropertyRecorder(aClass, property, expectation)
     }
 
     void setProperty(String property, Object value) {
         throw new MissingPropertyException("Cannot use property setter in record mode. " +
                 "Are you trying to mock a setter? Use 'static.${property}.set(${value.inspect()})' instead.")
+    }
+
+}
+
+class StaticMethodRecorderProxyMetaClass extends ProxyMetaClass {
+
+    def controller
+
+    StaticMethodRecorderProxyMetaClass(Class clazz, controller) {
+        super(GroovySystem.metaClassRegistry, clazz, GroovySystem.metaClassRegistry.getMetaClass(clazz))
+        this.controller = controller
+    }
+
+    MetaMethod pickMethod(String methodName, Class[] arguments) {
+        doInternal(controller) {
+            adaptee.pickMethod(methodName, arguments)
+        } {
+            if (!controller.replay && isGMockMethod(methodName, arguments)) {
+                return null
+            } else {
+                return new StaticMethodRecorderProxyMetaMethod(this, methodName, arguments)
+            }
+        }
+    }
+
+}
+
+class StaticMethodRecorderProxyMetaMethod extends ProxyMetaMethod {
+
+    StaticMethodRecorderProxyMetaMethod(MetaClass metaClass, String name, Class[] parameterTypes) {
+        super(metaClass, name, parameterTypes)
+    }
+
+    Object invoke(Object object, Object[] arguments) {
+        object."$name"(*arguments)
     }
 
 }

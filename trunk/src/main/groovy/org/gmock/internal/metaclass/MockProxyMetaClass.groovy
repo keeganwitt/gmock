@@ -17,6 +17,7 @@ package org.gmock.internal.metaclass
 
 import org.gmock.internal.Expectation
 import org.gmock.internal.ExpectationCollection
+import static org.gmock.internal.InternalModeHelper.doExternal
 import static org.gmock.internal.InternalModeHelper.doInternal
 import static org.gmock.internal.metaclass.MetaClassHelper.*
 import org.gmock.internal.recorder.PropertyRecorder
@@ -49,10 +50,24 @@ class MockProxyMetaClass extends ProxyMetaClass {
             if (controller.replay){
                 return findExpectation(expectations, signature, "Unexpected method call")
             } else {
-                def expectation = new Expectation(expectations: expectations, signature: signature)
-                expectations.add( expectation )
-                return new ReturnMethodRecorder(expectation)
+                if (methodName == "static" && arguments.length == 1 && arguments[0] instanceof Closure) {
+                    invokeStaticExpectationClosure(arguments[0])
+                    return null
+                } else {
+                    def expectation = new Expectation(expectations: expectations, signature: signature)
+                    expectations.add( expectation )
+                    return new ReturnMethodRecorder(expectation)
+                }
             }
+        }
+    }
+
+    private invokeStaticExpectationClosure(Closure staticExpectationClosure) {
+        def recorder = new StaticMethodRecoder(theClass, classExpectations, controller)
+        staticExpectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
+        staticExpectationClosure.delegate = recorder
+        doExternal(controller) {
+            staticExpectationClosure(recorder)
         }
     }
 
@@ -69,9 +84,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
                 return findExpectation(expectations, signature, "Unexpected property getter call")
             } else {
                 if (property == "static"){
-                    def expectation = new Expectation()
-                    classExpectations.addStaticExpectation(theClass, expectation)
-                    return new StaticMethodRecoder(theClass, expectation)
+                    return new StaticMethodRecoder(theClass, classExpectations, controller)
                 } else {
                     def expectation = new Expectation(expectations: expectations)
                     expectations.add( expectation )
@@ -100,10 +113,14 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     MetaMethod pickMethod(String methodName, Class[] arguments) {
-        if (!controller.replay && isGMockMethod(methodName, arguments)) {
-            return null
-        } else {
-            return new ProxyMetaMethod(this, methodName, arguments)
+        doInternal(controller) {
+            adaptee.pickMethod(methodName, arguments)
+        } {
+            if (!controller.replay && isGMockMethod(methodName, arguments)) {
+                return null
+            } else {
+                return new ProxyMetaMethod(this, methodName, arguments)
+            }
         }
     }
 

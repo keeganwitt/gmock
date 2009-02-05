@@ -164,4 +164,16 @@ class FunctionnalExpectationClosureTest extends GMockTestCase {
         }
     }
 
+    void testMockMethodsNamedMockInExpectationClosure() {
+        def closure = { -> }
+        def m = mock {
+            mock(closure).returns("yes")
+            it.mock(closure).returns("no")
+        }
+        play {
+            assertEquals "yes", m.mock(closure)
+            assertEquals "no", m.mock(closure)
+        }
+    }
+
 }

@@ -26,8 +26,16 @@ class InternalModeHelper {
     }
 
     static doInternal(controller, Closure work) {
+        doWork(controller, work, true)
+    }
+
+    static doExternal(controller, Closure work) {
+        doWork(controller, work, false)
+    }
+
+    static doWork(controller, Closure work, boolean mode) {
         def backup = controller.internal
-        controller.internal = true
+        controller.internal = mode
         try {
             return work()
         } finally {
