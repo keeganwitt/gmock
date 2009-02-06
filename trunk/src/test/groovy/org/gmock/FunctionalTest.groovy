@@ -689,4 +689,17 @@ class FunctionalTest extends GMockTestCase {
         assert message ==~ expected
     }
 
+    void testWithDelegateToMock(){
+        def mockLoader = mock()
+
+        with(mockLoader){
+            load("key").returns("number")
+            count.returns(1)
+        }
+        play{
+            assertEquals("number", mockLoader.load("key"))
+            assertEquals(1, mockLoader.count)
+        }
+    }
+
 }

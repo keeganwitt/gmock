@@ -434,4 +434,21 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         }
     }
 
+    void testStaticClosureInWithClosure(){
+        Loader mockLoader = mock(Loader)
+
+        with(mockLoader){
+            load("key").returns("number")
+            'static' {
+                count().returns(1)
+            }
+        }
+        play{
+            assertEquals("number", mockLoader.load("key"))
+            assertEquals 1, Loader.count()
+        }
+    }
+
+
+
 }

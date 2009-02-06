@@ -39,4 +39,8 @@ abstract class GMockTestCase extends GroovyTestCase {
         GMock.match(matcher)
     }
 
+    protected with(mock, Closure withClosure) {
+        gMockController.with(mock, withClosure)
+    }
+
 }
