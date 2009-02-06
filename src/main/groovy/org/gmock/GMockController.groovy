@@ -138,6 +138,12 @@ class GMockController {
         }
     }
 
+    def with(mock, Closure withClosure) {
+        withClosure.resolveStrategy = Closure.DELEGATE_FIRST
+        withClosure.setDelegate(mock)
+        withClosure(mock)
+    }
+
     private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder) {
         def groovyMethodInterceptor = new GroovyMethodInterceptor(mpmc)
         def javaMethodInterceptor = new JavaMethodInterceptor(this, mpmc, clazz)
