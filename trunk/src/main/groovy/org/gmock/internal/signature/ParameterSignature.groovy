@@ -19,6 +19,16 @@ import org.gmock.Matcher
 
 class ParameterSignature {
 
+    private static final Class HAMCREST_MATCHER_CLASS
+
+    static {
+        try {
+            HAMCREST_MATCHER_CLASS = Class.forName("org.hamcrest.Matcher")
+        } catch (e) {
+            HAMCREST_MATCHER_CLASS = null
+        }
+    }
+
     def arguments
 
     ParameterSignature(arguments) {
@@ -57,13 +67,7 @@ class ParameterSignature {
 
         // as the Hamcrest library is optional, it may be not present at runtime
         // so we cannot use "object instanceof org.hamcrest.Matcher" directly
-        return object instanceof Matcher || isHamcrestMatcherClass(object.class)
-    }
-
-    private boolean isHamcrestMatcherClass(Class clazz) {
-        if (clazz == null) return false
-        if (clazz.name == "org.hamcrest.Matcher") return true
-        return isHamcrestMatcherClass(clazz.superclass) || clazz.interfaces.any { isHamcrestMatcherClass(it) }
+        return object instanceof Matcher || HAMCREST_MATCHER_CLASS?.isInstance(object)
     }
 
     int hashCode() {
