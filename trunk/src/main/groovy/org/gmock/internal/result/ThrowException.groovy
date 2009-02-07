@@ -19,7 +19,7 @@ class ThrowException {
 
     def exception
 
-    ThrowException(exception){
+    ThrowException(Throwable exception){
         this.exception = exception
     }
 
