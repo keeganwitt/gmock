@@ -36,7 +36,7 @@ class StaticPropertyRecorder extends BaseRecorder {
 
     def set(value) {
         expectation.signature = new StaticPropertySetSignature(clazz, property, value)
-        expectation.result = new ReturnNull()
+        expectation.result = ReturnNull.INSTANCE
         return this
     }
 

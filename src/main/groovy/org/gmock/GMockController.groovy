@@ -27,7 +27,7 @@ import org.gmock.internal.recorder.ConstructorRecorder
 import org.gmock.internal.recorder.InvokeConstructorRecorder
 import org.objenesis.ObjenesisHelper
 
-class GMockController {
+class GMockController implements MockController {
 
     def mocks = []
     def classExpectations = new ClassExpectations(this)
@@ -95,6 +95,7 @@ class GMockController {
                 classExpectations.addConstructorExpectation(clazz, expectation)
             }
 
+            mpmc.mockInstance = mockInstance
             mocks << mpmc
         }
         if (expectationClosure){
@@ -114,6 +115,7 @@ class GMockController {
 
             mocks*.validate()
             classExpectations.validate()
+            mocks*.replay()
             classExpectations.startProxy()
         }
         try {
@@ -152,7 +154,7 @@ class GMockController {
         def interfaces = clazz.isInterface() ? [clazz, GroovyObject] : [GroovyObject]
 
         def enhancer = new Enhancer(superclass: superClass, interfaces: interfaces,
-                                    callbackFilter: GroovyObjectMethodFilter.instance,
+                                    callbackFilter: GroovyObjectMethodFilter.INSTANCE,
                                     callbackTypes: [MethodInterceptor, MethodInterceptor])
         def mockClass = enhancer.createClass()
 

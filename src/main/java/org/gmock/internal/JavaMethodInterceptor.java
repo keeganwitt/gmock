@@ -15,7 +15,6 @@
  */
 package org.gmock.internal;
 
-import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -24,22 +23,22 @@ import java.lang.reflect.Method;
 
 public class JavaMethodInterceptor implements MethodInterceptor {
 
-    private GroovyObject gmc;
+    private MockController gmc;
 
     private MetaClass mpmc;
 
     private Class mockClass;
 
-    public JavaMethodInterceptor(GroovyObject gmc, MetaClass mpmc, Class mockClass) {
+    public JavaMethodInterceptor(MockController gmc, MetaClass mpmc, Class mockClass) {
         this.gmc = gmc;
         this.mpmc = mpmc;
         this.mockClass = mockClass;
     }
 
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-        if ("toString".equals(method.getName()) && args.length == 0 && !(Boolean) gmc.getProperty("replay")) {
+        if ("toString".equals(method.getName()) && args.length == 0 && (!gmc.getReplay() || gmc.getInternal())) {
             return "Mock for " + mockClass.getName();
-        } else if ((Boolean) gmc.getProperty("internal")) {
+        } else if (gmc.getInternal()) {
             return proxy.invokeSuper(obj, args);
         } else {
             return mpmc.invokeMethod(obj, method.getName(), args);

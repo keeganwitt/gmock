@@ -38,7 +38,7 @@ class PropertyRecorder extends BaseRecorder {
 
     def set(value) {
         expectation.signature = new PropertySetSignature(propertyName, value)
-        expectation.result = new ReturnNull()
+        expectation.result = ReturnNull.INSTANCE
         return this
     }
 

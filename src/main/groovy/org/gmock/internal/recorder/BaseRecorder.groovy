@@ -26,7 +26,7 @@ class BaseRecorder {
     }
 
     def stub() {
-        expectation.times = new AnyTimes()
+        expectation.times = AnyTimes.INSTANCE
         return null
     }
 
@@ -41,7 +41,7 @@ class BaseRecorder {
     }
 
     def never() {
-        expectation.times = new NeverTimes()
+        expectation.times = NeverTimes.INSTANCE
         return null
     }
 

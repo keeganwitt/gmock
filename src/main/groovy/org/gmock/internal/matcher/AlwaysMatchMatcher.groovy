@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.result
+package org.gmock.internal.matcher
 
-import org.gmock.internal.Result
+import org.gmock.Matcher
 
-class ReturnValue implements Result {
+class AlwaysMatchMatcher implements Matcher {
 
-    def value
+    static final INSTANCE = new AlwaysMatchMatcher()
 
-    ReturnValue(value){
-        this.value = value
-    }
-
-    def answer(Object[] arguments) {
-        return value
+    boolean matches(object) {
+        return true
     }
 
 }

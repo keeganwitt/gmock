@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 
 public class GroovyObjectMethodFilter implements CallbackFilter {
 
-    public static GroovyObjectMethodFilter instance = new GroovyObjectMethodFilter();
+    public static final GroovyObjectMethodFilter INSTANCE = new GroovyObjectMethodFilter();
 
     private GroovyObjectMethodFilter() {
     }
