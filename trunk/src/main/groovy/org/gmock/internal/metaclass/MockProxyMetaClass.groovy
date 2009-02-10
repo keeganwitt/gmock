@@ -19,18 +19,25 @@ import org.gmock.internal.Expectation
 import org.gmock.internal.ExpectationCollection
 import static org.gmock.internal.InternalModeHelper.doExternal
 import static org.gmock.internal.InternalModeHelper.doInternal
+import org.gmock.internal.matcher.AlwaysMatchMatcher
 import static org.gmock.internal.metaclass.MetaClassHelper.*
 import org.gmock.internal.recorder.PropertyRecorder
 import org.gmock.internal.recorder.ReturnMethodRecorder
 import org.gmock.internal.recorder.StaticMethodRecoder
+import org.gmock.internal.result.EqualsDefaultBehavior
+import org.gmock.internal.result.HashCodeDefaultBehavior
+import org.gmock.internal.result.ToStringDefaultBehavior
+import org.gmock.internal.signature.MethodSignature
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
+import org.gmock.internal.times.AnyTimes
 
 class MockProxyMetaClass extends ProxyMetaClass {
 
     def expectations = new ExpectationCollection()
     def classExpectations
     def controller
+    def mockInstance
 
     MockProxyMetaClass(Class clazz, classExpectations, controller) {
         super(GroovySystem.metaClassRegistry, clazz, GroovySystem.metaClassRegistry.getMetaClass(clazz))
@@ -48,7 +55,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         } {
             def signature = newSignatureForMethod(methodName, arguments)
             if (controller.replay){
-                return findExpectation(expectations, signature, "Unexpected method call")
+                return findExpectation(expectations, signature, "Unexpected method call", arguments)
             } else {
                 if (methodName == "static" && arguments.length == 1 && arguments[0] instanceof Closure) {
                     invokeStaticExpectationClosure(arguments[0])
@@ -81,7 +88,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         } {
             if (controller.replay){
                 def signature = new PropertyGetSignature(property)
-                return findExpectation(expectations, signature, "Unexpected property getter call")
+                return findExpectation(expectations, signature, "Unexpected property getter call", [])
             } else {
                 if (property == "static"){
                     return new StaticMethodRecoder(theClass, classExpectations, controller)
@@ -104,7 +111,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         } {
             if (controller.replay){
                 def signature = new PropertySetSignature(property, value)
-                findExpectation(expectations, signature, "Unexpected property setter call")
+                findExpectation(expectations, signature, "Unexpected property setter call", [value])
             } else {
                 throw new MissingPropertyException("Cannot use property setter in record mode. " +
                         "Are you trying to mock a setter? Use '${property}.set(${value.inspect()})' instead.")
@@ -134,6 +141,21 @@ class MockProxyMetaClass extends ProxyMetaClass {
 
     void reset(){
         this.expectations = new ExpectationCollection()
+    }
+
+    void replay() {
+        addMethodDefaultBehavior("equals", [AlwaysMatchMatcher.INSTANCE], new EqualsDefaultBehavior(mockInstance))
+        addMethodDefaultBehavior("hashCode", [], new HashCodeDefaultBehavior(mockInstance))
+        addMethodDefaultBehavior("toString", [], new ToStringDefaultBehavior(theClass))
+    }
+
+    private addMethodDefaultBehavior(methodName, arguments, result) {
+        def signature = new MethodSignature(methodName, arguments)
+        if (!expectations.findSignature(signature)) {
+            def expectation = new Expectation(expectations: expectations, signature: signature, result: result,
+                                              times: AnyTimes.INSTANCE, hidden: true)
+            expectations.add(expectation)
+        }
     }
 
 }

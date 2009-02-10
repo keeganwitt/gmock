@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.result
+package org.gmock.internal
 
-import org.gmock.internal.Result
+interface Result {
 
-class ReturnValue implements Result {
-
-    def value
-
-    ReturnValue(value){
-        this.value = value
-    }
-
-    def answer(Object[] arguments) {
-        return value
-    }
+    Object answer(Object[] arguments)
 
 }

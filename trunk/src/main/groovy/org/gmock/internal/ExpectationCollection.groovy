@@ -65,4 +65,8 @@ class ExpectationCollection {
         }
     }
 
+    def findSignature(signature) {
+        expectations.find { signature.match(it.signature) }
+    }
+
 }

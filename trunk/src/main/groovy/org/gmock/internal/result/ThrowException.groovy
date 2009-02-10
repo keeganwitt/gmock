@@ -15,7 +15,9 @@
  */
 package org.gmock.internal.result
 
-class ThrowException {
+import org.gmock.internal.Result
+
+class ThrowException implements Result {
 
     def exception
 
@@ -27,7 +29,7 @@ class ThrowException {
         this.exception = exceptionClass.metaClass.invokeConstructor(params)
     }
 
-    def answer() {
+    def answer(Object[] arguments) {
         throw exception
     }
 

@@ -20,10 +20,10 @@ import org.gmock.internal.signature.*
 
 class MetaClassHelper {
 
-    static findExpectation(expectations, signature, message) {
+    static findExpectation(expectations, signature, message, arguments) {
         def expectation = expectations.findMatching(signature)
         if (expectation){
-            return expectation.answer()
+            return expectation.answer(arguments)
         } else {
             def callState = expectations.callState(signature).toString()
             if (callState) { callState = "\n$callState" }

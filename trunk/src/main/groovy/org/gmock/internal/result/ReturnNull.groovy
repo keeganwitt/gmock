@@ -15,8 +15,12 @@
  */
 package org.gmock.internal.result
 
-class ReturnNull {
+import org.gmock.internal.Result
 
-    def answer() {}
+class ReturnNull implements Result {
+
+    static final INSTANCE = new ReturnNull()
+
+    def answer(Object[] arguments) {}
 
 }

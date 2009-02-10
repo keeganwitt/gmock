@@ -16,17 +16,18 @@
 package org.gmock.internal.result
 
 import org.gmock.internal.Result
+import org.codehaus.groovy.runtime.DefaultGroovyMethods
 
-class ReturnValue implements Result {
+class EqualsDefaultBehavior implements Result {
 
-    def value
+    def mock
 
-    ReturnValue(value){
-        this.value = value
+    EqualsDefaultBehavior(mock) {
+        this.mock = mock
     }
 
     def answer(Object[] arguments) {
-        return value
+        return DefaultGroovyMethods.is(mock, arguments[0])
     }
 
 }

@@ -15,7 +15,7 @@
  */
 package org.gmock
 
-import org.gmock.internal.ClosureMatcher
+import org.gmock.internal.matcher.ClosureMatcher
 import org.gmock.internal.recorder.ConstructorRecorder
 import org.gmock.internal.recorder.InvokeConstructorRecorder
 

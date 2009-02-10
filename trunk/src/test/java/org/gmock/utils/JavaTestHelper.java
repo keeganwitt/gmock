@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.result
+package org.gmock.utils;
 
-import org.gmock.internal.Result
+public class JavaTestHelper {
 
-class ReturnValue implements Result {
-
-    def value
-
-    ReturnValue(value){
-        this.value = value
+    public static boolean equalsToEachOther(Object a, Object b) {
+        return a.equals(b);
     }
 
-    def answer(Object[] arguments) {
-        return value
+    public static int hashCodeOf(Object obj) {
+        return obj.hashCode();
+    }
+
+    public static String toStringOn(Object obj) {
+        return obj.toString();
     }
 
 }

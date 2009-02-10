@@ -17,16 +17,20 @@ package org.gmock.internal.result
 
 import org.gmock.internal.Result
 
-class ReturnValue implements Result {
+class ToStringDefaultBehavior implements Result {
 
-    def value
+    def name
 
-    ReturnValue(value){
-        this.value = value
+    ToStringDefaultBehavior(Class clazz) {
+        name = "Mock for ${clazz.name}".toString()
+    }
+
+    ToStringDefaultBehavior(String name) {
+        this.name = name
     }
 
     def answer(Object[] arguments) {
-        return value
+        return name
     }
 
 }

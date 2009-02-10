@@ -17,6 +17,8 @@ package org.gmock.internal.times
 
 class NeverTimes {
 
+    static final INSTANCE = new NeverTimes()
+
     def stillRemain(int called) {
         return false
     }

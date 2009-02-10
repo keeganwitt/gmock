@@ -20,11 +20,13 @@ class CallState {
     def methodStates = [:]
 
     def append(expectation){
-        def signature = expectation.signature
-        if (!methodStates.containsKey(signature)){
-            methodStates[signature] = new MethodState(signature)
+        if (!expectation.hidden) {
+            def signature = expectation.signature
+            if (!methodStates.containsKey(signature)){
+                methodStates[signature] = new MethodState(signature)
+            }
+            methodStates[signature].merge(expectation)
         }
-        methodStates[signature].merge(expectation)
     }
 
     def nowCalling(signature) {

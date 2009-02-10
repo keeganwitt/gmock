@@ -17,16 +17,16 @@ package org.gmock.internal.result
 
 import org.gmock.internal.Result
 
-class ReturnValue implements Result {
+class HashCodeDefaultBehavior implements Result {
 
-    def value
+    def mock
 
-    ReturnValue(value){
-        this.value = value
+    HashCodeDefaultBehavior(mock) {
+        this.mock = mock
     }
 
     def answer(Object[] arguments) {
-        return value
+        return System.identityHashCode(mock)
     }
 
 }

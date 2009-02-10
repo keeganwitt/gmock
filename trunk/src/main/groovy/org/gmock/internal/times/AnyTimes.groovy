@@ -17,6 +17,8 @@ package org.gmock.internal.times
 
 class AnyTimes {
 
+    static final INSTANCE = new AnyTimes()
+
     def stillRemain(int called) {
         return true
     }
