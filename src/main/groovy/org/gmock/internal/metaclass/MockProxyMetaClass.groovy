@@ -38,11 +38,13 @@ class MockProxyMetaClass extends ProxyMetaClass {
     def classExpectations
     def controller
     def mockInstance
+    String mockName
 
-    MockProxyMetaClass(Class clazz, classExpectations, controller) {
+    MockProxyMetaClass(Class clazz, classExpectations, controller, String mockName) {
         super(GroovySystem.metaClassRegistry, clazz, GroovySystem.metaClassRegistry.getMetaClass(clazz))
         this.classExpectations = classExpectations
         this.controller = controller
+        this.mockName = mockName
     }
 
     Object invokeMethod(Object object, String methodName, Object[] arguments) {
@@ -146,7 +148,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
     void replay() {
         addMethodDefaultBehavior("equals", [AlwaysMatchMatcher.INSTANCE], new EqualsDefaultBehavior(mockInstance))
         addMethodDefaultBehavior("hashCode", [], new HashCodeDefaultBehavior(mockInstance))
-        addMethodDefaultBehavior("toString", [], new ToStringDefaultBehavior(theClass))
+        addMethodDefaultBehavior("toString", [], new ToStringDefaultBehavior(mockName))
     }
 
     private addMethodDefaultBehavior(methodName, arguments, result) {

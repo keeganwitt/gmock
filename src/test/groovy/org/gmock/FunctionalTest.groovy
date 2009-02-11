@@ -17,6 +17,7 @@ package org.gmock
 
 import junit.framework.AssertionFailedError
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException
+import org.gmock.utils.JavaLoader
 import static org.hamcrest.Matchers.*
 
 class FunctionalTest extends GMockTestCase {
@@ -550,14 +551,14 @@ class FunctionalTest extends GMockTestCase {
         def mock3 = mock()
         mock1.is(mock2).returns(true)
 
-        def expected = "Unexpected method call 'is(.*)'\n" +
-                       "  'is(.*)': expected 1, actual 0"
+        def expected = "Unexpected method call 'is(Mock for java.lang.Object)'\n" +
+                       "  'is(Mock for java.lang.Object)': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {
                 mock1.is(mock3)
             }
         }
-        assert message ==~ expected
+        assertEquals expected, message
     }
 
     void testPassAMockObjectToAnotherButNotCalled() {
@@ -566,11 +567,11 @@ class FunctionalTest extends GMockTestCase {
         mock1.is(mock2).returns(true)
 
         def expected = "Expectation not matched on verify:\n" +
-                       "  'is(.*)': expected 1, actual 0"
+                       "  'is(Mock for java.lang.Object)': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {}
         }
-        assert message ==~ expected
+        assertEquals expected, message
     }
 
     void testMockObjectAsClosureDelegateWithOwnerFirstStrategy() {
@@ -689,6 +690,15 @@ class FunctionalTest extends GMockTestCase {
         assert message ==~ expected
     }
 
+    void testAssigningANonTypeVariableToATypeVariableGiveBadErrorMessageWithMockName() {
+        def expected = /Cannot cast object 'now' with class 'groovy\.lang\.GroovyObject.*' / +
+                       /to class 'java\.util\.Date'/
+        def message = shouldFail(GroovyCastException) {
+            Date date = mock(name("now"))
+        }
+        assert message ==~ expected
+    }
+
     void testWithDelegateToMock(){
         def mockLoader = mock()
 
@@ -699,6 +709,58 @@ class FunctionalTest extends GMockTestCase {
         play{
             assertEquals("number", mockLoader.load("key"))
             assertEquals(1, mockLoader.count)
+        }
+    }
+
+    void testMockName() {
+        def mock = mock(Date, name("date mock"))
+        play {
+          assertEquals "date mock", mock.toString()
+        }
+    }
+
+    void testMockNameShouldBeInErrorMessage() {
+        def m1 = mock()
+        def m2 = mock(name("test mock"))
+        m1.is(m2).returns(false)
+
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'is(test mock)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
+    void testMockNameWithOtherArguments() {
+        def m1 = mock(JavaLoader, name("m1"), invokeConstructor("test"))
+        mock(JavaLoader, constructor("test"), name("m2")) {
+            something().returns(true)
+        }
+        play {
+            assertEquals "m1", m1.toString()
+            assertEquals "test", m1.@name
+            def m2 = new JavaLoader("test")
+            assertTrue m2.something()
+            assertEquals "m2", m2.toString()
+        }
+    }
+
+    void testInvalidMockMethodsShouldFail() {
+        shouldFail(MissingMethodException) {
+            mock(JavaLoader, name("1"), name("2"))
+        }
+        shouldFail(MissingMethodException) {
+            mock(JavaLoader, constructor(), constructor())
+        }
+        shouldFail(MissingMethodException) {
+            mock(JavaLoader, invokeConstructor(), invokeConstructor())
+        }
+        shouldFail(MissingMethodException) {
+            mock(JavaLoader) {} {}
+        }
+        shouldFail(MissingMethodException) {
+            mock(JavaLoader, "3")
         }
     }
 

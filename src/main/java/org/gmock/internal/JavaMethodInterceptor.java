@@ -27,17 +27,17 @@ public class JavaMethodInterceptor implements MethodInterceptor {
 
     private MetaClass mpmc;
 
-    private Class mockClass;
+    private String mockName;
 
-    public JavaMethodInterceptor(MockController gmc, MetaClass mpmc, Class mockClass) {
+    public JavaMethodInterceptor(MockController gmc, MetaClass mpmc, String mockName) {
         this.gmc = gmc;
         this.mpmc = mpmc;
-        this.mockClass = mockClass;
+        this.mockName = mockName;
     }
 
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
         if ("toString".equals(method.getName()) && args.length == 0 && (!gmc.getReplay() || gmc.getInternal())) {
-            return "Mock for " + mockClass.getName();
+            return mockName;
         } else if (gmc.getInternal()) {
             return proxy.invokeSuper(obj, args);
         } else {
