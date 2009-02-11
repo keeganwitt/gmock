@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.result
+package org.gmock.internal.recorder
 
-import org.gmock.internal.Result
+class MockNameRecorder {
 
-class ToStringDefaultBehavior implements Result {
+    def mockName
 
-    def name
-
-    ToStringDefaultBehavior(String name) {
-        this.name = name
-    }
-
-    def answer(Object[] arguments) {
-        return name
+    MockNameRecorder(mockName) {
+        this.mockName = mockName
     }
 
 }

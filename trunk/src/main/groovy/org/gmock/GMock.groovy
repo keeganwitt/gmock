@@ -18,6 +18,7 @@ package org.gmock
 import org.gmock.internal.matcher.ClosureMatcher
 import org.gmock.internal.recorder.ConstructorRecorder
 import org.gmock.internal.recorder.InvokeConstructorRecorder
+import org.gmock.internal.recorder.MockNameRecorder
 
 class GMock {
 
@@ -31,6 +32,10 @@ class GMock {
 
     static invokeConstructor(Object... args) {
         new InvokeConstructorRecorder(args)
+    }
+
+    static name(String mockName) {
+        new MockNameRecorder(mockName)
     }
 
 }

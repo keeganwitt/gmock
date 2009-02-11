@@ -27,6 +27,10 @@ abstract class GMockTestCase extends GroovyTestCase {
         gMockController.play(closure)
     }
 
+    protected with(mock, Closure withClosure) {
+        gMockController.with(mock, withClosure)
+    }
+
     protected constructor(Object... args) {
         GMock.constructor(args)
     }
@@ -39,8 +43,8 @@ abstract class GMockTestCase extends GroovyTestCase {
         GMock.match(matcher)
     }
 
-    protected with(mock, Closure withClosure) {
-        gMockController.with(mock, withClosure)
+    protected name(String mockName) {
+        GMock.name(mockName)
     }
 
 }

@@ -25,6 +25,7 @@ import org.gmock.internal.metaclass.DispatcherProxyMetaClass
 import org.gmock.internal.metaclass.MockProxyMetaClass
 import org.gmock.internal.recorder.ConstructorRecorder
 import org.gmock.internal.recorder.InvokeConstructorRecorder
+import org.gmock.internal.recorder.MockNameRecorder
 import org.objenesis.ObjenesisHelper
 
 class GMockController implements MockController {
@@ -40,52 +41,52 @@ class GMockController implements MockController {
 
     @Deprecated
     def mock(Map constraints, Class clazz = Object, Closure expectationClosure = null) {
-        return doMock(clazz, new ConstructorRecorder(constraints.constructor), null, expectationClosure)
+        return doMock(clazz, new ConstructorRecorder(constraints.constructor), null, null, expectationClosure)
     }
 
-    def mock() {
-        return doMock(Object, null, null, null)
+    def mock(Class clazz = Object, Object... args) {
+        def constructorRecorder = null, invokeConstructorRecorder = null, mockNameRecorder = null, expectationClosure = null
+        args.each { arg ->
+            if (arg instanceof ConstructorRecorder) {
+                constructorRecorder = checkUnset(constructorRecorder, arg, clazz, args)
+            } else if (arg instanceof InvokeConstructorRecorder) {
+                invokeConstructorRecorder = checkUnset(invokeConstructorRecorder, arg, clazz, args)
+            } else if (arg instanceof MockNameRecorder) {
+                mockNameRecorder = checkUnset(mockNameRecorder, arg, clazz, args)
+            } else if (arg instanceof Closure) {
+                expectationClosure = checkUnset(expectationClosure, arg, clazz, args)
+            } else {
+                invalidMockMethod(clazz, args)
+            }
+        }
+        return doMock(clazz, constructorRecorder, invokeConstructorRecorder, mockNameRecorder, expectationClosure)
     }
 
-    def mock(Class clazz) {
-        return doMock(clazz, null, null, null)
+    private checkUnset(value, arg, Class clazz, Object[] args) {
+        if (value) {
+            invalidMockMethod(clazz, args)
+        } else {
+            return arg
+        }
     }
 
-    def mock(Closure expectationClosure) {
-        return doMock(Object, null, null, expectationClosure)
+    private invalidMockMethod(Class clazz, Object[] args) {
+        throw new MissingMethodException("mock", GMockController, [clazz, *args] as Object[])
     }
 
-    def mock(Class clazz, Closure expectationClosure) {
-        return doMock(clazz, null, null, expectationClosure)
-    }
-
-    def mock(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder, Closure expectationClosure = null) {
-        return doMock(clazz, null, invokeConstructorRecorder, expectationClosure)
-    }
-
-    def mock(Class clazz, ConstructorRecorder constructorRecorder, Closure expectationClosure = null) {
-        return doMock(clazz, constructorRecorder, null, expectationClosure)
-    }
-
-    def mock(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder, ConstructorRecorder constructorRecorder, Closure expectationClosure = null) {
-        return doMock(clazz, constructorRecorder, invokeConstructorRecorder, expectationClosure)
-    }
-
-    def mock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder, Closure expectationClosure = null) {
-        return doMock(clazz, constructorRecorder, invokeConstructorRecorder, expectationClosure)
-    }
-
-    private doMock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder, Closure expectationClosure) {
+    private doMock(Class clazz, ConstructorRecorder constructorRecorder, InvokeConstructorRecorder invokeConstructorRecorder,
+                   MockNameRecorder mockNameRecorder, Closure expectationClosure) {
         def mockInstance
         doInternal(this) {
             if (replay) {
                 throw new IllegalStateException("Cannot create mocks in play closure.")
             }
 
-            def mpmc = new MockProxyMetaClass(clazz, classExpectations, this)
+            String mockName = mockNameRecorder ? mockNameRecorder.mockName : "Mock for $clazz.name"
+            def mpmc = new MockProxyMetaClass(clazz, classExpectations, this, mockName)
 
             if (!Modifier.isFinal(clazz.modifiers)) {
-                mockInstance = mockNonFinalClass(clazz, mpmc, invokeConstructorRecorder)
+                mockInstance = mockNonFinalClass(clazz, mpmc, invokeConstructorRecorder, mockName)
             } else {
                 mockInstance = mockFinalClass(clazz, mpmc, invokeConstructorRecorder)
             }
@@ -146,9 +147,9 @@ class GMockController implements MockController {
         withClosure(mock)
     }
 
-    private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder) {
+    private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder, String mockName) {
         def groovyMethodInterceptor = new GroovyMethodInterceptor(mpmc)
-        def javaMethodInterceptor = new JavaMethodInterceptor(this, mpmc, clazz)
+        def javaMethodInterceptor = new JavaMethodInterceptor(this, mpmc, mockName)
 
         def superClass = clazz.isInterface() ? Object : clazz
         def interfaces = clazz.isInterface() ? [clazz, GroovyObject] : [GroovyObject]
