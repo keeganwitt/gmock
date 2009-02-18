@@ -38,7 +38,7 @@ environments {
     }
 }
 
-gmock.version = "0.5.0"
+gmock.version = "0.6.0"
 grails.war.destFile = "gmock.war"
 
 
@@ -54,7 +54,7 @@ log4j {
     rootLogger="error,stdout"
     logger {
         grails="error"
-        StackTrace="error,stacktraceLog"
+        StackTrace="error"
         org {
             codehaus.groovy.grails.web.servlet="error"  //  controllers
             codehaus.groovy.grails.web.pages="error" //  GSP

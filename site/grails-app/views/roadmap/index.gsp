@@ -18,28 +18,24 @@
             <li>Nice,Strict mock</li>
         </ul>
 
-        <h2>Version 0.9.0</h2>
+        <h2>Version 0.8.0</h2>
         <ul>
             <li>Closure mocking</li>
         </ul>
 
-        <h2>Version 0.8.0</h2>
-        <ul>
-            <li>Mock out single method on concrete object</li>
-        </ul>
-
         <h2>Version 0.7.0</h2>
         <ul>
-            <li>Strict ordering</li>
+            <li>Strict ordering <g:issue number="50"/></li>
+            <li>Mock out single method on concrete object <g:issue number="52"/></li>
         </ul>
 
-        <h2>Version 0.6.0</h2>
+        <h2 class="done here">Version 0.6.0</h2>
         <ul>
-            <li>Static property mocking <g:issue number="23"/></li>
-            <li>Setup expectation in mock closure <g:issue number="35"/></li>
+            <li>Static property mocking <g:issue number="23" done="true"/></li>
+            <li>Setup expectation in mock closure <g:issue number="35" done="true"/></li>
         </ul>
 
-        <h2  class="done here">Version 0.5.0</h2>
+        <h2  class="done">Version 0.5.0</h2>
         <ul>
             <li>Strong typing support <g:issue number="14" done="true"/></li>
         </ul>
