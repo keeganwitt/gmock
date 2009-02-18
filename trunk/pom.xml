@@ -6,7 +6,7 @@
     <groupId>org.gmock</groupId>
     <artifactId>gmock</artifactId>
     <packaging>jar</packaging>
-    <version>0.6.0</version>
+    <version>0.7.0-SNAPSHOT</version>
     <name>Gmock</name>
     <description>Mocking Framework for Groovy</description>
     <url>http://www.gmock.org</url>
