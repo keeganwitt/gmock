@@ -1,4 +1,5 @@
 #summary Gmock documentation for gmock-0.6
+#labels Featured
 
 = Introduction =
 
@@ -282,5 +283,3 @@ Gmock provides default implementation for the equals, hashcode and toString meth
 If you need to you can setup expectation on those methods which will disable the default implementation.
 
 You can provide an optional name for your mock which will be used in the toString method with the following syntax: `mock(name("now"))`
-
-
