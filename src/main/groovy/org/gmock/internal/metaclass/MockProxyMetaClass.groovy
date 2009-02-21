@@ -57,14 +57,18 @@ class MockProxyMetaClass extends ProxyMetaClass {
         } {
             def signature = newSignatureForMethod(methodName, arguments)
             if (controller.replay){
-                return findExpectation(expectations, signature, "Unexpected method call", arguments)
+                return findExpectation(expectations, signature, "Unexpected method call", arguments, controller)
             } else {
                 if (methodName == "static" && arguments.length == 1 && arguments[0] instanceof Closure) {
                     invokeStaticExpectationClosure(arguments[0])
                     return null
                 } else {
-                    def expectation = new Expectation(expectations: expectations, signature: signature)
-                    expectations.add( expectation )
+                    def expectation = new Expectation(signature: signature)
+                    if (!controller.ordered) {
+                        expectations.add(expectation)
+                    } else {
+                        controller.orderedExpectations.add(expectation)
+                    }
                     return new ReturnMethodRecorder(expectation)
                 }
             }
@@ -95,8 +99,8 @@ class MockProxyMetaClass extends ProxyMetaClass {
                 if (property == "static"){
                     return new StaticMethodRecoder(theClass, classExpectations, controller)
                 } else {
-                    def expectation = new Expectation(expectations: expectations)
-                    expectations.add( expectation )
+                    def expectation = new Expectation()
+                    expectations.add(expectation)
                     return new PropertyRecorder(property, expectation)
                 }
             }
@@ -154,8 +158,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
     private addMethodDefaultBehavior(methodName, arguments, result) {
         def signature = new MethodSignature(methodName, arguments)
         if (!expectations.findSignature(signature)) {
-            def expectation = new Expectation(expectations: expectations, signature: signature, result: result,
-                                              times: AnyTimes.INSTANCE, hidden: true)
+            def expectation = new Expectation(signature: signature, result: result, times: AnyTimes.INSTANCE, hidden: true)
             expectations.add(expectation)
         }
     }

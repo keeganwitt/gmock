@@ -20,8 +20,8 @@ import org.gmock.internal.times.StrictTimes
 
 class Expectation {
 
-    def expectations
     def signature
+    def signatureObserver
     def result = ReturnNull.INSTANCE
     def times = new StrictTimes(1)
     def called = 0
@@ -29,7 +29,14 @@ class Expectation {
 
     void setSignature(signature) {
         this.signature = signature
-        expectations.checkTimes(this)
+        signatureObserver?.signatureChanged(this)
+    }
+
+    void setSignatureObserver(signatureObserver) {
+        this.signatureObserver = signatureObserver
+        if (signature) {
+            signatureObserver.signatureChanged(this)
+        }
     }
 
     boolean canCall(methodSignature) {
@@ -42,13 +49,15 @@ class Expectation {
     }
 
     def isVerified() {
-        // TODO: should we check if signature is null here any more?
-        return !signature || called in times
+        return called in times
+    }
+
+    def satisfied() {
+        isVerified()
     }
 
     def validate(){
-        // TODO: should we check if signature is null here any more?
-        signature?.validate()
+        signature.validate()
     }
 
     String toString() {

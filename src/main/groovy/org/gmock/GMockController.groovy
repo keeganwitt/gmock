@@ -33,4 +33,8 @@ class GMockController {
         internalMockController.with(mock, withClosure)
     }
 
+    def strict(Closure strictClosure) {
+        internalMockController.strict(strictClosure)
+    }
+
 }

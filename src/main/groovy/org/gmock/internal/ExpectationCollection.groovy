@@ -22,11 +22,12 @@ class ExpectationCollection {
 
     def expectations = []
 
-    void add(expectation){
+    void add(expectation) {
+        expectation.signatureObserver = this
         expectations << expectation
     }
 
-    def findMatching(signature){
+    def findMatching(signature) {
         expectations.find { it.canCall(signature)}
     }
 
@@ -63,6 +64,10 @@ class ExpectationCollection {
             expectations.remove(expectation)
             throw new IllegalStateException("Last method called on mock already has a non-fixed count set.")
         }
+    }
+
+    void signatureChanged(expectation) {
+        checkTimes(expectation)
     }
 
     def findSignature(signature) {

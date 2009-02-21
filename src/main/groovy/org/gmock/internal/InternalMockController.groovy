@@ -32,8 +32,10 @@ class InternalMockController implements MockController {
 
     def mocks = []
     def classExpectations = new ClassExpectations(this)
+    def orderedExpectations = new OrderedExpectations()
 
     boolean replay = false
+    boolean ordered = false
 
     // while running in internal mode, we should not mock any methods, instead, we should invoke the original implements
     // it is a little like the kernel mode in OS
@@ -132,11 +134,13 @@ class InternalMockController implements MockController {
             doInternal(this) {
                 mocks*.verify()
                 classExpectations.verify()
+                orderedExpectations.verify()
             }
         } finally {
             doInternal(this) {
                 mocks*.reset()
                 classExpectations.reset()
+                orderedExpectations.reset()
             }
         }
     }
@@ -145,6 +149,15 @@ class InternalMockController implements MockController {
         withClosure.resolveStrategy = Closure.DELEGATE_FIRST
         withClosure.setDelegate(mock)
         withClosure(mock)
+    }
+
+    def strict(Closure strictClosure) {
+        try {
+            ordered = true
+            strictClosure()
+        } finally {
+            ordered = false
+        }
     }
 
     private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder, String mockName) {
