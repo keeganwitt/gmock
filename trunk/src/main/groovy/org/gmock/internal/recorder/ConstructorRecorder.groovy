@@ -41,11 +41,10 @@ class ConstructorRecorder {
 
     def generateExpectation(clazz, mockInstance){
         def signature = new ConstructorSignature(clazz, args)
-        def returnValue = result ? result : new ReturnValue(mockInstance)
+        def returnValue = result ?: new ReturnValue(mockInstance)
         def expectation = new Expectation(result: returnValue)
-        expectation.@signature = signature
+        expectation.signature = signature
         return expectation
     }
 
 }
-

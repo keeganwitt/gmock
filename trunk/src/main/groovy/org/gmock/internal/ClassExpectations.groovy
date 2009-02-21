@@ -34,7 +34,6 @@ class ClassExpectations {
             proxies.put(aClass, proxy)
         }
         proxy.constructorExpectations.add(expectation)
-        expectation.expectations = proxy.constructorExpectations
     }
 
     def addStaticExpectation(aClass, expectation){
@@ -45,7 +44,6 @@ class ClassExpectations {
             proxies.put(aClass, proxy)
         }
         proxy.staticExpectations.add(expectation)
-        expectation.expectations = proxy.staticExpectations
     }
 
     def startProxy() {

@@ -31,6 +31,10 @@ abstract class GMockTestCase extends GroovyTestCase {
         gMockController.with(mock, withClosure)
     }
 
+    protected strict(Closure strictClosure) {
+        gMockController.strict(strictClosure)
+    }
+
     protected constructor(Object... args) {
         GMock.constructor(args)
     }

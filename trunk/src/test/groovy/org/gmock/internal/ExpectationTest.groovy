@@ -23,8 +23,8 @@ class ExpectationTest extends GMockTestCase {
 
     void testIsVerifiedHasntBeenCalled() {
         def mockExpectations = mock()
-        def expectation = new Expectation(expectations: mockExpectations)
-        mockExpectations.checkTimes(expectation)
+        def expectation = new Expectation(signatureObserver: mockExpectations)
+        mockExpectations.signatureChanged(expectation)
 
         play {
             expectation.signature = new MethodSignature("a method", [])
@@ -34,8 +34,8 @@ class ExpectationTest extends GMockTestCase {
 
     void testIsVerifiedHasBeenCalled() {
         def mockExpectations = mock()
-        def expectation = new Expectation(expectations: mockExpectations)
-        mockExpectations.checkTimes(expectation)
+        def expectation = new Expectation(signatureObserver: mockExpectations)
+        mockExpectations.signatureChanged(expectation)
 
         play {
             expectation.signature = new MethodSignature("a method", [])
@@ -50,15 +50,10 @@ class ExpectationTest extends GMockTestCase {
         assertTrue expectation.isVerified()
     }
 
-    void testIsVerifiedDoesntContainSignature() {
-        def expectation = new Expectation()
-        assertTrue expectation.isVerified()
-    }
-
     void testSetSignature() {
         def mockExpectations = mock()
-        def expectation = new Expectation(expectations: mockExpectations)
-        mockExpectations.checkTimes(expectation)
+        def expectation = new Expectation(signatureObserver: mockExpectations)
+        mockExpectations.signatureChanged(expectation)
 
         play {
             expectation.signature = new MethodSignature("method", [1, 2])
@@ -107,13 +102,5 @@ class ExpectationTest extends GMockTestCase {
             expectation.validate()
         }
     }
-
-    void testValidateWithoutSignature(){
-        def expectation = new Expectation()
-        play {
-            expectation.validate()
-        }
-    }
-
 
 }

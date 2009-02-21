@@ -20,8 +20,21 @@ import org.gmock.internal.signature.*
 
 class MetaClassHelper {
 
-    static findExpectation(expectations, signature, message, arguments) {
-        def expectation = expectations.findMatching(signature)
+    static findExpectation(expectations, signature, message, arguments) { // TODO: remove it
+        findExpectation(expectations, signature, message, arguments, null)
+    }
+
+    static findExpectation(expectations, signature, message, arguments, controller) {
+        def expectation = null
+
+        if (controller) { // TODO: remove it
+            expectation = controller.orderedExpectations.findMatching(signature)
+        }
+
+        if (!expectation) {
+            expectation = expectations.findMatching(signature)
+        }
+
         if (expectation){
             return expectation.answer(arguments)
         } else {
