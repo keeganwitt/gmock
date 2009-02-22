@@ -19,6 +19,36 @@ import static org.junit.Assert.fail
 
 class OrderedExpectations {
 
+    def groups = []
+
+    def newStrictGroup() {
+        groups << new StrictGroup()
+    }
+
+    def add(mock, expectation) {
+        groups.last().add(mock, expectation)
+    }
+
+    def findMatching(mock, signature) {
+        for (group in groups) {
+            def expectation = group.findMatching(mock, signature)
+            if (expectation) return expectation
+        }
+        return null
+    }
+
+    def verify() {
+        groups*.verify()
+    }
+
+    def reset() {
+        groups = []
+    }
+
+}
+
+class StrictGroup {
+
     def mocks = []
     def expectations = []
     def current = 0
@@ -29,6 +59,7 @@ class OrderedExpectations {
     }
 
     def findMatching(mock, signature) {
+        def backup = current
         for (; current < expectations.size(); ++current) {
             def currentMock = mocks[current]
             def expectation = expectations[current]
@@ -38,6 +69,7 @@ class OrderedExpectations {
                 break
             }
         }
+        current = backup
         return null
     }
 
@@ -45,12 +77,6 @@ class OrderedExpectations {
         if (!expectations.every { it.isVerified()}) {
             fail() // TODO: the message should be given
         }
-    }
-
-    def reset() {
-        mocks = []
-        expectations = []
-        current = 0
     }
 
 }

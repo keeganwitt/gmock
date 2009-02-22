@@ -152,6 +152,7 @@ class InternalMockController implements MockController {
     }
 
     def strict(Closure strictClosure) {
+        orderedExpectations.newStrictGroup()
         try {
             ordered = true
             strictClosure()
