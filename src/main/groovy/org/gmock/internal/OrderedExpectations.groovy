@@ -15,23 +15,26 @@
  */
 package org.gmock.internal
 
+import static org.junit.Assert.fail
+
 class OrderedExpectations {
 
+    def mocks = []
     def expectations = []
     def current = 0
 
-    def add(expectation) {
+    def add(mock, expectation) {
+        mocks << mock
         expectations << expectation
     }
 
-    def findMatching(signature) {
-        while (current < expectations.size()) {
+    def findMatching(mock, signature) {
+        for (; current < expectations.size(); ++current) {
+            def currentMock = mocks[current]
             def expectation = expectations[current]
-            if (expectation.canCall(signature)) {
+            if (currentMock.is(mock) && expectation.canCall(signature)) {
                 return expectation
-            } else if (expectation.satisfied()) {
-                ++current
-            } else {
+            } else if (!expectation.satisfied()) {
                 break
             }
         }
@@ -45,6 +48,7 @@ class OrderedExpectations {
     }
 
     def reset() {
+        mocks = []
         expectations = []
         current = 0
     }
