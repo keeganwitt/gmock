@@ -57,7 +57,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         } {
             def signature = newSignatureForMethod(methodName, arguments)
             if (controller.replay){
-                return findExpectation(expectations, signature, "Unexpected method call", arguments, controller)
+                return findExpectation(expectations, signature, "Unexpected method call", arguments, controller, this)
             } else {
                 if (methodName == "static" && arguments.length == 1 && arguments[0] instanceof Closure) {
                     invokeStaticExpectationClosure(arguments[0])
@@ -67,7 +67,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
                     if (!controller.ordered) {
                         expectations.add(expectation)
                     } else {
-                        controller.orderedExpectations.add(expectation)
+                        controller.orderedExpectations.add(this, expectation)
                     }
                     return new ReturnMethodRecorder(expectation)
                 }

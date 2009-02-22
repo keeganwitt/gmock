@@ -34,14 +34,15 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     void testOneStrictClosureWithOneMockAndFailed() {
         def mock = mock()
         strict {
-            mock.a().returns(1)
-            mock.b().returns(2)
-            mock.c().returns(3)
+            mock.a()
+            mock.b()
+            mock.c()
         }
         shouldFail { // TODO: check the message
             play {
-                assertEquals 1, mock.a()
+                mock.a()
                 mock.c()
+                mock.b()
             }
         }
     }
@@ -79,6 +80,8 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         shouldFail { // TODO: check the message
             play {
                 mock.b()
+                mock.c()
+                mock.d()
             }
         }
     }
@@ -92,6 +95,40 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         shouldFail { // TODO: check the message
             play {
                 mock.a()
+            }
+        }
+    }
+
+    void testOneStrictClosureWithMultiMocks() {
+        def m1 = mock(), m2 = mock(), m3 = mock()
+        strict {
+            m1.a().returns(1)
+            m2.b().returns(2)
+            m3.b().returns(3)
+            m1.c().returns(4)
+        }
+        play {
+            assertEquals 1, m1.a()
+            assertEquals 2, m2.b()
+            assertEquals 3, m3.b()
+            assertEquals 4, m1.c()
+        }
+    }
+
+    void testOneStrictClosureWithMultiMocksAndFailed() {
+        def m1 = mock(), m2 = mock(), m3 = mock()
+        strict {
+            m1.a()
+            m2.b()
+            m3.b()
+            m1.c()
+        }
+        shouldFail { // TODO: check the message
+            play {
+                m1.a()
+                m3.b()
+                m2.b()
+                m1.c()
             }
         }
     }
