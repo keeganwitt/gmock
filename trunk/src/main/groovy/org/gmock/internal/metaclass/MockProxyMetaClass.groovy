@@ -64,18 +64,10 @@ class MockProxyMetaClass extends ProxyMetaClass {
                     return null
                 } else {
                     def expectation = new Expectation(signature: signature)
-                    addToExpectations(expectation)
+                    addToExpectations(expectation, expectations, controller, this)
                     return new ReturnMethodRecorder(expectation)
                 }
             }
-        }
-    }
-
-    private addToExpectations(Expectation expectation) {
-        if (!controller.ordered) {
-            expectations.add(expectation)
-        } else {
-            controller.orderedExpectations.add(this, expectation)
         }
     }
 
@@ -104,7 +96,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
                     return new StaticMethodRecoder(theClass, classExpectations, controller)
                 } else {
                     def expectation = new Expectation()
-                    addToExpectations(expectation)
+                    addToExpectations(expectation, expectations, controller, this)
                     return new PropertyRecorder(property, expectation)
                 }
             }

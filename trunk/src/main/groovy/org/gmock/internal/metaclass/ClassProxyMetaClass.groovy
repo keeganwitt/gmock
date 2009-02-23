@@ -18,11 +18,10 @@ package org.gmock.internal.metaclass
 import java.beans.IntrospectionException
 import org.gmock.internal.ExpectationCollection
 import static org.gmock.internal.InternalModeHelper.doInternal
-import static org.gmock.internal.metaclass.MetaClassHelper.findExpectation
-import static org.gmock.internal.metaclass.MetaClassHelper.newSignatureForStaticMethod
 import org.gmock.internal.signature.ConstructorSignature
 import org.gmock.internal.signature.StaticPropertyGetSignature
 import org.gmock.internal.signature.StaticPropertySetSignature
+import static org.gmock.internal.metaclass.MetaClassHelper.*
 
 /**
  * ClassProxyMetaClass capture all static and constructor call in replay mode.
@@ -31,6 +30,8 @@ class ClassProxyMetaClass extends ProxyMetaClass {
 
     ExpectationCollection constructorExpectations = new ExpectationCollection()
     ExpectationCollection staticExpectations = new ExpectationCollection()
+    boolean constructorExpectationsEmpty = true
+    boolean staticExpectationsEmpty = true
     def controller
 
     public ClassProxyMetaClass(MetaClassRegistry metaClassRegistry, Class aClass, MetaClass adaptee) throws IntrospectionException {
@@ -41,6 +42,16 @@ class ClassProxyMetaClass extends ProxyMetaClass {
         MetaClassRegistry registry = GroovySystem.metaClassRegistry
         MetaClass adaptee = registry.getMetaClass(theClass)
         return new ClassProxyMetaClass(registry, theClass, adaptee)
+    }
+
+    def addConstructorExpectation(expectation) {
+        addToExpectations(expectation, constructorExpectations, controller, this)
+        constructorExpectationsEmpty = false
+    }
+
+    def addStaticExpectation(expectation) {
+        addToExpectations(expectation, staticExpectations, controller, this)
+        staticExpectationsEmpty = false
     }
 
     def startProxy(){
@@ -68,33 +79,35 @@ class ClassProxyMetaClass extends ProxyMetaClass {
     def reset() {
         constructorExpectations = new ExpectationCollection()
         staticExpectations = new ExpectationCollection()
+        constructorExpectationsEmpty = true
+        staticExpectationsEmpty = true
     }
 
     Object invokeConstructor(Object[] arguments) {
-        checkAndDo constructorExpectations.empty(), { adaptee.invokeConstructor(arguments) }, {
+        checkAndDo constructorExpectationsEmpty, { adaptee.invokeConstructor(arguments) }, {
             def signature = new ConstructorSignature(theClass, arguments)
-            return findExpectation(constructorExpectations, signature, "Unexpected constructor call", arguments)
+            return findExpectation(constructorExpectations, signature, "Unexpected constructor call", arguments, controller, this)
         }
     }
 
     Object invokeStaticMethod(Object aClass, String method, Object[] arguments) {
-        checkAndDo staticExpectations.empty(), { adaptee.invokeStaticMethod(aClass, method, arguments) }, {
+        checkAndDo staticExpectationsEmpty, { adaptee.invokeStaticMethod(aClass, method, arguments) }, {
             def signature = newSignatureForStaticMethod(aClass, method, arguments)
-            return findExpectation(staticExpectations, signature, "Unexpected static method call", arguments)
+            return findExpectation(staticExpectations, signature, "Unexpected static method call", arguments, controller, this)
         }
     }
 
     Object getProperty(Object clazz, String property) {
-        checkAndDo staticExpectations.empty() || !(clazz instanceof Class), { adaptee.getProperty(clazz, property) }, {
+        checkAndDo staticExpectationsEmpty || !(clazz instanceof Class), { adaptee.getProperty(clazz, property) }, {
             def signature = new StaticPropertyGetSignature(clazz, property)
-            return findExpectation(staticExpectations, signature, "Unexpected static property getter call", [])
+            return findExpectation(staticExpectations, signature, "Unexpected static property getter call", [], controller, this)
         }
     }
 
     void setProperty(Object clazz, String property, Object value) {
-        checkAndDo staticExpectations.empty() || !(clazz instanceof Class), { adaptee.setProperty(clazz, property, value) }, {
+        checkAndDo staticExpectationsEmpty || !(clazz instanceof Class), { adaptee.setProperty(clazz, property, value) }, {
             def signature = new StaticPropertySetSignature(clazz, property, value)
-            findExpectation(staticExpectations, signature, "Unexpected static property setter call", [value])
+            findExpectation(staticExpectations, signature, "Unexpected static property setter call", [value], controller, this)
         }
     }
 
@@ -107,7 +120,7 @@ class ClassProxyMetaClass extends ProxyMetaClass {
     }
 
     private empty() {
-        constructorExpectations.empty() && staticExpectations.empty()
+        constructorExpectationsEmpty && staticExpectationsEmpty
     }
 
 }

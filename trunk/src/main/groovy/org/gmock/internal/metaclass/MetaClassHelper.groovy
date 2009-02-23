@@ -20,27 +20,22 @@ import org.gmock.internal.signature.*
 
 class MetaClassHelper {
 
-    static findExpectation(expectations, signature, message, arguments) { // TODO: remove it
-        findExpectation(expectations, signature, message, arguments, null, null)
-    }
-
     static findExpectation(expectations, signature, message, arguments, controller, mock) {
-        def expectation = null
-
-        if (controller) { // TODO: remove it
-            expectation = controller.orderedExpectations.findMatching(mock, signature)
-        }
-
-        if (!expectation) {
-            expectation = expectations.findMatching(signature)
-        }
-
+        def expectation = controller.orderedExpectations.findMatching(mock, signature) ?: expectations.findMatching(signature)
         if (expectation){
             return expectation.answer(arguments)
         } else {
             def callState = expectations.callState(signature).toString()
             if (callState) { callState = "\n$callState" }
             fail("$message '${signature}'$callState")
+        }
+    }
+
+    static addToExpectations(expectation, expectations, controller, mock) {
+        if (!controller.ordered) {
+            expectations.add(expectation)
+        } else {
+            controller.orderedExpectations.add(mock, expectation)
         }
     }
 
