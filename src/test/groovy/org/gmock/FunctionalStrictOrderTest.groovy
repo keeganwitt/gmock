@@ -15,6 +15,8 @@
  */
 package org.gmock
 
+import org.gmock.utils.Loader
+
 class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testOneStrictClosureWithOneMock() {
@@ -367,6 +369,155 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                 m1.a = 1
                 assertEquals 0, m1.a
                 m2.a = 2
+            }
+        }
+    }
+
+    void testStrictClosureWithStaticMocking() {
+        def mockLoader = mock(Loader), mockString = mock(String)
+        strict {
+            mockLoader.static.a().returns(1)
+            mockLoader.static.b().returns(2)
+            mockLoader.static.c().returns(3)
+        }
+        strict {
+            mockString.static.a().returns(4)
+            mockString.static.b().returns(5)
+        }
+        play {
+            assertEquals 1, Loader.a()
+            assertEquals 4, String.a()
+            assertEquals 2, Loader.b()
+            assertEquals 3, Loader.c()
+            assertEquals 5, String.b()
+        }
+    }
+
+    void testStrictClosureWithStaticMockingAndFailed() {
+        def mockLoader = mock(Loader)
+        strict {
+            mockLoader.static.a()
+            mockLoader.static.b()
+            mockLoader.static.c()
+        }
+        shouldFail { // TODO: check the message
+            play {
+                Loader.a()
+                Loader.c()
+                Loader.b()
+            }
+        }
+    }
+
+    void testStrictClosureWithStaticPropertyMocking() {
+        def mockLoader = mock(Loader), mockString = mock(String)
+        strict {
+            mockLoader.static.a.set(1)
+            mockString.static.a.set(2)
+        }
+        strict {
+            mockLoader.static.b.returns(3)
+            mockString.static.b.returns(4)
+        }
+        mockString.static.b.returns(5).stub()
+        play {
+            assertEquals 5, String.b
+            assertEquals 3, Loader.b
+            Loader.a = 1
+            String.a = 2
+            assertEquals 4, String.b
+            assertEquals 5, String.b
+        }
+    }
+
+    void testStrictClosureWithStaticPropertyMockingAndFailed() {
+        def mockLoader = mock(Loader)
+        strict {
+            mockLoader.static.a.set(1)
+            mockLoader.static.b.set(2)
+            mockLoader.static.c.set(3)
+            mockLoader.static.a.returns(4)
+        }
+        shouldFail { // TODO: check the message
+            play {
+                Loader.a = 1
+                Loader.b = 2
+                assertEquals 4, Loader.a
+                Loader.c = 3
+            }
+        }
+    }
+
+    void testStrictClosureWithConstructorMocking() {
+        strict {
+            mock(Loader, constructor(1))
+            mock(String, constructor(2))
+        }
+        strict {
+            mock(String, constructor(3))
+            mock(Loader, constructor(4))
+        }
+        play {
+            new String(3)
+            new Loader(1)
+            new Loader(4)
+            new String(2)
+        }
+    }
+
+    void testStrictClosureWithConstructorMockingAndFailed() {
+        strict {
+            mock(Loader, constructor(1))
+            mock(Loader, constructor(2))
+            mock(Loader, constructor(3))
+        }
+        shouldFail { // TODO: check the message
+            play {
+                new Loader(1)
+                new Loader(3)
+                new Loader(2)
+            }
+        }
+    }
+
+    void testStrictOrderingWithAllKindOfMocking() {
+        strict {
+            mock(Loader).static.init()
+            mock(Loader, constructor()) {
+                load(1).returns(2)
+                name.set('test')
+                name.returns('correct')
+            }
+            mock(Loader).static.finalize()
+        }
+        play {
+            Loader.init()
+            def loader = new Loader()
+            assertEquals 2, loader.load(1)
+            loader.name = 'test'
+            assertEquals 'correct', loader.name
+            Loader.finalize()
+        }
+    }
+
+    void testStrictOrderingWithAllKindOfMockingAndFailed() {
+        strict {
+            mock(Loader).static.init()
+            mock(Loader, constructor()) {
+                load(1).returns(2)
+                name.set('test')
+                name.returns('correct')
+            }
+            mock(Loader).static.finalize()
+        }
+        shouldFail { // TODO: check the message
+            play {
+                Loader.init()
+                def loader = new Loader()
+                assertEquals 2, loader.load(1)
+                loader.name = 'test'
+                Loader.finalize()
+                assertEquals 'correct', loader.name
             }
         }
     }
