@@ -37,6 +37,10 @@ class OrderedExpectations {
         return null
     }
 
+    def validate() {
+        groups*.validate()
+    }
+
     def verify() {
         groups*.verify()
     }
@@ -71,6 +75,10 @@ class StrictGroup {
         }
         current = backup
         return null
+    }
+
+    def validate() {
+        expectations*.validate()
     }
 
     def verify() {

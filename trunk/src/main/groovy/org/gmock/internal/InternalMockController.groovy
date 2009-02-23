@@ -118,6 +118,7 @@ class InternalMockController implements MockController {
 
             mocks*.validate()
             classExpectations.validate()
+            orderedExpectations.validate()
             mocks*.replay()
             classExpectations.startProxy()
         }
