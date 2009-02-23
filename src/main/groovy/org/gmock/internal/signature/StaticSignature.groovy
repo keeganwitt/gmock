@@ -36,9 +36,6 @@ class StaticSignature {
     }
 
     def validate(){
-        if (!methodName){
-            throw new IllegalStateException("Missing static expectation for ${aClass.simpleName}")
-        }
     }
 
     private boolean equalsWithoutArguments(Object staticSignature) {

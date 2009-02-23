@@ -25,22 +25,30 @@ class StaticMethodRecoder implements GroovyInterceptable {
 
     def classExpectations
     def aClass
+    boolean missingExpectation = true
 
     StaticMethodRecoder(aClass, classExpectations, controller){
         this.classExpectations = classExpectations
         this.aClass = aClass
         this.metaClass = new StaticMethodRecorderProxyMetaClass(StaticMethodRecoder, controller)
+        classExpectations.addStaticValidator { ->
+            if (this.@missingExpectation) {
+                throw new IllegalStateException("Missing static expectation for ${aClass.simpleName}")
+            }
+        }
     }
 
     Object invokeMethod(String name, Object args) {
         def expectation = new Expectation(signature: newSignatureForStaticMethod(aClass, name, args))
         classExpectations.addStaticExpectation(aClass, expectation)
+        missingExpectation = false
         return new ReturnMethodRecorder(expectation)
     }
 
     Object getProperty(String property) {
         def expectation = new Expectation()
         classExpectations.addStaticExpectation(aClass, expectation)
+        missingExpectation = false
         return new StaticPropertyRecorder(aClass, property, expectation)
     }
 
