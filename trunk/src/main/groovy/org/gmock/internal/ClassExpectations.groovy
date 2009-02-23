@@ -21,9 +21,14 @@ class ClassExpectations {
 
     def proxies = [:]
     def controller
+    def staticValidators = []
 
     ClassExpectations(controller) {
         this.controller = controller
+    }
+
+    def addStaticValidator(staticValidator) {
+        staticValidators << staticValidator
     }
 
     def addConstructorExpectation(aClass, expectation){
@@ -56,6 +61,7 @@ class ClassExpectations {
 
     def validate(){
         proxies.values()*.validate()
+        staticValidators*.call()
     }
 
     def verify() {
@@ -64,6 +70,7 @@ class ClassExpectations {
 
     def reset() {
         proxies.values()*.reset()
+        staticValidators = []
     }
 
 }

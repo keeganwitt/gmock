@@ -546,4 +546,16 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testStrictClosureShouldValidate3() {
+        def mock = mock()
+        strict {
+            mock.static
+        }
+        def expected = "Missing static expectation for Object"
+        def message = shouldFail(IllegalStateException) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
 }
