@@ -64,14 +64,18 @@ class MockProxyMetaClass extends ProxyMetaClass {
                     return null
                 } else {
                     def expectation = new Expectation(signature: signature)
-                    if (!controller.ordered) {
-                        expectations.add(expectation)
-                    } else {
-                        controller.orderedExpectations.add(this, expectation)
-                    }
+                    addToExpectations(expectation)
                     return new ReturnMethodRecorder(expectation)
                 }
             }
+        }
+    }
+
+    private addToExpectations(Expectation expectation) {
+        if (!controller.ordered) {
+            expectations.add(expectation)
+        } else {
+            controller.orderedExpectations.add(this, expectation)
         }
     }
 
@@ -94,13 +98,13 @@ class MockProxyMetaClass extends ProxyMetaClass {
         } {
             if (controller.replay){
                 def signature = new PropertyGetSignature(property)
-                return findExpectation(expectations, signature, "Unexpected property getter call", [])
+                return findExpectation(expectations, signature, "Unexpected property getter call", [], controller, this)
             } else {
                 if (property == "static"){
                     return new StaticMethodRecoder(theClass, classExpectations, controller)
                 } else {
                     def expectation = new Expectation()
-                    expectations.add(expectation)
+                    addToExpectations(expectation)
                     return new PropertyRecorder(property, expectation)
                 }
             }
@@ -117,7 +121,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         } {
             if (controller.replay){
                 def signature = new PropertySetSignature(property, value)
-                findExpectation(expectations, signature, "Unexpected property setter call", [value])
+                findExpectation(expectations, signature, "Unexpected property setter call", [value], controller, this)
             } else {
                 throw new MissingPropertyException("Cannot use property setter in record mode. " +
                         "Are you trying to mock a setter? Use '${property}.set(${value.inspect()})' instead.")
