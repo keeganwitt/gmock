@@ -522,4 +522,28 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         }
     }
 
+    void testStrictClosureShouldValidate1() {
+        def mock = mock()
+        strict {
+            mock.a
+        }
+        def expected = "Missing property expectation for 'a'"
+        def message = shouldFail(IllegalStateException) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
+    void testStrictClosureShouldValidate2() {
+        def mock = mock()
+        strict {
+            mock.static.a
+        }
+        def expected = "Missing property expectation for 'Object.a'"
+        def message = shouldFail(IllegalStateException) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
 }
