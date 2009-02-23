@@ -332,4 +332,43 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         }
     }
 
+    void testStrictClosuresWithPropertyMocking() {
+        def m1 = mock(), m2 = mock()
+        strict {
+            m1.a.set(1)
+            m2.a.set(2)
+        }
+        m1.b.set(3)
+        strict {
+            m2.a.set(4).atMost(2)
+            m1.b.set(5)
+            m1.c.returns(6)
+        }
+        m2.a.returns(7)
+        play {
+            m1.a = 1
+            m1.b = 3
+            assertEquals 7, m2.a
+            m2.a = 2
+            m1.b = 5
+            assertEquals 6, m1.c
+        }
+    }
+
+    void testStrictClosuresWithPropertyMockingAndFailed() {
+        def m1 = mock(), m2 = mock()
+        strict {
+            m1.a.set(1)
+            m2.a.set(2)
+            m1.a.returns(0)
+        }
+        shouldFail { // TODO: check the message
+            play {
+                m1.a = 1
+                assertEquals 0, m1.a
+                m2.a = 2
+            }
+        }
+    }
+
 }
