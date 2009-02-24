@@ -15,6 +15,7 @@
  */
 package org.gmock.internal.metaclass
 
+import org.gmock.GMock
 import static junit.framework.Assert.fail
 import org.gmock.internal.signature.*
 
@@ -59,8 +60,18 @@ class MetaClassHelper {
         }
     }
 
-    static isGMockMethod(String methodName, Class[] arguments) {
-        methodName == "match" && arguments.length == 1 && Closure.isAssignableFrom(arguments[0])
+    static getGMockMethod(String methodName, Class[] arguments, MetaClass metaClass, controller) {
+        def method = null, delegator = null
+        if (arguments.length == 1 && Closure.isAssignableFrom(arguments[0])) {
+            if (methodName == "match") {
+                method = GMock.metaClass.pickMethod(methodName, arguments)
+                delegator = GMock
+            } else if (methodName == "strict") {
+                method = controller.metaClass.pickMethod(methodName, arguments)
+                delegator = controller
+            }
+        }
+        return method ? new DelegateMetaMethod(metaClass, methodName, arguments, method, delegator) : null
     }
 
     private static isSetter(method, arguments) {

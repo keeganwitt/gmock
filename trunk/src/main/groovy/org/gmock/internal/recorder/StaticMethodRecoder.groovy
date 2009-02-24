@@ -17,7 +17,7 @@ package org.gmock.internal.recorder
 
 import org.gmock.internal.Expectation
 import static org.gmock.internal.InternalModeHelper.doInternal
-import static org.gmock.internal.metaclass.MetaClassHelper.isGMockMethod
+import static org.gmock.internal.metaclass.MetaClassHelper.getGMockMethod
 import static org.gmock.internal.metaclass.MetaClassHelper.newSignatureForStaticMethod
 import org.gmock.internal.metaclass.ProxyMetaMethod
 
@@ -72,11 +72,11 @@ class StaticMethodRecorderProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee.pickMethod(methodName, arguments)
         } {
-            if (!controller.replay && isGMockMethod(methodName, arguments)) {
-                return null
-            } else {
-                return new StaticMethodRecorderProxyMetaMethod(this, methodName, arguments)
+            if (!controller.replay) {
+                def method = getGMockMethod(methodName, arguments, this, controller)
+                if (method) return method
             }
+            return new StaticMethodRecorderProxyMetaMethod(this, methodName, arguments)
         }
     }
 

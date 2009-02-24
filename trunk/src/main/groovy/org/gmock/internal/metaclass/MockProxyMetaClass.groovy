@@ -75,8 +75,13 @@ class MockProxyMetaClass extends ProxyMetaClass {
         def recorder = new StaticMethodRecoder(theClass, classExpectations, controller)
         staticExpectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
         staticExpectationClosure.delegate = recorder
-        doExternal(controller) {
-            staticExpectationClosure(recorder)
+        try {
+            controller.mockDelegate = recorder
+            doExternal(controller) {
+                staticExpectationClosure(recorder)
+            }
+        } finally {
+            controller.mockDelegate = null
         }
     }
 
@@ -125,11 +130,11 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee.pickMethod(methodName, arguments)
         } {
-            if (!controller.replay && isGMockMethod(methodName, arguments)) {
-                return null
-            } else {
-                return new ProxyMetaMethod(this, methodName, arguments)
+            if (!controller.replay) {
+                def method = getGMockMethod(methodName, arguments, this, controller)
+                if (method) return method
             }
+            return new ProxyMetaMethod(this, methodName, arguments)
         }
     }
 
