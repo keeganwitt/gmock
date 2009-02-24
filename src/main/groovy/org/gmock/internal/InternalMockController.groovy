@@ -36,6 +36,7 @@ class InternalMockController implements MockController {
 
     boolean replay = false
     boolean ordered = false
+    def mockDelegate = null
 
     // while running in internal mode, we should not mock any methods, instead, we should invoke the original implements
     // it is a little like the kernel mode in OS
@@ -104,7 +105,12 @@ class InternalMockController implements MockController {
         if (expectationClosure){
             expectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
             expectationClosure.setDelegate(mockInstance)
-            expectationClosure(mockInstance)
+            try {
+                mockDelegate = mockInstance
+                expectationClosure(mockInstance)
+            } finally {
+                mockDelegate = null
+            }
         }
 
         return mockInstance
@@ -149,14 +155,23 @@ class InternalMockController implements MockController {
     def with(mock, Closure withClosure) {
         withClosure.resolveStrategy = Closure.DELEGATE_FIRST
         withClosure.setDelegate(mock)
-        withClosure(mock)
+        try {
+            mockDelegate = mock
+            withClosure(mock)
+        } finally {
+            mockDelegate = null
+        }
     }
 
     def strict(Closure strictClosure) {
         orderedExpectations.newStrictGroup()
         try {
             ordered = true
-            strictClosure()
+            if (mockDelegate) {
+                strictClosure.resolveStrategy = Closure.DELEGATE_FIRST
+                strictClosure.delegate = mockDelegate
+            }
+            strictClosure(mockDelegate)
         } finally {
             ordered = false
         }

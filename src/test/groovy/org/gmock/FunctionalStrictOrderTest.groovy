@@ -558,4 +558,114 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testStrictClosureInsideExpectationClosure() {
+        def mock = mock {
+            strict {
+                a().returns(1)
+                b().returns(2)
+                c().returns(3)
+                setUp().returns(4)
+            }
+        }
+        play {
+            assertEquals 1, mock.a()
+            assertEquals 2, mock.b()
+            assertEquals 3, mock.c()
+            assertEquals 4, mock.setUp()
+        }
+    }
+
+    void testStrictClosureInsideStaticClosure() {
+        mock(Loader).static {
+            strict {
+                a().returns(1)
+                b().returns(2)
+                setUp().returns(3)
+            }
+        }
+        play {
+            assertEquals 1, Loader.a()
+            assertEquals 2, Loader.b()
+            assertEquals 3, Loader.setUp()
+        }
+    }
+
+    void testStrictClosureInsideStaticClosureWhichIsInsideMockClosure() {
+        mock(Loader) {
+            'static' {
+                strict {
+                    a().returns(1)
+                    b().returns(2)
+                    setUp().returns(3)
+                }
+            }
+        }
+        play {
+            assertEquals 1, Loader.a()
+            assertEquals 2, Loader.b()
+            assertEquals 3, Loader.setUp()
+        }
+    }
+
+    void testStrictClosureInsideWithClosure() {
+        def mock = mock()
+        with(mock) {
+            strict {
+                a().returns(1)
+                setUp().returns(2)
+            }
+        }
+        play {
+            assertEquals 1, mock.a()
+            assertEquals 2, mock.setUp()
+        }
+    }
+
+    void testStrictClosureInsideStaticClosureWhichIsInsideWithClosure() {
+        def mock = mock(Loader)
+        with(mock) {
+            'static' {
+                strict {
+                    a().returns(1)
+                    setUp().returns(2)
+                }
+            }
+        }
+        play {
+            assertEquals 1, Loader.a()
+            assertEquals 2, Loader.setUp()
+        }
+    }
+
+    void testClosureMatcherInsideStrictClosureWhichIsInsideExpectationClosure() {
+        def mock = mock {
+            strict {
+                a(match { it == 1 }).returns(2)
+                it.match(match { it == 3 }).returns(4)
+            }
+        }
+        play {
+            assertEquals 2, mock.a(1)
+            assertEquals 4, mock.match(3)
+        }
+    }
+
+    void testClosureMatcherInsideStrictClosureWhichIsInsideStaticClosure() {
+        mock(Loader).static {
+            strict {
+                a(match { it == 1 }).returns(2)
+                it.match(match { it == 3 }).returns(4)
+            }
+        }
+        play {
+            assertEquals 2, Loader.a(1)
+            assertEquals 4, Loader.match(3)
+        }
+    }
+
+    // TODO: strict closure cannot be nested, cannot be inside play closure, play closure cannot be inside strict closure
+    // TODO: times checking on strict closure
+    // TODO: loose closure
+    // TODO: error messages
+
 }
