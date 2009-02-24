@@ -75,13 +75,14 @@ class MockProxyMetaClass extends ProxyMetaClass {
         def recorder = new StaticMethodRecoder(theClass, classExpectations, controller)
         staticExpectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
         staticExpectationClosure.delegate = recorder
+        def backup = controller.mockDelegate
         try {
             controller.mockDelegate = recorder
             doExternal(controller) {
                 staticExpectationClosure(recorder)
             }
         } finally {
-            controller.mockDelegate = null
+            controller.mockDelegate = backup
         }
     }
 

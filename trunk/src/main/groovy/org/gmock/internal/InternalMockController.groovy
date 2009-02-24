@@ -103,17 +103,22 @@ class InternalMockController implements MockController {
             mocks << mpmc
         }
         if (expectationClosure){
-            expectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
-            expectationClosure.setDelegate(mockInstance)
-            try {
-                mockDelegate = mockInstance
-                expectationClosure(mockInstance)
-            } finally {
-                mockDelegate = null
-            }
+            callClosureWithDelegate(expectationClosure, mockInstance)
         }
 
         return mockInstance
+    }
+
+    private callClosureWithDelegate(Closure closure, delegate) {
+        closure.resolveStrategy = Closure.DELEGATE_FIRST
+        closure.delegate = delegate
+        def backup = mockDelegate
+        try {
+            mockDelegate = delegate
+            closure(delegate)
+        } finally {
+            mockDelegate = backup
+        }
     }
 
     def play(Closure closure) {
@@ -153,14 +158,7 @@ class InternalMockController implements MockController {
     }
 
     def with(mock, Closure withClosure) {
-        withClosure.resolveStrategy = Closure.DELEGATE_FIRST
-        withClosure.setDelegate(mock)
-        try {
-            mockDelegate = mock
-            withClosure(mock)
-        } finally {
-            mockDelegate = null
-        }
+        callClosureWithDelegate(withClosure, mock)
     }
 
     def strict(Closure strictClosure) {
