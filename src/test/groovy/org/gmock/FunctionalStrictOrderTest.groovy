@@ -663,6 +663,65 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         }
     }
 
+    void testMultipleStrictClosuresInsideExpectationClosure() {
+        def mock = mock {
+            strict {
+                a().returns(1)
+                b().returns(2)
+            }
+            strict {
+                a().returns(3)
+                b().returns(4)
+            }
+        }
+        play {
+            assertEquals 1, mock.a()
+            assertEquals 3, mock.a()
+            assertEquals 2, mock.b()
+            assertEquals 4, mock.b()
+        }
+    }
+
+    void testMultipleStrictClosuresInsideStaticClosure() {
+        mock(Loader).static {
+            strict {
+                a().returns(1)
+                b().returns(2)
+            }
+            strict {
+                a().returns(3)
+                b().returns(4)
+            }
+        }
+        play {
+            assertEquals 1, Loader.a()
+            assertEquals 3, Loader.a()
+            assertEquals 2, Loader.b()
+            assertEquals 4, Loader.b()
+        }
+    }
+
+    void testMultipleStrictClosuresInsideStaticClosureWhichIsInsideExpectationClosure() {
+        def mock = mock(Loader) {
+            'static' {
+                strict {
+                    a().returns(1)
+                    b().returns(2)
+                }
+            }
+            strict {
+                a().returns(3)
+                b().returns(4)
+            }
+        }
+        play {
+            assertEquals 1, Loader.a()
+            assertEquals 2, Loader.b()
+            assertEquals 3, mock.a()
+            assertEquals 4, mock.b()
+        }
+    }
+
     // TODO: strict closure cannot be nested, cannot be inside play closure, play closure cannot be inside strict closure
     // TODO: times checking on strict closure
     // TODO: loose closure
