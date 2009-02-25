@@ -32,7 +32,7 @@ class AnyTimes {
     }
 
     def merge(StrictTimes times) {
-        times
+        new AtLeastTimes(times.times)
     }
 
 }

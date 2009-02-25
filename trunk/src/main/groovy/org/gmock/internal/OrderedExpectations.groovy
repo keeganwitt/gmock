@@ -15,6 +15,7 @@
  */
 package org.gmock.internal
 
+import org.gmock.internal.times.StrictTimes
 import static org.junit.Assert.fail
 
 class OrderedExpectations {
@@ -37,6 +38,10 @@ class OrderedExpectations {
         return null
     }
 
+    def findSignature(mock, signature) {
+        groups.find { it.findSignature(mock, signature) }
+    }
+
     def validate() {
         groups*.validate()
     }
@@ -53,21 +58,19 @@ class OrderedExpectations {
 
 class StrictGroup {
 
-    def mocks = []
     def expectations = []
     def current = 0
 
     def add(mock, expectation) {
-        mocks << mock
+        expectation.signatureObserver = this
         expectations << expectation
     }
 
     def findMatching(mock, signature) {
         def backup = current
         for (; current < expectations.size(); ++current) {
-            def currentMock = mocks[current]
             def expectation = expectations[current]
-            if (currentMock.is(mock) && expectation.canCall(signature)) {
+            if (expectation.mock.is(mock) && expectation.canCall(signature)) {
                 return expectation
             } else if (!expectation.satisfied()) {
                 break
@@ -85,6 +88,28 @@ class StrictGroup {
         if (!expectations.every { it.isVerified()}) {
             fail() // TODO: the message should be given
         }
+    }
+
+    def findSignature(mock, signature) {
+        expectations.find { mock.is(it.mock) && signature.match(it.signature) }
+    }
+
+    void checkTimes(expectation) {
+        if (!expectations.empty) {
+            def last = expectations.last()
+            def exps = last.is(expectation) ? expectations.subList(0, expectations.size() - 1) : expectations
+            if (!exps.empty) {
+                last = exps.last()
+                if (last.signature == expectation.signature && last.mock.is(expectation.mock) && !(last.times instanceof StrictTimes)) {
+                    expectations = exps
+                    throw new IllegalStateException("Last method called on mock already has a non-fixed count set.")
+                }
+            }
+        }
+    }
+
+    void signatureChanged(expectation) {
+        checkTimes(expectation)
     }
 
 }
