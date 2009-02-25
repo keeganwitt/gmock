@@ -722,7 +722,38 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         }
     }
 
-    // TODO: strict closure cannot be nested, cannot be inside play closure, play closure cannot be inside strict closure
+    void testCannotNestStrictClosures() {
+        strict {
+            shouldFail(IllegalStateException) {
+                strict {}
+            }
+        }
+
+        mock {
+            strict {
+                shouldFail(IllegalStateException) {
+                    strict {}
+                }
+            }
+        }
+    }
+
+    void testStrictClosureCannotBeInsidePlayClosure() {
+        play {
+            shouldFail(IllegalStateException) {
+                strict {}
+            }
+        }
+    }
+
+    void testPlayClosureCannotBeInsideStrictClosure() {
+        strict {
+            shouldFail(IllegalStateException) {
+                play {}
+            }
+        }
+    }
+
     // TODO: times checking on strict closure
     // TODO: loose closure
     // TODO: error messages
