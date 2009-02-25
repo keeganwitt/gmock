@@ -159,8 +159,8 @@ class MockProxyMetaClass extends ProxyMetaClass {
 
     private addMethodDefaultBehavior(methodName, arguments, result) {
         def signature = new MethodSignature(methodName, arguments)
-        if (!expectations.findSignature(signature)) {
-            def expectation = new Expectation(signature: signature, result: result, times: AnyTimes.INSTANCE, hidden: true)
+        if (!expectations.findSignature(signature) && !controller.orderedExpectations.findSignature(this, signature)) {
+            def expectation = new Expectation(signature: signature, result: result, times: AnyTimes.INSTANCE, hidden: true, mock: this)
             expectations.add(expectation)
         }
     }

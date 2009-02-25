@@ -26,6 +26,7 @@ class Expectation {
     def times = new StrictTimes(1)
     def called = 0
     def hidden = false
+    def mock
 
     void setSignature(signature) {
         this.signature = signature

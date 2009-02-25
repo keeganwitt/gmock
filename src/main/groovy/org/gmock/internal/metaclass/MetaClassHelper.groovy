@@ -33,6 +33,7 @@ class MetaClassHelper {
     }
 
     static addToExpectations(expectation, expectations, controller, mock) {
+        expectation.mock = mock
         if (!controller.ordered) {
             expectations.add(expectation)
         } else {

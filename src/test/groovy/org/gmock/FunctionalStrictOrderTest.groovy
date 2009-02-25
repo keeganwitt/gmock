@@ -754,7 +754,82 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         }
     }
 
-    // TODO: times checking on strict closure
+    void testTimesShouldBeCheckedForStrictOrdering() {
+        def mock = mock()
+        strict {
+            mock.a().atLeast(2)
+            shouldFail(IllegalStateException) {
+                mock.a().times(2)
+            }
+        }
+    }
+
+    void testNonfixedTimesForStrictOrderingButNotTheSameMockShouldBeFine() {
+        def m1 = mock(), m2 = mock()
+        strict {
+            m1.a().atLeast(2)
+            m2.a().atMost(2)
+        }
+    }
+
+    void testNonfixedTimesInDifferentStrictClosuresShouldBeFine() {
+        def mock = mock()
+        strict {
+            mock.a().times(2)
+            mock.a().times(1..2)
+        }
+        strict {
+            mock.a()
+            mock.a().atMostOnce()
+        }
+        mock.a().times(3)
+        mock.a().stub()
+        play {
+            9.times { mock.a() }
+        }
+    }
+
+    void testNonfixedTimesNotHeelInStrictClosureShouldBeFine() {
+        def mock = mock()
+        strict {
+            mock.a().stub()
+            mock.b()
+            mock.a().atLeastOnce()
+        }
+        play {
+            mock.a()
+            mock.b()
+            mock.a()
+        }
+    }
+
+    void testTimesShouldBeCheckedForStrictOrderingWithStaticMocking() {
+        strict {
+            mock(Loader).static.a().stub()
+            shouldFail(IllegalStateException) {
+                mock(Loader).static.a().times(1..2)
+            }
+        }
+    }
+
+    void testNoDefaultBehaviorsIfExpectationsAreSetInStrictClosure() {
+        def mock = mock {
+            strict {
+                it.toString().returns('test')
+                it.hashCode().returns(1)
+                it.equals(match { true }).returns(false)
+            }
+        }
+        play {
+            assertEquals 'test', mock.toString()
+            assertEquals 1, mock.hashCode()
+            assertFalse mock == new Object()
+            shouldFail { mock.toString() }
+            shouldFail { mock.hashCode() }
+            shouldFail { mock.equals(mock) }
+        }
+    }
+
     // TODO: loose closure
     // TODO: error messages
 

@@ -38,7 +38,9 @@ class AnyTimesTest extends GroovyTestCase {
 
     void testMerge() {
         def st = new StrictTimes(5)
-        assertEquals st, times.merge(st)
+        def result = times.merge(st)
+        assertEquals AtLeastTimes, result.class
+        assertEquals 5, result.times
     }
 
 }
