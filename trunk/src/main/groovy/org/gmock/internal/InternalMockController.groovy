@@ -126,6 +126,9 @@ class InternalMockController implements MockController {
             if (replay) {
                 throw new IllegalStateException("Cannot nest play closures.")
             }
+            if (ordered) {
+                throw new IllegalStateException("Play closures cannot be inside strict closure.")
+            }
 
             mocks*.validate()
             classExpectations.validate()
@@ -162,6 +165,13 @@ class InternalMockController implements MockController {
     }
 
     def strict(Closure strictClosure) {
+        if (ordered) {
+            throw new IllegalStateException("Cannot nest strict closures.")
+        }
+        if (replay) {
+            throw new IllegalStateException("Strict closures cannot be inside play closure.")
+        }
+
         orderedExpectations.newStrictGroup()
         try {
             ordered = true
