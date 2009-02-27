@@ -830,7 +830,197 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         }
     }
 
-    // TODO: loose closure
-    // TODO: error messages
+    void testLooseClosureInsideStrictClosure() {
+        def mockLock = mock(), mockOther = mock()
+        strict {
+            mockLock.lock().returns(true)
+            loose {
+                mockLock.a().returns(1)
+                mockOther.b().returns(2).times(1..2)
+                mockOther.c().returns(3).stub()
+            }
+            mockLock.unlock().returns(true)
+        }
+        play {
+            assertTrue mockLock.lock()
+            assertEquals 3, mockOther.c()
+            assertEquals 1, mockLock.a()
+            assertEquals 2, mockOther.b()
+            assertEquals 3, mockOther.c()
+            assertEquals 3, mockOther.c()
+            assertTrue mockLock.unlock()
+        }
+    }
+
+    void testLooseClosureInsideStrictClosureAndFailed() {
+        def mockLock = mock(), mockOther = mock()
+        strict {
+            mockLock.lock().returns(true)
+            loose {
+                mockOther.b().returns(2).times(2..3)
+                mockOther.c().returns(3).stub()
+            }
+            mockLock.unlock().returns(true)
+        }
+        shouldFail { // TODO: check the message
+            play {
+                assertTrue mockLock.lock()
+                assertEquals 3, mockOther.c()
+                assertEquals 2, mockOther.b()
+                assertEquals 3, mockOther.c()
+                assertEquals 3, mockOther.c()
+                mockLock.unlock()
+            }
+        }
+    }
+
+    void testLooseClosureInsideStrictClosureShouldValidate() {
+        def mock = mock()
+        strict {
+            mock.a()
+            loose {
+                mock.b()
+                mock.c
+            }
+            mock.d()
+        }
+        def expected = "Missing property expectation for 'c'"
+        def message = shouldFail(IllegalStateException) {
+            play {}
+        }
+        assertEquals expected, message
+    }
+
+    void testLooseClosureInsideStrictClosureShouldVerify() {
+        def mock = mock()
+        strict {
+            mock.a()
+            loose {
+                mock.b()
+                mock.c()
+            }
+        }
+        shouldFail { // TODO: check the message
+            play {
+                mock.a()
+                mock.c()
+            }
+        }
+    }
+
+    void testNonfixedTimesAfterLooseClosureShouldBeFine() {
+        def mock = mock()
+        strict {
+            mock.a().returns(1).atLeast(1)
+            loose {
+                mock.a().returns(2)
+                mock.b().returns(3).stub()
+                mock.a().returns(4).times(1..2)
+            }
+            mock.a().returns(5).times(1..2)
+        }
+        play {
+            assertEquals 1, mock.a()
+            assertEquals 3, mock.b()
+            assertEquals 2, mock.a()
+            2.times { assertEquals 4, mock.a() }
+            assertEquals 5, mock.a()
+        }
+    }
+
+    void testNonfixedTimesShouldBeCheckedInsideLooseClosure() {
+        def mock = mock()
+        strict {
+            loose {
+                mock.a().times(1..2)
+                shouldFail {
+                    mock.a()
+                }
+            }
+        }
+    }
+
+    void testNoDefaultBehaviorsIfExpectationsAreSetInLooseClosure() {
+        def mock = mock()
+        strict {
+            loose {
+                mock.toString().returns('test')
+                mock.hashCode().returns(2)
+                mock.equals(match { true }).returns(false)
+            }
+        }
+        play {
+            assertEquals "test", mock.toString()
+            assertEquals 2, mock.hashCode()
+            assertFalse mock == new Object()
+            shouldFail { mock.toString() }
+            shouldFail { mock.hashCode() }
+            shouldFail { mock.equals(mock) }
+        }
+    }
+
+    void testLooseClosureCanOnlyBeInsideStrictClosure() {
+        shouldFail(IllegalStateException) {
+            loose {}
+        }
+    }
+
+    void testLooseClosuresCannotBeNested() {
+        strict {
+            loose {
+                shouldFail(IllegalStateException) {
+                    loose {}
+                }
+            }
+        }
+    }
+
+    void testStrictClosureCannotBeInsideLooseClosure() {
+        strict {
+            loose {
+                shouldFail(IllegalStateException) {
+                    strict {}
+                }
+            }
+        }
+    }
+
+    void testLooseClosureInsideExpectationClosure() {
+        def mock = mock {
+            strict {
+                a().returns(1)
+                loose {
+                    b().returns(2)
+                    c().returns(3)
+                }
+                d().returns(4)
+            }
+        }
+        play {
+            assertEquals 1, mock.a()
+            assertEquals 3, mock.c()
+            assertEquals 2, mock.b()
+            assertEquals 4, mock.d()
+        }
+    }
+
+    void testLooseClosureInsideStaticClosure() {
+        mock(Loader).static {
+            strict {
+                a().returns(1)
+                loose {
+                    b().returns(2)
+                    c().returns(3)
+                }
+                d().returns(4)
+            }
+        }
+        play {
+            assertEquals 1, Loader.a()
+            assertEquals 3, Loader.c()
+            assertEquals 2, Loader.b()
+            assertEquals 4, Loader.d()
+        }
+    }
 
 }

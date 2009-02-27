@@ -32,15 +32,27 @@ class InternalMockController implements MockController {
 
     def mocks = []
     def classExpectations = new ClassExpectations(this)
-    def orderedExpectations = new OrderedExpectations()
+    def orderedExpectations = new OrderedExpectations(this)
 
     boolean replay = false
-    boolean ordered = false
+    Order order = Order.NONE
     def mockDelegate = null
 
     // while running in internal mode, we should not mock any methods, instead, we should invoke the original implements
     // it is a little like the kernel mode in OS
     boolean internal = false
+
+    boolean isOrdered() {
+        order != Order.NONE
+    }
+
+    boolean isStrictOrdered() {
+        order == Order.STRICT
+    }
+
+    boolean isLooseOrdered() {
+        order == Order.LOOSE
+    }
 
     @Deprecated
     def mock(Map constraints, Class clazz = Object, Closure expectationClosure = null) {
@@ -173,15 +185,32 @@ class InternalMockController implements MockController {
         }
 
         orderedExpectations.newStrictGroup()
+        callClosureWithMockDelegate(strictClosure, Order.STRICT)
+    }
+
+    def loose(Closure looseClosure) {
+        if (looseOrdered) {
+            throw new IllegalStateException("Cannot nest loose closures.")
+        }
+        if (!strictOrdered) {
+            throw new IllegalStateException("Loose closures can only be inside strict closure.")
+        }
+
+        orderedExpectations.newLooseGroup()
+        callClosureWithMockDelegate(looseClosure, Order.LOOSE)
+    }
+
+    private def callClosureWithMockDelegate(Closure closure, Order order) {
+        Order backup = this.order
         try {
-            ordered = true
+            this.order = order
             if (mockDelegate) {
-                strictClosure.resolveStrategy = Closure.DELEGATE_FIRST
-                strictClosure.delegate = mockDelegate
+                closure.resolveStrategy = Closure.DELEGATE_FIRST
+                closure.delegate = mockDelegate
             }
-            strictClosure(mockDelegate)
+            closure(mockDelegate)
         } finally {
-            ordered = false
+            this.order = backup
         }
     }
 
@@ -224,3 +253,5 @@ class InternalMockController implements MockController {
     }
 
 }
+
+enum Order { NONE, STRICT, LOOSE }

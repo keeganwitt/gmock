@@ -37,7 +37,7 @@ class MetaClassHelper {
         if (!controller.ordered) {
             expectations.add(expectation)
         } else {
-            controller.orderedExpectations.add(mock, expectation)
+            controller.orderedExpectations.add(expectation)
         }
     }
 
@@ -67,7 +67,7 @@ class MetaClassHelper {
             if (methodName == "match") {
                 method = GMock.metaClass.pickMethod(methodName, arguments)
                 delegator = GMock
-            } else if (methodName == "strict") {
+            } else if (methodName == "strict" || methodName == "loose") {
                 method = controller.metaClass.pickMethod(methodName, arguments)
                 delegator = controller
             }

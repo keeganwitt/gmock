@@ -21,13 +21,22 @@ import static org.junit.Assert.fail
 class OrderedExpectations {
 
     def groups = []
+    def controller
 
-    def newStrictGroup() {
-        groups << new StrictGroup()
+    OrderedExpectations(controller) {
+        this.controller = controller
     }
 
-    def add(mock, expectation) {
-        groups.last().add(mock, expectation)
+    def newStrictGroup() {
+        groups << new StrictGroup(controller)
+    }
+
+    def newLooseGroup() {
+        groups.last().newLooseGroup()
+    }
+
+    def add(expectation) {
+        groups.last().add(expectation)
     }
 
     def findMatching(mock, signature) {
@@ -60,19 +69,38 @@ class StrictGroup {
 
     def expectations = []
     def current = 0
+    def controller
 
-    def add(mock, expectation) {
-        expectation.signatureObserver = this
-        expectations << expectation
+    StrictGroup(controller) {
+        this.controller = controller
+    }
+
+    def add(expectation) {
+        if (controller.strictOrdered) {
+            expectation.signatureObserver = this
+            expectations << expectation
+        } else { // looseOrdered
+            expectations.last().add(expectation)
+        }
+    }
+
+    def newLooseGroup() {
+        expectations << new LooseGroup()
     }
 
     def findMatching(mock, signature) {
         def backup = current
         for (; current < expectations.size(); ++current) {
             def expectation = expectations[current]
-            if (expectation.mock.is(mock) && expectation.canCall(signature)) {
-                return expectation
-            } else if (!expectation.satisfied()) {
+            if (expectation instanceof LooseGroup) {
+                def expectationInLooseGroup = expectation.findMatching(mock, signature)
+                if (expectationInLooseGroup) return expectationInLooseGroup
+            } else { // expectation instanceof Expectation
+                if (expectation.mock.is(mock) && expectation.canCall(signature)) {
+                    return expectation
+                }
+            }
+            if (!expectation.satisfied()) {
                 break
             }
         }
@@ -85,13 +113,23 @@ class StrictGroup {
     }
 
     def verify() {
-        if (!expectations.every { it.isVerified()}) {
+        if (!expectations.every { it.isVerified() }) {
             fail() // TODO: the message should be given
         }
     }
 
     def findSignature(mock, signature) {
-        expectations.find { mock.is(it.mock) && signature.match(it.signature) }
+        for (expectation in expectations) {
+            if (expectation instanceof LooseGroup) {
+                def expectationInLooseGroup = expectation.findSignature(mock, signature)
+                if (expectationInLooseGroup) return expectationInLooseGroup
+            } else { // expectation instanceof Expectation
+                if (expectation.mock.is(mock) && signature.match(expectation.signature)) {
+                    return expectation
+                }
+            }
+        }
+        return null
     }
 
     void checkTimes(expectation) {
@@ -100,7 +138,8 @@ class StrictGroup {
             def exps = last.is(expectation) ? expectations.subList(0, expectations.size() - 1) : expectations
             if (!exps.empty) {
                 last = exps.last()
-                if (last.signature == expectation.signature && last.mock.is(expectation.mock) && !(last.times instanceof StrictTimes)) {
+                if (last instanceof Expectation && last.signature == expectation.signature &&
+                        last.mock.is(expectation.mock) && !(last.times instanceof StrictTimes)) {
                     expectations = exps
                     throw new IllegalStateException("Last method called on mock already has a non-fixed count set.")
                 }
@@ -110,6 +149,26 @@ class StrictGroup {
 
     void signatureChanged(expectation) {
         checkTimes(expectation)
+    }
+
+}
+
+class LooseGroup extends ExpectationCollection {
+
+    def isVerified() {
+        expectations.every { it.isVerified() }
+    }
+
+    def satisfied() {
+        expectations.every { it.satisfied() }
+    }
+
+    def findMatching(mock, signature) {
+        expectations.find { it.mock.is(mock) && it.canCall(signature)}
+    }
+
+    def findSignature(mock, signature) {
+        expectations.find { it.mock.is(mock) && signature.match(it.signature) }
     }
 
 }

@@ -35,6 +35,10 @@ abstract class GMockTestCase extends GroovyTestCase {
         gMockController.strict(strictClosure)
     }
 
+    protected loose(Closure looseClosure) {
+        gMockController.loose(looseClosure)
+    }
+
     protected constructor(Object... args) {
         GMock.constructor(args)
     }
