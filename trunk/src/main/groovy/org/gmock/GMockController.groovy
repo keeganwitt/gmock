@@ -37,4 +37,8 @@ class GMockController {
         internalMockController.strict(strictClosure)
     }
 
+    def loose(Closure looseClosure) {
+        internalMockController.loose(looseClosure)
+    }
+
 }
