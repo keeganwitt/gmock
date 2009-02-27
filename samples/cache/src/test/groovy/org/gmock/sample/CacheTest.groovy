@@ -51,12 +51,18 @@ class CacheTest extends GMockTestCase {
     }
 
     void testGetAndSwapOutDirtyItem() {
-        respository.get("key 1").returns(1)
-        respository.get("key 3").returns(3)
-        respository.get("key 4").returns(4)
-        respository.put("key 2", 2)
+        strict {
+            loose {
+                with(respository) {
+                    get("key 1").returns(1)
+                    get("key 3").returns(3)
+                    get("key 4").returns(4)
+                }
+            }
+            strategy.getKeyToRemove().returns("key 2")
+            respository.put("key 2", 2)
+        }
         strategy.onAccess(anything()).times(4)
-        strategy.getKeyToRemove().returns("key 2")
         play {
             assertEquals 1, cache.get("key 1")
             cache.put "key 2", 2
