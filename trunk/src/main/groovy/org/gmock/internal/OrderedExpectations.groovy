@@ -92,14 +92,8 @@ class StrictGroup {
         def backup = current
         for (; current < expectations.size(); ++current) {
             def expectation = expectations[current]
-            if (expectation instanceof LooseGroup) {
-                def expectationInLooseGroup = expectation.findMatching(mock, signature)
-                if (expectationInLooseGroup) return expectationInLooseGroup
-            } else { // expectation instanceof Expectation
-                if (expectation.mock.is(mock) && expectation.canCall(signature)) {
-                    return expectation
-                }
-            }
+            def found = expectation.findMatching(mock, signature)
+            if (found) return found
             if (!expectation.satisfied()) {
                 break
             }
@@ -120,14 +114,8 @@ class StrictGroup {
 
     def findSignature(mock, signature) {
         for (expectation in expectations) {
-            if (expectation instanceof LooseGroup) {
-                def expectationInLooseGroup = expectation.findSignature(mock, signature)
-                if (expectationInLooseGroup) return expectationInLooseGroup
-            } else { // expectation instanceof Expectation
-                if (expectation.mock.is(mock) && signature.match(expectation.signature)) {
-                    return expectation
-                }
-            }
+            def found = expectation.findSignature(mock, signature)
+            if (found) return found
         }
         return null
     }
@@ -164,11 +152,11 @@ class LooseGroup extends ExpectationCollection {
     }
 
     def findMatching(mock, signature) {
-        expectations.find { it.mock.is(mock) && it.canCall(signature)}
+        expectations.find { it.findMatching(mock, signature) }
     }
 
     def findSignature(mock, signature) {
-        expectations.find { it.mock.is(mock) && signature.match(it.signature) }
+        expectations.find { it.findSignature(mock, signature) }
     }
 
 }
