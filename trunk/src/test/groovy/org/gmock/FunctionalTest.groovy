@@ -551,8 +551,8 @@ class FunctionalTest extends GMockTestCase {
         def mock3 = mock()
         mock1.is(mock2).returns(true)
 
-        def expected = "Unexpected method call 'is(Mock for java.lang.Object)'\n" +
-                       "  'is(Mock for java.lang.Object)': expected 1, actual 0"
+        def expected = "Unexpected method call 'is(Mock for Object (3))'\n" +
+                       "  'is(Mock for Object (2))': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {
                 mock1.is(mock3)
@@ -567,7 +567,7 @@ class FunctionalTest extends GMockTestCase {
         mock1.is(mock2).returns(true)
 
         def expected = "Expectation not matched on verify:\n" +
-                       "  'is(Mock for java.lang.Object)': expected 1, actual 0"
+                       "  'is(Mock for Object (2))': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {}
         }
@@ -682,7 +682,7 @@ class FunctionalTest extends GMockTestCase {
     }
 
     void testAssigningANonTypeVariableToATypeVariableGiveBadErrorMessage() {
-        def expected = /Cannot cast object 'Mock for java\.lang\.Object' with class 'groovy\.lang\.GroovyObject.*' / +
+        def expected = /Cannot cast object 'Mock for Object' with class 'groovy\.lang\.GroovyObject.*' / +
                        /to class 'java\.util\.Date'/
         def message = shouldFail(GroovyCastException) {
             Date date = mock()
