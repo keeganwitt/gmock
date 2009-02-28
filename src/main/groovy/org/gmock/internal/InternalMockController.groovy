@@ -33,6 +33,7 @@ class InternalMockController implements MockController {
     def mocks = []
     def classExpectations = new ClassExpectations(this)
     def orderedExpectations = new OrderedExpectations(this)
+    def defaultNames = [:]
 
     boolean replay = false
     Order order = Order.NONE
@@ -97,7 +98,7 @@ class InternalMockController implements MockController {
                 throw new IllegalStateException("Cannot create mocks in play closure.")
             }
 
-            String mockName = mockNameRecorder ? mockNameRecorder.mockName : "Mock for $clazz.name"
+            def mockName = getMockName(clazz, mockNameRecorder)
             def mpmc = new MockProxyMetaClass(clazz, classExpectations, this, mockName)
 
             if (!Modifier.isFinal(clazz.modifiers)) {
@@ -119,6 +120,26 @@ class InternalMockController implements MockController {
         }
 
         return mockInstance
+    }
+
+    private getMockName(Class clazz, MockNameRecorder mockNameRecorder) {
+        def mockName
+        if (mockNameRecorder) {
+            mockName = mockNameRecorder
+        } else {
+            mockName = new MockNameRecorder(clazz)
+            if (!defaultNames[clazz]) {
+                defaultNames[clazz] = mockName
+            } else {
+                if (defaultNames[clazz] instanceof MockNameRecorder) {
+                    defaultNames[clazz].count = 1
+                    mockName.count = defaultNames[clazz] = 2
+                } else { // defaultNames[clazz] instanceof Integer
+                    mockName.count = ++defaultNames[clazz]
+                }
+            }
+        }
+        return mockName
     }
 
     private callClosureWithDelegate(Closure closure, delegate) {
@@ -214,7 +235,7 @@ class InternalMockController implements MockController {
         }
     }
 
-    private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder, String mockName) {
+    private mockNonFinalClass(Class clazz, MockProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder, mockName) {
         def groovyMethodInterceptor = new GroovyMethodInterceptor(mpmc)
         def javaMethodInterceptor = new JavaMethodInterceptor(this, mpmc, mockName)
 

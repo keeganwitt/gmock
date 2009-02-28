@@ -21,12 +21,12 @@ class ToStringDefaultBehavior implements Result {
 
     def name
 
-    ToStringDefaultBehavior(String name) {
+    ToStringDefaultBehavior(name) {
         this.name = name
     }
 
     def answer(Object[] arguments) {
-        return name
+        name.toString()
     }
 
 }

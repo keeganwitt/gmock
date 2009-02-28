@@ -17,10 +17,22 @@ package org.gmock.internal.recorder
 
 class MockNameRecorder {
 
-    def mockName
+    String mockName
 
-    MockNameRecorder(mockName) {
+    MockNameRecorder(String mockName) {
         this.mockName = mockName
+    }
+
+    MockNameRecorder(Class clazz) {
+        mockName = "Mock for $clazz.simpleName"
+    }
+
+    void setCount(int count) {
+        mockName += " ($count)"
+    }
+
+    String toString() {
+        mockName
     }
 
 }

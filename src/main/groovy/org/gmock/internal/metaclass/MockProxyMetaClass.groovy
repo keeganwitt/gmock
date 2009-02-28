@@ -38,9 +38,9 @@ class MockProxyMetaClass extends ProxyMetaClass {
     def classExpectations
     def controller
     def mockInstance
-    String mockName
+    def mockName
 
-    MockProxyMetaClass(Class clazz, classExpectations, controller, String mockName) {
+    MockProxyMetaClass(Class clazz, classExpectations, controller, mockName) {
         super(GroovySystem.metaClassRegistry, clazz, GroovySystem.metaClassRegistry.getMetaClass(clazz))
         this.classExpectations = classExpectations
         this.controller = controller

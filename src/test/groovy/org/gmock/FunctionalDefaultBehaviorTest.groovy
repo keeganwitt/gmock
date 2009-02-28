@@ -72,8 +72,8 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
         def m1 = mock()
         def m2 = mock(Date)
         play {
-            assertEquals "Mock for java.lang.Object", m1.toString()
-            assertEquals "Mock for java.util.Date", m2.toString()
+            assertEquals "Mock for Object", m1.toString()
+            assertEquals "Mock for Date", m2.toString()
         }
     }
 
@@ -81,8 +81,8 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
         def m1 = mock()
         def m2 = mock(Date)
         play {
-            assertEquals "Mock for java.lang.Object", JavaTestHelper.toStringOn(m1)
-            assertEquals "Mock for java.util.Date", JavaTestHelper.toStringOn(m2)
+            assertEquals "Mock for Object", JavaTestHelper.toStringOn(m1)
+            assertEquals "Mock for Date", JavaTestHelper.toStringOn(m2)
         }
     }
 
@@ -93,10 +93,10 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
         play {
             assertTrue m1 == m2
             assertEquals System.identityHashCode(m1), m1.hashCode()
-            assertEquals "Mock for java.lang.Object", m1.toString()
+            assertEquals "Mock for Object (1)", m1.toString()
 
-            def expected = "Unexpected method call 'equals(Mock for java.lang.Object)'\n" +
-                           "  'equals(Mock for java.lang.Object)': expected 1, actual 1 (+1)"
+            def expected = "Unexpected method call 'equals(Mock for Object (2))'\n" +
+                           "  'equals(Mock for Object (2))': expected 1, actual 1 (+1)"
             def message = shouldFail(AssertionFailedError) {
                 m1.equals(m2)
             }
@@ -110,7 +110,7 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
         play {
             assertEquals 1, m1.hashCode()
             assertFalse m1 == m2
-            assertEquals "Mock for java.lang.Object", m1.toString()
+            assertEquals "Mock for Object (1)", m1.toString()
 
             def expected = "Unexpected method call 'hashCode()'\n" +
                            "  'hashCode()': expected 1, actual 1 (+1)"
@@ -135,6 +135,34 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
                 m1.toString()
             }
             assertEquals expected, message
+        }
+    }
+
+    void testDefaultMockNames() {
+        def m1 = mock()
+        def m2 = mock(Date)
+
+        play {
+            assertEquals 'Mock for Date', m2.toString()
+            assertEquals 'Mock for Date', JavaTestHelper.toStringOn(m2)
+        }
+
+        def m3 = mock(Date, name('m3'))
+        def m4 = mock(Date)
+        def m5 = mock(Date)
+
+        play {
+            assertEquals 'Mock for Object', m1.toString()
+            assertEquals 'Mock for Date (1)', m2.toString()
+            assertEquals 'm3', m3.toString()
+            assertEquals 'Mock for Date (2)', m4.toString()
+            assertEquals 'Mock for Date (3)', m5.toString()
+
+            assertEquals 'Mock for Object', JavaTestHelper.toStringOn(m1)
+            assertEquals 'Mock for Date (1)', JavaTestHelper.toStringOn(m2)
+            assertEquals 'm3', JavaTestHelper.toStringOn(m3)
+            assertEquals 'Mock for Date (2)', JavaTestHelper.toStringOn(m4)
+            assertEquals 'Mock for Date (3)', JavaTestHelper.toStringOn(m5)
         }
     }
 
