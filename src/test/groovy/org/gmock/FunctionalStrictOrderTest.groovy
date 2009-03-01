@@ -15,6 +15,7 @@
  */
 package org.gmock
 
+import junit.framework.AssertionFailedError
 import org.gmock.utils.Loader
 
 class FunctionalStrictOrderTest extends GMockTestCase {
@@ -58,13 +59,19 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             mock.b()
             mock.c()
         }
-        shouldFail { // TODO: check the message
+
+        def expected = "Unexpected method call 'c()'\n" +
+                       "  strict:\n" +
+                       "    'a()': expected 1, actual 1\n" +
+                       "    'b()': expected 1, actual 0\n" +
+                       "    'c()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 mock.a()
                 mock.c()
-                mock.b()
             }
         }
+        assertEquals expected, message
     }
 
     void testStrictClosureWithTimesExpectations() {
@@ -98,13 +105,16 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             mock.c()
             mock.d()
         }
-        shouldFail { // TODO: check the message
+        def expected = "Unexpected method call 'b()'\n" +
+                       "  strict:\n" +
+                       "    'c()': expected 1, actual 0\n" +
+                       "    'd()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 mock.b()
-                mock.c()
-                mock.d()
             }
         }
+        assertEquals expected, message
     }
 
     void testStrictClosureShouldVerify() {
@@ -113,11 +123,16 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             mock.a()
             mock.b()
         }
-        shouldFail { // TODO: check the message
+        def expected = "Expectation not matched on verify:\n" +
+                       "  strict:\n" +
+                       "    'a()': expected 1, actual 1\n" +
+                       "    'b()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 mock.a()
             }
         }
+        assertEquals expected, message
     }
 
     void testOneStrictClosureWithMultiMocks() {
@@ -168,14 +183,19 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             m3.b()
             m1.c()
         }
-        shouldFail { // TODO: check the message
+        def expected = "Unexpected method call 'b()' on 'Mock for Object (3)'\n" +
+                       "  strict:\n" +
+                       "    'a()' on 'Mock for Object (1)': expected 1, actual 1\n" +
+                       "    'b()' on 'Mock for Object (2)': expected 1, actual 0\n" +
+                       "    'b()' on 'Mock for Object (3)': expected 1, actual 0\n" +
+                       "    'c()' on 'Mock for Object (1)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 m1.a()
                 m3.b()
-                m2.b()
-                m1.c()
             }
         }
+        assertEquals expected, message
     }
 
     void testTwoStrictClosuresWithOneMock() {
@@ -223,14 +243,20 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             mock.a()
             mock.c()
         }
-        shouldFail { // TODO: check the message
+        def expected = "Unexpected method call 'c()'\n" +
+                       "  strict:\n" +
+                       "    'a()': expected 1, actual 1\n" +
+                       "    'b()': expected 1, actual 0\n" +
+                       "  strict:\n" +
+                       "    'a()': expected 1, actual 0\n" +
+                       "    'c()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 mock.a()
                 mock.c()
-                mock.a()
-                mock.b()
             }
         }
+        assertEquals expected, message
     }
 
     void testTwoStrictClosuresWithOneMockAndTimesExpectations() {
@@ -364,13 +390,18 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             m2.a.set(2)
             m1.a.returns(0)
         }
-        shouldFail { // TODO: check the message
+        def expected = "Unexpected property getter call 'a' on 'Mock for Object (1)'\n" +
+                       "  strict:\n" +
+                       "    'a = 1' on 'Mock for Object (1)': expected 1, actual 1\n" +
+                       "    'a = 2' on 'Mock for Object (2)': expected 1, actual 0\n" +
+                       "    'a' on 'Mock for Object (1)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 m1.a = 1
                 assertEquals 0, m1.a
-                m2.a = 2
             }
         }
+        assertEquals expected, message
     }
 
     void testStrictClosureWithStaticMocking() {
@@ -400,13 +431,18 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             mockLoader.static.b()
             mockLoader.static.c()
         }
-        shouldFail { // TODO: check the message
+        def expected = "Unexpected static method call 'Loader.c()'\n" +
+                       "  strict:\n" +
+                       "    'Loader.a()': expected 1, actual 1\n" +
+                       "    'Loader.b()': expected 1, actual 0\n" +
+                       "    'Loader.c()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 Loader.a()
                 Loader.c()
-                Loader.b()
             }
         }
+        assertEquals expected, message
     }
 
     void testStrictClosureWithStaticPropertyMocking() {
@@ -438,14 +474,20 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             mockLoader.static.c.set(3)
             mockLoader.static.a.returns(4)
         }
-        shouldFail { // TODO: check the message
+        def expected = "Unexpected static property getter call 'Loader.a'\n" +
+                       "  strict:\n" +
+                       "    'Loader.a = 1': expected 1, actual 1\n" +
+                       "    'Loader.b = 2': expected 1, actual 1\n" +
+                       "    'Loader.c = 3': expected 1, actual 0\n" +
+                       "    'Loader.a': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 Loader.a = 1
                 Loader.b = 2
                 assertEquals 4, Loader.a
-                Loader.c = 3
             }
         }
+        assertEquals expected, message
     }
 
     void testStrictClosureWithConstructorMocking() {
@@ -471,13 +513,18 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             mock(Loader, constructor(2))
             mock(Loader, constructor(3))
         }
-        shouldFail { // TODO: check the message
+        def expected = "Unexpected constructor call 'new Loader(3)'\n" +
+                       "  strict:\n" +
+                       "    'new Loader(1)': expected 1, actual 1\n" +
+                       "    'new Loader(2)': expected 1, actual 0\n" +
+                       "    'new Loader(3)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 new Loader(1)
                 new Loader(3)
-                new Loader(2)
             }
         }
+        assertEquals expected, message
     }
 
     void testStrictOrderingWithAllKindOfMocking() {
@@ -510,16 +557,24 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             }
             mock(Loader).static.finalize()
         }
-        shouldFail { // TODO: check the message
+        def expected = "Unexpected static method call 'Loader.finalize()'\n" +
+                       "  strict:\n" +
+                       "    'Loader.init()': expected 1, actual 1\n" +
+                       "    'new Loader()': expected 1, actual 1\n" +
+                       "    'load(1)' on 'Mock for Loader (2)': expected 1, actual 1\n" +
+                       "    'name = \"test\"' on 'Mock for Loader (2)': expected 1, actual 1\n" +
+                       "    'name' on 'Mock for Loader (2)': expected 1, actual 0\n" +
+                       "    'Loader.finalize()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 Loader.init()
                 def loader = new Loader()
                 assertEquals 2, loader.load(1)
                 loader.name = 'test'
                 Loader.finalize()
-                assertEquals 'correct', loader.name
             }
         }
+        assertEquals expected, message
     }
 
     void testStrictClosureShouldValidate1() {
@@ -862,7 +917,14 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             }
             mockLock.unlock().returns(true)
         }
-        shouldFail { // TODO: check the message
+        def expected = "Unexpected method call 'unlock()' on 'Mock for Object (1)'\n" +
+                       "  strict:\n" +
+                       "    'lock()' on 'Mock for Object (1)': expected 1, actual 1\n" +
+                       "    loose:\n" +
+                       "      'b()' on 'Mock for Object (2)': expected 2..3, actual 1\n" +
+                       "      'c()' on 'Mock for Object (2)': expected any times, actual 3\n" +
+                       "    'unlock()' on 'Mock for Object (1)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 assertTrue mockLock.lock()
                 assertEquals 3, mockOther.c()
@@ -872,6 +934,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                 mockLock.unlock()
             }
         }
+        assertEquals expected, message
     }
 
     void testLooseClosureInsideStrictClosureShouldValidate() {
@@ -900,12 +963,19 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                 mock.c()
             }
         }
-        shouldFail { // TODO: check the message
+        def expected = "Expectation not matched on verify:\n" +
+                       "  strict:\n" +
+                       "    'a()': expected 1, actual 1\n" +
+                       "    loose:\n" +
+                       "      'b()': expected 1, actual 0\n" +
+                       "      'c()': expected 1, actual 1"
+        def message = shouldFail(AssertionFailedError) {
             play {
                 mock.a()
                 mock.c()
             }
         }
+        assertEquals expected, message
     }
 
     void testNonfixedTimesAfterLooseClosureShouldBeFine() {
@@ -1021,6 +1091,50 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             assertEquals 2, Loader.b()
             assertEquals 4, Loader.d()
         }
+    }
+
+    void testErrorMessageWithMultipleMocksAndMultipleStrictClosures() {
+        def m1 = mock(), m2 = mock(), m3 = mock()
+        strict {
+            m1.a().times(2)
+            m1.a().times(1..2)
+            loose {
+                m2.b()
+                m3.c()
+                m2.b().times(2..3)
+            }
+            m3.c().atMost(2)
+        }
+        m1.a()
+        strict { loose {}; loose {} }
+        strict {
+            m1.a()
+            m2.b()
+            m1.a().times(2)
+        }
+        m2.b().never()
+        m1.a().atLeast(2)
+
+        def expected = "Unexpected method call 'b()' on 'Mock for Object (2)'\n" +
+                       "  strict:\n" +
+                       "    'a()' on 'Mock for Object (1)': expected 3..4, actual 0\n" +
+                       "    loose:\n" +
+                       "      'b()' on 'Mock for Object (2)': expected 3..4, actual 0\n" +
+                       "      'c()' on 'Mock for Object (3)': expected 1, actual 0\n" +
+                       "    'c()' on 'Mock for Object (3)': expected at most 2, actual 0\n" +
+                       "  strict:\n" +
+                       "    'a()' on 'Mock for Object (1)': expected 1, actual 0\n" +
+                       "    'b()' on 'Mock for Object (2)': expected 1, actual 0\n" +
+                       "    'a()' on 'Mock for Object (1)': expected 2, actual 0\n" +
+                       "  unordered:\n" +
+                       "    'a()' on 'Mock for Object (1)': expected at least 3, actual 0\n" +
+                       "    'b()' on 'Mock for Object (2)': expected never, actual 0 (+1)"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                m2.b()
+            }
+        }
+        assertEquals expected, message
     }
 
 }

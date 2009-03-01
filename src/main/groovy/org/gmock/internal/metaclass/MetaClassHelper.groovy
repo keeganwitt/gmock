@@ -16,7 +16,6 @@
 package org.gmock.internal.metaclass
 
 import org.gmock.GMock
-import static junit.framework.Assert.fail
 import org.gmock.internal.signature.*
 
 class MetaClassHelper {
@@ -26,15 +25,14 @@ class MetaClassHelper {
         if (expectation){
             return expectation.answer(arguments)
         } else {
-            def callState = expectations.callState(signature).toString()
-            if (callState) { callState = "\n$callState" }
-            fail("$message '${signature}'$callState")
+            controller.fail(message, signature)
         }
     }
 
     static addToExpectations(expectation, expectations, controller) {
         if (!controller.ordered) {
             expectations.add(expectation)
+            controller.unorderedExpectations.add(expectation)
         } else {
             controller.orderedExpectations.add(expectation)
         }

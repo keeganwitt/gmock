@@ -59,7 +59,7 @@ class PropertyGetSignatureTest extends GroovyTestCase {
 
     void testToString() {
         def signature = new PropertyGetSignature(new Object(), "tostring")
-        assertEquals "tostring", signature.toString()
+        assertEquals "'tostring'", signature.toString()
     }
 
 }

@@ -34,8 +34,7 @@ class ClassExpectations {
     def addConstructorExpectation(aClass, expectation){
         ClassProxyMetaClass proxy = proxies.get(aClass)
         if (!proxy){
-            proxy = ClassProxyMetaClass.getInstance(aClass)
-            proxy.controller = controller
+            proxy = ClassProxyMetaClass.getInstance(aClass, controller)
             proxies.put(aClass, proxy)
         }
         proxy.addConstructorExpectation(expectation)
@@ -44,8 +43,7 @@ class ClassExpectations {
     def addStaticExpectation(aClass, expectation){
         ClassProxyMetaClass proxy = proxies.get(aClass)
         if (!proxy){
-            proxy = ClassProxyMetaClass.getInstance(aClass)
-            proxy.controller = controller
+            proxy = ClassProxyMetaClass.getInstance(aClass, controller)
             proxies.put(aClass, proxy)
         }
         proxy.addStaticExpectation(expectation)

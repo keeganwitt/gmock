@@ -20,10 +20,12 @@ import org.gmock.GMockTestCase
 import org.gmock.internal.signature.MethodSignature
 import org.gmock.internal.times.RangeTimes
 import org.gmock.internal.times.StrictTimes
+import org.gmock.internal.callstate.CallState
 
 class ExpectationCollectionTest extends GMockTestCase {
 
-    ExpectationCollection expectations = new ExpectationCollection()
+    def mockController = mock()
+    ExpectationCollection expectations = new ExpectationCollection(mockController)
     def mockExpectation1 = mock()
     def mockExpectation2 = mock()
     def mockExpectation3 = mock()
@@ -63,33 +65,13 @@ class ExpectationCollectionTest extends GMockTestCase {
     }
 
     void testVerifyFailed() {
-        def mockCallState = mock(CallState, constructor())
-        mockCallState.append(mockExpectation1)
-        mockCallState.append(mockExpectation2)
-        mockCallState.append(mockExpectation3)
-        mockCallState.toString().returns("mockCallState")
         mockExpectation1.isVerified().returns(true)
         mockExpectation2.isVerified().returns(false)
         expectations.expectations = [mockExpectation1, mockExpectation2, mockExpectation3]
-        def expected = "Expectation not matched on verify:\nmockCallState"
+        mockController.fail("Expectation not matched on verify:")
 
         play {
-            def message = shouldFail(AssertionFailedError) {
-                expectations.verify()
-            }
-            assertEquals expected, message
-        }
-    }
-
-    void testCallState() {
-        def mockCallState = mock(CallState, constructor())
-        mockCallState.append(mockExpectation1)
-        mockCallState.append(mockExpectation2)
-        mockCallState.append(mockExpectation3)
-        expectations.expectations = [mockExpectation1, mockExpectation2, mockExpectation3]
-
-        play {
-            assertEquals mockCallState, expectations.callState()
+            expectations.verify()
         }
     }
 

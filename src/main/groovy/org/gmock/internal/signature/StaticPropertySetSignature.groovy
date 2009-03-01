@@ -31,11 +31,11 @@ class StaticPropertySetSignature {
 
     def validate() {}
 
-    String toString() {
+    String toString(boolean showMockName = false) {
         if (method) {
-            return "${clazz.simpleName}.$method($argument)"
+            return "'${clazz.simpleName}.$method($argument)'"
         } else {
-            return "${clazz.simpleName}.$property = $argument"
+            return "'${clazz.simpleName}.$property = $argument'"
         }
     }
 

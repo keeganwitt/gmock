@@ -28,20 +28,22 @@ import static org.gmock.internal.metaclass.MetaClassHelper.*
  */
 class ClassProxyMetaClass extends ProxyMetaClass {
 
-    ExpectationCollection constructorExpectations = new ExpectationCollection()
-    ExpectationCollection staticExpectations = new ExpectationCollection()
-    boolean constructorExpectationsEmpty = true
-    boolean staticExpectationsEmpty = true
+    ExpectationCollection constructorExpectations
+    ExpectationCollection staticExpectations
+    boolean constructorExpectationsEmpty
+    boolean staticExpectationsEmpty
     def controller
 
-    public ClassProxyMetaClass(MetaClassRegistry metaClassRegistry, Class aClass, MetaClass adaptee) throws IntrospectionException {
+    public ClassProxyMetaClass(MetaClassRegistry metaClassRegistry, Class aClass, MetaClass adaptee, controller) throws IntrospectionException {
         super(metaClassRegistry, aClass, adaptee)
+        this.controller = controller
+        reset()
     }
 
-    static getInstance(theClass){
+    static getInstance(theClass, controller) {
         MetaClassRegistry registry = GroovySystem.metaClassRegistry
         MetaClass adaptee = registry.getMetaClass(theClass)
-        return new ClassProxyMetaClass(registry, theClass, adaptee)
+        return new ClassProxyMetaClass(registry, theClass, adaptee, controller)
     }
 
     def addConstructorExpectation(expectation) {
@@ -77,8 +79,8 @@ class ClassProxyMetaClass extends ProxyMetaClass {
     }
 
     def reset() {
-        constructorExpectations = new ExpectationCollection()
-        staticExpectations = new ExpectationCollection()
+        constructorExpectations = new ExpectationCollection(controller)
+        staticExpectations = new ExpectationCollection(controller)
         constructorExpectationsEmpty = true
         staticExpectationsEmpty = true
     }

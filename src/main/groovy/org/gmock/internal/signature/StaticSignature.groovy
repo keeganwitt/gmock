@@ -31,8 +31,8 @@ class StaticSignature {
         this.arguments = new ParameterSignature(arguments)
     }
 
-    String toString() {
-        "${aClass.simpleName}.$methodName($arguments)"
+    String toString(boolean showMockName = false) {
+        "'${aClass.simpleName}.$methodName($arguments)'"
     }
 
     def validate(){

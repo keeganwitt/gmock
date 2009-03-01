@@ -65,7 +65,7 @@ class MethodSignatureTest extends GroovyTestCase {
 
     void testToString() {
         def signature = new MethodSignature(new Object(), "someOperate", ["test", 3, true])
-        assertEquals 'someOperate("test", 3, true)', signature.toString()
+        assertEquals "'someOperate(\"test\", 3, true)'", signature.toString()
     }
 
 }

@@ -27,12 +27,15 @@ import org.gmock.internal.recorder.InvokeConstructorRecorder
 import org.gmock.internal.recorder.MockNameRecorder
 import org.objenesis.ObjenesisHelper
 import static org.gmock.internal.InternalModeHelper.doInternal
+import junit.framework.Assert
+import org.gmock.internal.callstate.CallState
 
 class InternalMockController implements MockController {
 
     def mocks = []
     def classExpectations = new ClassExpectations(this)
     def orderedExpectations = new OrderedExpectations(this)
+    def unorderedExpectations = new ExpectationCollection(this)
     def defaultNames = [:]
 
     boolean replay = false
@@ -189,6 +192,7 @@ class InternalMockController implements MockController {
                 mocks*.reset()
                 classExpectations.reset()
                 orderedExpectations.reset()
+                unorderedExpectations.reset()
             }
         }
     }
@@ -271,6 +275,23 @@ class InternalMockController implements MockController {
         } else {
             return ObjenesisHelper.newInstance(clazz)
         }
+    }
+
+    def fail(message, signature = null) {
+        def callState = callState(signature).toString()
+        if (callState) { callState = "\n$callState" }
+        signature = signature ? ' ' + signature.toString(mocks.size() > 1) : ''
+        Assert.fail("$message$signature$callState")
+    }
+
+    private callState(signature) {
+        def callState = new CallState(mocks.size() > 1, !orderedExpectations.empty)
+        orderedExpectations.appendToCallState(callState)
+        unorderedExpectations.appendToCallState(callState)
+        if (signature) {
+            callState.nowCalling(signature)
+        }
+        return callState
     }
 
 }

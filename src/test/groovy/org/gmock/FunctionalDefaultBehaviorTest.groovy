@@ -95,8 +95,8 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
             assertEquals System.identityHashCode(m1), m1.hashCode()
             assertEquals "Mock for Object (1)", m1.toString()
 
-            def expected = "Unexpected method call 'equals(Mock for Object (2))'\n" +
-                           "  'equals(Mock for Object (2))': expected 1, actual 1 (+1)"
+            def expected = "Unexpected method call 'equals(Mock for Object (2))' on 'Mock for Object (1)'\n" +
+                           "  'equals(Mock for Object (2))' on 'Mock for Object (1)': expected 1, actual 1 (+1)"
             def message = shouldFail(AssertionFailedError) {
                 m1.equals(m2)
             }
@@ -112,8 +112,8 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
             assertFalse m1 == m2
             assertEquals "Mock for Object (1)", m1.toString()
 
-            def expected = "Unexpected method call 'hashCode()'\n" +
-                           "  'hashCode()': expected 1, actual 1 (+1)"
+            def expected = "Unexpected method call 'hashCode()' on 'Mock for Object (1)'\n" +
+                           "  'hashCode()' on 'Mock for Object (1)': expected 1, actual 1 (+1)"
             def message = shouldFail(AssertionFailedError) {
                 m1.hashCode()
             }
@@ -129,8 +129,8 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
             assertFalse m1 == m2
             assertEquals System.identityHashCode(m1), m1.hashCode()
 
-            def expected = "Unexpected method call 'toString()'\n" +
-                           "  'toString()': expected 1, actual 1 (+1)"
+            def expected = "Unexpected method call 'toString()' on 'Mock for Object (1)'\n" +
+                           "  'toString()' on 'Mock for Object (1)': expected 1, actual 1 (+1)"
             def message = shouldFail(AssertionFailedError) {
                 m1.toString()
             }
