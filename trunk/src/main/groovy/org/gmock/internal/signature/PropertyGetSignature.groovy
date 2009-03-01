@@ -17,10 +17,12 @@ package org.gmock.internal.signature
 
 class PropertyGetSignature {
 
+    def object
     def propertyName
     def methodName
 
-    PropertyGetSignature(propertyName, methodName = null) {
+    PropertyGetSignature(object, propertyName, methodName = null) {
+        this.object = object
         this.propertyName = propertyName
         this.methodName = methodName
     }
@@ -36,8 +38,14 @@ class PropertyGetSignature {
     def validate(){
     }
 
-    boolean equals(Object getSignature) {
+    private boolean equalsWithoutName(Object getSignature) {
         if (getSignature == null || getClass() != getSignature.getClass()) return false
+        if (!object.is(getSignature.object)) return false
+        return true
+    }
+
+    boolean equals(Object getSignature) {
+        if (!equalsWithoutName(getSignature)) return false
         if (methodName || getSignature.methodName) {
             if (methodName != getSignature.methodName) return false
         } else {
@@ -47,13 +55,13 @@ class PropertyGetSignature {
     }
 
     boolean match(Object getSignature) {
-        if (getSignature == null || getClass() != getSignature.getClass()) return false
+        if (!equalsWithoutName(getSignature)) return false
         if (propertyName != getSignature.propertyName) return false
         return true
     }
 
     int hashCode() {
-        propertyName.hashCode()
+        object.hashCode() * 31 + propertyName.hashCode()
     }
 
 }

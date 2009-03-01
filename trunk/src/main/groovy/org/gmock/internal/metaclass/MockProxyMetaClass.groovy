@@ -55,16 +55,16 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee.invokeMethod(receiver, methodName, arguments)
         } {
-            def signature = newSignatureForMethod(methodName, arguments)
+            def signature = newSignatureForMethod(this, methodName, arguments)
             if (controller.replay){
-                return findExpectation(expectations, signature, "Unexpected method call", arguments, controller, this)
+                return findExpectation(expectations, signature, "Unexpected method call", arguments, controller)
             } else {
                 if (methodName == "static" && arguments.length == 1 && arguments[0] instanceof Closure) {
                     invokeStaticExpectationClosure(arguments[0])
                     return null
                 } else {
                     def expectation = new Expectation(signature: signature)
-                    addToExpectations(expectation, expectations, controller, this)
+                    addToExpectations(expectation, expectations, controller)
                     return new ReturnMethodRecorder(expectation)
                 }
             }
@@ -95,15 +95,15 @@ class MockProxyMetaClass extends ProxyMetaClass {
             adaptee.getProperty(receiver, property)
         } {
             if (controller.replay){
-                def signature = new PropertyGetSignature(property)
-                return findExpectation(expectations, signature, "Unexpected property getter call", [], controller, this)
+                def signature = new PropertyGetSignature(this, property)
+                return findExpectation(expectations, signature, "Unexpected property getter call", [], controller)
             } else {
                 if (property == "static"){
                     return new StaticMethodRecoder(theClass, classExpectations, controller)
                 } else {
                     def expectation = new Expectation()
-                    addToExpectations(expectation, expectations, controller, this)
-                    return new PropertyRecorder(property, expectation)
+                    addToExpectations(expectation, expectations, controller)
+                    return new PropertyRecorder(this, property, expectation)
                 }
             }
         }
@@ -118,8 +118,8 @@ class MockProxyMetaClass extends ProxyMetaClass {
             adaptee.setProperty(receiver, property, value)
         } {
             if (controller.replay){
-                def signature = new PropertySetSignature(property, value)
-                findExpectation(expectations, signature, "Unexpected property setter call", [value], controller, this)
+                def signature = new PropertySetSignature(this, property, value)
+                findExpectation(expectations, signature, "Unexpected property setter call", [value], controller)
             } else {
                 throw new MissingPropertyException("Cannot use property setter in record mode. " +
                         "Are you trying to mock a setter? Use '${property}.set(${value.inspect()})' instead.")
@@ -158,9 +158,9 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     private addMethodDefaultBehavior(methodName, arguments, result) {
-        def signature = new MethodSignature(methodName, arguments)
-        if (!expectations.findSignature(signature) && !controller.orderedExpectations.findSignature(this, signature)) {
-            def expectation = new Expectation(signature: signature, result: result, times: AnyTimes.INSTANCE, hidden: true, mock: this)
+        def signature = new MethodSignature(this, methodName, arguments)
+        if (!expectations.findSignature(signature) && !controller.orderedExpectations.findSignature(signature)) {
+            def expectation = new Expectation(signature: signature, result: result, times: AnyTimes.INSTANCE, hidden: true)
             expectations.add(expectation)
         }
     }

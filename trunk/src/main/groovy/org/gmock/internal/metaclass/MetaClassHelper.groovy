@@ -21,8 +21,8 @@ import org.gmock.internal.signature.*
 
 class MetaClassHelper {
 
-    static findExpectation(expectations, signature, message, arguments, controller, mock) {
-        def expectation = controller.orderedExpectations.findMatching(mock, signature) ?: expectations.findMatching(signature)
+    static findExpectation(expectations, signature, message, arguments, controller) {
+        def expectation = controller.orderedExpectations.findMatching(signature) ?: expectations.findMatching(signature)
         if (expectation){
             return expectation.answer(arguments)
         } else {
@@ -32,8 +32,7 @@ class MetaClassHelper {
         }
     }
 
-    static addToExpectations(expectation, expectations, controller, mock) {
-        expectation.mock = mock
+    static addToExpectations(expectation, expectations, controller) {
         if (!controller.ordered) {
             expectations.add(expectation)
         } else {
@@ -41,13 +40,13 @@ class MetaClassHelper {
         }
     }
 
-    static newSignatureForMethod(methodName, arguments) {
+    static newSignatureForMethod(mock, methodName, arguments) {
         if (isGetter(methodName, arguments)) {
-            return new PropertyGetSignature(getPropertyForGetter(methodName), methodName)
+            return new PropertyGetSignature(mock, getPropertyForGetter(methodName), methodName)
         } else if (isSetter(methodName, arguments)) {
-            return new PropertySetSignature(getPropertyForSetter(methodName), arguments[0], methodName)
+            return new PropertySetSignature(mock, getPropertyForSetter(methodName), arguments[0], methodName)
         } else {
-            return new MethodSignature(methodName, arguments)
+            return new MethodSignature(mock, methodName, arguments)
         }
     }
 

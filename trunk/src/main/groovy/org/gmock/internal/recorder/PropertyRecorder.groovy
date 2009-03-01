@@ -24,12 +24,14 @@ import org.gmock.internal.signature.PropertyUncompleteSignature
 
 class PropertyRecorder extends BaseRecorder {
 
+    def mock
     def propertyName
 
-    PropertyRecorder(propertyName, expectation) {
+    PropertyRecorder(mock, propertyName, expectation) {
         super(expectation)
+        this.mock = mock
         this.propertyName = propertyName
-        this.expectation.signature = new PropertyUncompleteSignature(propertyName)
+        this.expectation.signature = new PropertyUncompleteSignature(mock, propertyName)
     }
 
     def sets(value) {
@@ -37,20 +39,20 @@ class PropertyRecorder extends BaseRecorder {
     }
 
     def set(value) {
-        expectation.signature = new PropertySetSignature(propertyName, value)
+        expectation.signature = new PropertySetSignature(mock, propertyName, value)
         expectation.result = ReturnNull.INSTANCE
         return this
     }
 
     def returns(value) {
-        expectation.signature = new PropertyGetSignature(propertyName)
+        expectation.signature = new PropertyGetSignature(mock, propertyName)
         expectation.result = new ReturnValue(value)
         return this
     }
 
     private doRaises(Object[] params) {
         if (expectation.signature.class == PropertyUncompleteSignature){
-            expectation.signature = new PropertyGetSignature(propertyName)
+            expectation.signature = new PropertyGetSignature(mock, propertyName)
         }
         expectation.result = ThrowException.metaClass.invokeConstructor(params)
         return this

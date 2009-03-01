@@ -28,15 +28,15 @@ import org.gmock.internal.times.AnyTimes
 class PropertyRecorderTest extends GMockTestCase {
 
     void testRecordGetProperty(){
-        def getSignature = mock(PropertyGetSignature, constructor("name"))
+        def object = new Object()
+        def getSignature = mock(PropertyGetSignature, constructor(object, "name"))
 
         def mockExpectations = mock()
         def expectation = new Expectation(signatureObserver: mockExpectations)
         mockExpectations.signatureChanged(expectation).times(2)
 
-
         play {
-            PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
+            PropertyRecorder propertyRecorder = new PropertyRecorder(object, "name", expectation)
             propertyRecorder.returns("a name")
         }
 
@@ -46,7 +46,8 @@ class PropertyRecorderTest extends GMockTestCase {
     }
 
     void testRecordSetProperty(){
-        def setSignature = mock(PropertySetSignature, constructor("name", "a value"))
+        def object = new Object()
+        def setSignature = mock(PropertySetSignature, constructor(object, "name", "a value"))
 
         def mockExpectations = mock()
         def expectation = new Expectation(signatureObserver: mockExpectations)
@@ -54,7 +55,7 @@ class PropertyRecorderTest extends GMockTestCase {
 
 
         play {
-            PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
+            PropertyRecorder propertyRecorder = new PropertyRecorder(object, "name", expectation)
             propertyRecorder.set("a value")
         }
 
@@ -69,7 +70,7 @@ class PropertyRecorderTest extends GMockTestCase {
         expectation.times.set(match { it instanceof AnyTimes })
 
         play {
-            PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
+            PropertyRecorder propertyRecorder = new PropertyRecorder(new Object(), "name", expectation)
             propertyRecorder.stub()
         }
     }
@@ -79,7 +80,7 @@ class PropertyRecorderTest extends GMockTestCase {
         def expectation = new Expectation(signatureObserver: mockExpectations)
         mockExpectations.checkTimes(expectation)
 
-        PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
+        PropertyRecorder propertyRecorder = new PropertyRecorder(new Object(), "name", expectation)
         def exception = new RuntimeException()
 
         assertEquals propertyRecorder, propertyRecorder.raises(exception)
@@ -94,7 +95,7 @@ class PropertyRecorderTest extends GMockTestCase {
         def expectation = new Expectation(signatureObserver: mockExpectations)
         mockExpectations.checkTimes(expectation)
 
-        PropertyRecorder propertyRecorder = new PropertyRecorder("name", expectation)
+        PropertyRecorder propertyRecorder = new PropertyRecorder(new Object(), "name", expectation)
         def cause = new RuntimeException()
 
         assertEquals propertyRecorder, propertyRecorder.raises(Exception, "test", cause)

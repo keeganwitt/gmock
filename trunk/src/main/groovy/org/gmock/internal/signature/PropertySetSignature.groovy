@@ -17,11 +17,13 @@ package org.gmock.internal.signature
 
 class PropertySetSignature {
 
+    def object
     def propertyName
     def argument
     def methodName
 
-    PropertySetSignature(propertyName, argument, methodName = null) {
+    PropertySetSignature(object, propertyName, argument, methodName = null) {
+        this.object = object
         this.propertyName = propertyName
         this.argument = new ParameterSignature([argument])
         this.methodName = methodName
@@ -38,8 +40,14 @@ class PropertySetSignature {
     def validate(){
     }
 
-    boolean equals(Object setSignature) {
+    private boolean equalsWithoutName(Object setSignature) {
         if (setSignature == null || getClass() != setSignature.getClass()) return false
+        if (!object.is(setSignature.object)) return false
+        return true
+    }
+
+    boolean equals(Object setSignature) {
+        if (!equalsWithoutName(setSignature)) return false
         if (methodName || setSignature.methodName) {
             if (methodName != setSignature.methodName) return false
         } else {
@@ -50,14 +58,14 @@ class PropertySetSignature {
     }
 
     boolean match(Object setSignature) {
-        if (setSignature == null || getClass() != setSignature.getClass()) return false
+        if (!equalsWithoutName(setSignature)) return false
         if (propertyName != setSignature.propertyName) return false
         if (!argument.match(setSignature.argument)) return false
         return true
     }
 
     int hashCode() {
-        propertyName.hashCode() * 31 + argument.hashCode()
+        object.hashCode() * 51 + propertyName.hashCode() * 31 + argument.hashCode()
     }
 
 }

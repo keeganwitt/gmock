@@ -41,7 +41,7 @@ class ExpectationCollectionTest extends GMockTestCase {
     }
 
     void testFindMatching() {
-        def signature = new MethodSignature("method", [1, 2])
+        def signature = new MethodSignature(new Object(), "method", [1, 2])
         mockExpectation1.canCall(signature).returns(false)
         mockExpectation2.canCall(signature).returns(true)
         expectations.expectations = [mockExpectation1, mockExpectation2, mockExpectation3]
@@ -102,8 +102,9 @@ class ExpectationCollectionTest extends GMockTestCase {
     }
 
     void testCheckTimes() {
-        def signature1 = new MethodSignature("a", [1])
-        def signature2 = new MethodSignature("b", [2])
+        def object = new Object()
+        def signature1 = new MethodSignature(object, "a", [1])
+        def signature2 = new MethodSignature(object, "b", [2])
         mockExpectation3.is(mockExpectation3).returns(true)
         mockExpectation2.is(mockExpectation3).returns(false)
         mockExpectation1.is(mockExpectation3).returns(false)
@@ -119,7 +120,7 @@ class ExpectationCollectionTest extends GMockTestCase {
     }
 
     void testCheckTimesFailed() {
-        def signature = new MethodSignature("a", [1])
+        def signature = new MethodSignature(new Object(), "a", [1])
 
         mockExpectation3.is(mockExpectation3).returns(true)
         mockExpectation2.is(mockExpectation3).returns(false)

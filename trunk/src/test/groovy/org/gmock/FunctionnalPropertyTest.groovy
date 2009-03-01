@@ -454,7 +454,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def mockLoader = mock()
         mockLoader.nonCompleteProperty
 
-        def expected = "Missing property expectation for 'nonCompleteProperty'"
+        def expected = "Missing property expectation for 'nonCompleteProperty' on 'Mock for Object'"
         def message = shouldFail(IllegalStateException) {
             play {}
         }
