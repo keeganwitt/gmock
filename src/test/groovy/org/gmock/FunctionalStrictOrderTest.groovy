@@ -527,7 +527,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         strict {
             mock.a
         }
-        def expected = "Missing property expectation for 'a'"
+        def expected = "Missing property expectation for 'a' on 'Mock for Object'"
         def message = shouldFail(IllegalStateException) {
             play {}
         }
@@ -884,7 +884,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             }
             mock.d()
         }
-        def expected = "Missing property expectation for 'c'"
+        def expected = "Missing property expectation for 'c' on 'Mock for Object'"
         def message = shouldFail(IllegalStateException) {
             play {}
         }

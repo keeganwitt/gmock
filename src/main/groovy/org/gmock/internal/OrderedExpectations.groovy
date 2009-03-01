@@ -15,6 +15,7 @@
  */
 package org.gmock.internal
 
+import org.gmock.internal.ExpectationCollection as LooseGroup
 import org.gmock.internal.times.StrictTimes
 import static org.junit.Assert.fail
 
@@ -39,16 +40,20 @@ class OrderedExpectations {
         groups.last().add(expectation)
     }
 
-    def findMatching(mock, signature) {
+    def findMatching(signature) {
+        findWith("findMatching", signature)
+    }
+
+    def findSignature(signature) {
+        findWith("findSignature", signature)
+    }
+
+    private findWith(method, signature) {
         for (group in groups) {
-            def expectation = group.findMatching(mock, signature)
+            def expectation = group."$method"(signature)
             if (expectation) return expectation
         }
         return null
-    }
-
-    def findSignature(mock, signature) {
-        groups.find { it.findSignature(mock, signature) }
     }
 
     def validate() {
@@ -88,11 +93,11 @@ class StrictGroup {
         expectations << new LooseGroup()
     }
 
-    def findMatching(mock, signature) {
+    def findMatching(signature) {
         def backup = current
         for (; current < expectations.size(); ++current) {
             def expectation = expectations[current]
-            def found = expectation.findMatching(mock, signature)
+            def found = expectation.findMatching(signature)
             if (found) return found
             if (!expectation.satisfied()) {
                 break
@@ -112,9 +117,9 @@ class StrictGroup {
         }
     }
 
-    def findSignature(mock, signature) {
+    def findSignature(signature) {
         for (expectation in expectations) {
-            def found = expectation.findSignature(mock, signature)
+            def found = expectation.findSignature(signature)
             if (found) return found
         }
         return null
@@ -126,8 +131,7 @@ class StrictGroup {
             def exps = last.is(expectation) ? expectations.subList(0, expectations.size() - 1) : expectations
             if (!exps.empty) {
                 last = exps.last()
-                if (last instanceof Expectation && last.signature == expectation.signature &&
-                        last.mock.is(expectation.mock) && !(last.times instanceof StrictTimes)) {
+                if (last instanceof Expectation && last.signature == expectation.signature && !(last.times instanceof StrictTimes)) {
                     expectations = exps
                     throw new IllegalStateException("Last method called on mock already has a non-fixed count set.")
                 }
@@ -137,26 +141,6 @@ class StrictGroup {
 
     void signatureChanged(expectation) {
         checkTimes(expectation)
-    }
-
-}
-
-class LooseGroup extends ExpectationCollection {
-
-    def isVerified() {
-        expectations.every { it.isVerified() }
-    }
-
-    def satisfied() {
-        expectations.every { it.satisfied() }
-    }
-
-    def findMatching(mock, signature) {
-        expectations.find { it.findMatching(mock, signature) }
-    }
-
-    def findSignature(mock, signature) {
-        expectations.find { it.findSignature(mock, signature) }
     }
 
 }

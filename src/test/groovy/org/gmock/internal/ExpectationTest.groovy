@@ -27,7 +27,7 @@ class ExpectationTest extends GMockTestCase {
         mockExpectations.signatureChanged(expectation)
 
         play {
-            expectation.signature = new MethodSignature("a method", [])
+            expectation.signature = new MethodSignature(new Object(), "a method", [])
             assertFalse expectation.isVerified()
         }
     }
@@ -38,7 +38,7 @@ class ExpectationTest extends GMockTestCase {
         mockExpectations.signatureChanged(expectation)
 
         play {
-            expectation.signature = new MethodSignature("a method", [])
+            expectation.signature = new MethodSignature(new Object(), "a method", [])
             expectation.times = new AnyTimes()
             assertTrue expectation.isVerified()
         }
@@ -56,14 +56,14 @@ class ExpectationTest extends GMockTestCase {
         mockExpectations.signatureChanged(expectation)
 
         play {
-            expectation.signature = new MethodSignature("method", [1, 2])
+            expectation.signature = new MethodSignature(new Object(), "method", [1, 2])
         }
     }
 
     void testCanCall() {
         def mockTimes = mock()
         mockTimes.stillRemain(3).returns(true)
-        def signature = new MethodSignature("method", [1, 2])
+        def signature = new MethodSignature(new Object(), "method", [1, 2])
         def expectation = new Expectation(times: mockTimes, called: 3)
         expectation.@signature = signature
         play {
@@ -77,7 +77,7 @@ class ExpectationTest extends GMockTestCase {
 
         mockTimes.stillRemain(3).returns(true)
         play {
-            assertFalse expectation.canCall(new MethodSignature("other", []))
+            assertFalse expectation.canCall(new MethodSignature(new Object(), "other", []))
         }
     }
 

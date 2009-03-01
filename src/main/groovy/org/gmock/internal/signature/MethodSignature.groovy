@@ -17,10 +17,12 @@ package org.gmock.internal.signature
 
 class MethodSignature {
 
+    def object
     def methodName
     def arguments
 
-    MethodSignature(methodName, arguments) {
+    MethodSignature(object, methodName, arguments) {
+        this.object = object
         this.methodName = methodName
         this.arguments = new ParameterSignature(arguments)
     }
@@ -34,6 +36,7 @@ class MethodSignature {
 
     private boolean equalsWithoutArguments(Object method) {
         if (method == null || getClass() != method.getClass()) return false
+        if (!object.is(method.object)) return false
         if (methodName != method.methodName) return false
         return true
     }
@@ -51,7 +54,7 @@ class MethodSignature {
     }
 
     int hashCode() {
-        methodName.hashCode() * 31  + arguments.hashCode()
+        object.hashCode() * 51 + methodName.hashCode() * 31 + arguments.hashCode()
     }
 
 }

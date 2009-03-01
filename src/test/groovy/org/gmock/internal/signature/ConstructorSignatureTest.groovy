@@ -32,7 +32,7 @@ class ConstructorSignatureTest extends GroovyTestCase {
 
     void testNotEqualsDifferentClass() {
         def signature1 = new ConstructorSignature(Loader, [1, 2])
-        def signature2 = new MethodSignature("Loader", [1, 2])
+        def signature2 = new MethodSignature(new Object(), "Loader", [1, 2])
         assert signature1 != signature2
     }
 

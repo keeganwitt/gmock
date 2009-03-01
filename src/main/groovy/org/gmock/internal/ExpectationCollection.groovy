@@ -32,9 +32,17 @@ class ExpectationCollection {
     }
 
     void verify(){
-        if (expectations.find { !it.isVerified()} ){
+        if (!isVerified()){
             fail("Expectation not matched on verify:\n${callState()}")
         }
+    }
+
+    def isVerified() {
+        expectations.every { it.isVerified() }
+    }
+
+    def satisfied() {
+        isVerified()
     }
 
     def callState(signature = null) {

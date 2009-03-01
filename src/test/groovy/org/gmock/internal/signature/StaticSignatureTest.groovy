@@ -32,7 +32,7 @@ class StaticSignatureTest extends GroovyTestCase {
 
     void testNotEqualsDifferentClass() {
         def signature1 = new StaticSignature(Loader, "put", [1, 2])
-        def signature2 = new MethodSignature("put", [1, 2])
+        def signature2 = new MethodSignature(new Object(), "put", [1, 2])
         assert signature1 != signature2
     }
 

@@ -26,7 +26,6 @@ class Expectation {
     def times = new StrictTimes(1)
     def called = 0
     def hidden = false
-    def mock
 
     void setSignature(signature) {
         this.signature = signature
@@ -65,12 +64,12 @@ class Expectation {
         return "Expectation [signature: $signature, result: $result, times: $times]"
     }
 
-    def findMatching(mock, signature) {
-        this.mock.is(mock) && canCall(signature) ? this : null
+    def findMatching(signature) {
+        canCall(signature) ? this : null
     }
 
-    def findSignature(mock, signature) {
-        this.mock.is(mock) && signature.match(this.signature) ? this : null
+    def findSignature(signature) {
+        signature.match(this.signature) ? this : null
     }
 
 }

@@ -33,7 +33,7 @@ class ParameterSignatureTest extends GroovyTestCase {
 
     void testNotEqualsDifferentClass() {
         def signature1 = new ParameterSignature([1, 2])
-        def signature2 = new MethodSignature("name", [1, 2])
+        def signature2 = new MethodSignature(new Object(), "name", [1, 2])
         assert signature1 != signature2
     }
 
