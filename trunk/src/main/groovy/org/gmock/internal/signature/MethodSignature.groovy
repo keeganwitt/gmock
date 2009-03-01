@@ -27,8 +27,9 @@ class MethodSignature {
         this.arguments = new ParameterSignature(arguments)
     }
 
-    String toString() {
-        "$methodName($arguments)"
+    String toString(boolean showMockName = false) {
+        def mockName = showMockName ? " on '$object.mockName'" : ""
+        "'$methodName($arguments)'$mockName"
     }
 
     def validate(){

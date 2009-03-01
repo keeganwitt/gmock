@@ -66,7 +66,7 @@ class PropertySetSignatureTest extends GroovyTestCase {
 
     void testToString() {
         def signature = new PropertySetSignature(new Object(), "name", "tostring")
-        assertEquals 'name = "tostring"', signature.toString()
+        assertEquals "'name = \"tostring\"'", signature.toString()
     }
 
 }

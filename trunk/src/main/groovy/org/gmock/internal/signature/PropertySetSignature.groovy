@@ -29,11 +29,12 @@ class PropertySetSignature {
         this.methodName = methodName
     }
 
-    String toString() {
+    String toString(boolean showMockName = false) {
+        def mockName = showMockName ? " on '$object.mockName'" : ""
         if (methodName) {
-            return "$methodName($argument)"
+            return "'$methodName($argument)'$mockName"
         } else {
-            return "$propertyName = $argument"
+            return "'$propertyName = $argument'$mockName"
         }
     }
 

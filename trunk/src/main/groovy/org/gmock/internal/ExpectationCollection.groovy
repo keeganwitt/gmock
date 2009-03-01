@@ -15,12 +15,18 @@
  */
 package org.gmock.internal
 
-import static junit.framework.Assert.fail
 import org.gmock.internal.times.StrictTimes
+import org.gmock.internal.callstate.UnorderedCallState
 
 class ExpectationCollection {
 
     def expectations = []
+    def controller
+    def callStateTitle = "unordered"
+
+    ExpectationCollection(controller) {
+        this.controller = controller
+    }
 
     void add(expectation) {
         expectation.signatureObserver = this
@@ -32,8 +38,8 @@ class ExpectationCollection {
     }
 
     void verify(){
-        if (!isVerified()){
-            fail("Expectation not matched on verify:\n${callState()}")
+        if (!isVerified()) {
+            controller.fail("Expectation not matched on verify:")
         }
     }
 
@@ -45,15 +51,11 @@ class ExpectationCollection {
         isVerified()
     }
 
-    def callState(signature = null) {
-        def callState = new CallState()
-        expectations.each {
-            callState.append(it)
+    def appendToCallState(callState) {
+        if (!empty) {
+            def unorderedCallState = new UnorderedCallState(callState, callStateTitle)
+            expectations.each { unorderedCallState.append(it) }
         }
-        if (signature) {
-            callState.nowCalling(signature)
-        }
-        return callState
     }
 
     def empty(){
@@ -80,6 +82,14 @@ class ExpectationCollection {
 
     def findSignature(signature) {
         expectations.find { signature.match(it.signature) }
+    }
+
+    def reset() {
+        expectations = []
+    }
+
+    boolean isEmpty() {
+        expectations.empty
     }
 
 }

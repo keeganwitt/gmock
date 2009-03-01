@@ -17,7 +17,7 @@ package org.gmock.internal
 
 import org.gmock.internal.ExpectationCollection as LooseGroup
 import org.gmock.internal.times.StrictTimes
-import static org.junit.Assert.fail
+import org.gmock.internal.callstate.OrderedCallState
 
 class OrderedExpectations {
 
@@ -68,6 +68,14 @@ class OrderedExpectations {
         groups = []
     }
 
+    boolean isEmpty() {
+        groups.every { it.empty }
+    }
+
+    def appendToCallState(callState) {
+        groups*.appendToCallState(callState)
+    }
+
 }
 
 class StrictGroup {
@@ -90,7 +98,9 @@ class StrictGroup {
     }
 
     def newLooseGroup() {
-        expectations << new LooseGroup()
+        def looseGroup = new LooseGroup(controller)
+        looseGroup.callStateTitle = "loose"
+        expectations << looseGroup
     }
 
     def findMatching(signature) {
@@ -113,7 +123,7 @@ class StrictGroup {
 
     def verify() {
         if (!expectations.every { it.isVerified() }) {
-            fail() // TODO: the message should be given
+            controller.fail("Expectation not matched on verify:")
         }
     }
 
@@ -141,6 +151,23 @@ class StrictGroup {
 
     void signatureChanged(expectation) {
         checkTimes(expectation)
+    }
+
+    boolean isEmpty() {
+        expectations.empty || expectations.every { it instanceof LooseGroup && it.empty }
+    }
+
+    def appendToCallState(callState) {
+        if (!empty) {
+            def orderedCallState = new OrderedCallState(callState)
+            expectations.each {
+                if (it instanceof Expectation) {
+                    orderedCallState.append(it)
+                } else {
+                    it.appendToCallState(orderedCallState)
+                }
+            }
+        }
     }
 
 }

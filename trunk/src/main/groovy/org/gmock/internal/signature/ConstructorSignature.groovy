@@ -25,8 +25,8 @@ class ConstructorSignature {
         this.arguments = new ParameterSignature(arguments)
     }
 
-    String toString() {
-        "new $aClass.simpleName($arguments)"
+    String toString(boolean showMockName = false) {
+        "'new $aClass.simpleName($arguments)'"
     }
 
     def validate(){

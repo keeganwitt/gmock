@@ -202,13 +202,12 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
         def closure = {
             this.assertEquals 4, load(2)
         }
-        def test = { Class clazz ->
+        def test = { Class clazz, String expected ->
             def mock = mock(clazz)
             play {
                 closure.delegate = mock
                 [Closure.OWNER_FIRST, Closure.DELEGATE_FIRST, Closure.DELEGATE_ONLY].each { strategy ->
                     closure.resolveStrategy = strategy
-                    def expected = "Unexpected method call 'load(2)'"
                     def message = shouldFail(AssertionFailedError) {
                         closure()
                     }
@@ -216,8 +215,8 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
                 }
             }
         }
-        test(GroovyLoader)
-        test(JavaLoader)
+        test(GroovyLoader, "Unexpected method call 'load(2)'")
+        test(JavaLoader, "Unexpected method call 'load(2)' on 'Mock for JavaLoader'")
     }
 
     void testExceptionsShouldNotBeWrappedByInvokerInvocationException() {

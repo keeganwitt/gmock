@@ -34,7 +34,7 @@ import org.gmock.internal.times.AnyTimes
 
 class MockProxyMetaClass extends ProxyMetaClass {
 
-    def expectations = new ExpectationCollection()
+    def expectations
     def classExpectations
     def controller
     def mockInstance
@@ -42,6 +42,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
 
     MockProxyMetaClass(Class clazz, classExpectations, controller, mockName) {
         super(GroovySystem.metaClassRegistry, clazz, GroovySystem.metaClassRegistry.getMetaClass(clazz))
+        this.expectations = new ExpectationCollection(controller)
         this.classExpectations = classExpectations
         this.controller = controller
         this.mockName = mockName
@@ -148,7 +149,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     void reset(){
-        this.expectations = new ExpectationCollection()
+        this.expectations = new ExpectationCollection(controller)
     }
 
     void replay() {

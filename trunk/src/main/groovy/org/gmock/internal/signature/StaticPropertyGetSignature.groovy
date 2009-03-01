@@ -29,11 +29,11 @@ class StaticPropertyGetSignature {
 
     def validate() {}
 
-    String toString() {
+    String toString(boolean showMockName = false) {
         if (method) {
-            return "${clazz.simpleName}.$method()"
+            return "'${clazz.simpleName}.$method()'"
         } else {
-            return "${clazz.simpleName}.$property"
+            return "'${clazz.simpleName}.$property'"
         }
     }
 

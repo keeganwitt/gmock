@@ -551,8 +551,8 @@ class FunctionalTest extends GMockTestCase {
         def mock3 = mock()
         mock1.is(mock2).returns(true)
 
-        def expected = "Unexpected method call 'is(Mock for Object (3))'\n" +
-                       "  'is(Mock for Object (2))': expected 1, actual 0"
+        def expected = "Unexpected method call 'is(Mock for Object (3))' on 'Mock for Object (1)'\n" +
+                       "  'is(Mock for Object (2))' on 'Mock for Object (1)': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {
                 mock1.is(mock3)
@@ -567,7 +567,7 @@ class FunctionalTest extends GMockTestCase {
         mock1.is(mock2).returns(true)
 
         def expected = "Expectation not matched on verify:\n" +
-                       "  'is(Mock for Object (2))': expected 1, actual 0"
+                       "  'is(Mock for Object (2))' on 'Mock for Object (1)': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {}
         }
@@ -725,7 +725,7 @@ class FunctionalTest extends GMockTestCase {
         m1.is(m2).returns(false)
 
         def expected = "Expectation not matched on verify:\n" +
-                       "  'is(test mock)': expected 1, actual 0"
+                       "  'is(test mock)' on 'Mock for Object': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {}
         }
@@ -762,6 +762,39 @@ class FunctionalTest extends GMockTestCase {
         shouldFail(MissingMethodException) {
             mock(JavaLoader, "3")
         }
+    }
+
+    void testUnexpectedMethodCallErrorMessageWithMultipleMocks() {
+        def m1 = mock(Date), m2 = mock(), m3 = mock(Date, name('now')), m4 = mock(Date)
+        m4.a()
+        m3.b.returns(1)
+        m2.c.set(2)
+        m1.setD(true)
+        m1.isD().returns(true)
+        m1.getD().returns(true)
+        mock(Date, constructor('now')).static {
+            e()
+            f.returns(3)
+            g.set(4)
+        }
+
+        def expected = "Unexpected method call 'z()' on 'Mock for Date (1)'\n" +
+                       "  'a()' on 'Mock for Date (2)': expected 1, actual 0\n" +
+                       "  'b' on 'now': expected 1, actual 0\n" +
+                       "  'c = 2' on 'Mock for Object': expected 1, actual 0\n" +
+                       "  'setD(true)' on 'Mock for Date (1)': expected 1, actual 0\n" +
+                       "  'isD()' on 'Mock for Date (1)': expected 1, actual 0\n" +
+                       "  'getD()' on 'Mock for Date (1)': expected 1, actual 0\n" +
+                       "  'new Date(\"now\")': expected 1, actual 0\n" +
+                       "  'Date.e()': expected 1, actual 0\n" +
+                       "  'Date.f': expected 1, actual 0\n" +
+                       "  'Date.g = 4': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                m1.z()
+            }
+        }
+        assertEquals expected, message
     }
 
 }

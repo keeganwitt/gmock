@@ -27,11 +27,12 @@ class PropertyGetSignature {
         this.methodName = methodName
     }
 
-    String toString() {
+    String toString(boolean showMockName = false) {
+        def mockName = showMockName ? " on '$object.mockName'" : ""
         if (methodName) {
-            return "$methodName()"
+            return "'$methodName()'$mockName"
         } else {
-            return propertyName
+            return "'$propertyName'$mockName"
         }
     }
 
