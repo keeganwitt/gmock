@@ -116,7 +116,9 @@ class InternalMockController implements MockController {
             }
 
             mpmc.mockInstance = mockInstance
-            mocks << mpmc
+            def mock = new MockInternal(this, mockInstance, mockName, mpmc)
+
+            mocks << mock
         }
         if (expectationClosure){
             callClosureWithDelegate(expectationClosure, mockInstance)
