@@ -15,23 +15,9 @@
  */
 package org.gmock.internal.metaclass
 
-import org.gmock.internal.Expectation
-import org.gmock.internal.ExpectationCollection
-import static org.gmock.internal.InternalModeHelper.doExternal
 import static org.gmock.internal.InternalModeHelper.doInternal
-import org.gmock.internal.matcher.AlwaysMatchMatcher
-import static org.gmock.internal.metaclass.MetaClassHelper.*
-import org.gmock.internal.recorder.PropertyRecorder
-import org.gmock.internal.recorder.ReturnMethodRecorder
-import org.gmock.internal.recorder.StaticMethodRecoder
-import org.gmock.internal.result.EqualsDefaultBehavior
-import org.gmock.internal.result.HashCodeDefaultBehavior
-import org.gmock.internal.result.ToStringDefaultBehavior
-import org.gmock.internal.signature.MethodSignature
-import org.gmock.internal.signature.PropertyGetSignature
-import org.gmock.internal.signature.PropertySetSignature
-import org.gmock.internal.times.AnyTimes
 import org.gmock.internal.MockInternal
+import static org.gmock.internal.metaclass.MetaClassHelper.getGMockMethod
 
 class MockProxyMetaClass extends ProxyMetaClass {
 
@@ -39,7 +25,6 @@ class MockProxyMetaClass extends ProxyMetaClass {
 
     def classExpectations
     def controller
-    def mockInstance
     def mockName
 
     MockProxyMetaClass(Class clazz, classExpectations, controller, mockName) {
@@ -57,7 +42,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee.invokeMethod(receiver, methodName, arguments)
         } {
-            return mock.invokeMockMethod(sender, receiver, methodName, arguments)
+            return mock.invokeMockMethod(methodName, arguments)
         }
     }
 
@@ -69,18 +54,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee.getProperty(receiver, property)
         } {
-            if (controller.replay){
-                def signature = new PropertyGetSignature(this, property)
-                return findExpectation(mock.expectations, signature, "Unexpected property getter call", [], controller)
-            } else {
-                if (property == "static"){
-                    return new StaticMethodRecoder(theClass, classExpectations, controller)
-                } else {
-                    def expectation = new Expectation()
-                    addToExpectations(expectation, mock.expectations, controller)
-                    return new PropertyRecorder(this, property, expectation)
-                }
-            }
+            return mock.getMockProperty(property)
         }
     }
 
@@ -92,13 +66,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee.setProperty(receiver, property, value)
         } {
-            if (controller.replay){
-                def signature = new PropertySetSignature(this, property, value)
-                findExpectation(mock.expectations, signature, "Unexpected property setter call", [value], controller)
-            } else {
-                throw new MissingPropertyException("Cannot use property setter in record mode. " +
-                        "Are you trying to mock a setter? Use '${property}.set(${value.inspect()})' instead.")
-            }
+            return mock.setMockProperty(property, value)
         }
     }
 

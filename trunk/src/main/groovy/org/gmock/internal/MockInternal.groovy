@@ -10,6 +10,9 @@ import org.gmock.internal.recorder.ReturnMethodRecorder
 import static org.gmock.internal.metaclass.MetaClassHelper.*
 import org.gmock.internal.recorder.StaticMethodRecoder
 import static org.gmock.internal.InternalModeHelper.doExternal
+import org.gmock.internal.signature.PropertyGetSignature
+import org.gmock.internal.recorder.PropertyRecorder
+import org.gmock.internal.signature.PropertySetSignature
 
 
 class MockInternal {
@@ -56,7 +59,7 @@ class MockInternal {
     }
 
 
-    Object invokeMockMethod(Class sender, Object receiver, String methodName, Object[] arguments) {
+    Object invokeMockMethod(String methodName, Object[] arguments) {
         def signature = newSignatureForMethod(mockProxyMetaClass, methodName, arguments)
         if (controller.replay){
             def result =  findExpectation(expectations, signature, "Unexpected method call", arguments, controller)
@@ -87,4 +90,28 @@ class MockInternal {
         }
     }
 
+    Object getMockProperty(String property) {
+        if (controller.replay){
+            def signature = new PropertyGetSignature(mockProxyMetaClass, property)
+            return findExpectation(expectations, signature, "Unexpected property getter call", [], controller)
+        } else {
+            if (property == "static"){
+                return new StaticMethodRecoder(mockProxyMetaClass.theClass, mockProxyMetaClass.classExpectations, controller)
+            } else {
+                def expectation = new Expectation()
+                addToExpectations(expectation, expectations, controller)
+                return new PropertyRecorder(mockProxyMetaClass, property, expectation)
+            }
+        }
+    }
+
+    Object setMockProperty(String property, Object value) {
+        if (controller.replay){
+            def signature = new PropertySetSignature(mockProxyMetaClass, property, value)
+            findExpectation(expectations, signature, "Unexpected property setter call", [value], controller)
+        } else {
+            throw new MissingPropertyException("Cannot use property setter in record mode. " +
+                    "Are you trying to mock a setter? Use '${property}.set(${value.inspect()})' instead.")
+        }
+    }
 }
