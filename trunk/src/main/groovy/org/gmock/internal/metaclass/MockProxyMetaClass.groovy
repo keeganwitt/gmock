@@ -57,34 +57,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee.invokeMethod(receiver, methodName, arguments)
         } {
-            def signature = newSignatureForMethod(this, methodName, arguments)
-            if (controller.replay){
-                return findExpectation(mock.expectations, signature, "Unexpected method call", arguments, controller)
-            } else {
-                if (methodName == "static" && arguments.length == 1 && arguments[0] instanceof Closure) {
-                    invokeStaticExpectationClosure(arguments[0])
-                    return null
-                } else {
-                    def expectation = new Expectation(signature: signature)
-                    addToExpectations(expectation, mock.expectations, controller)
-                    return new ReturnMethodRecorder(expectation)
-                }
-            }
-        }
-    }
-
-    private invokeStaticExpectationClosure(Closure staticExpectationClosure) {
-        def recorder = new StaticMethodRecoder(theClass, classExpectations, controller)
-        staticExpectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
-        staticExpectationClosure.delegate = recorder
-        def backup = controller.mockDelegate
-        try {
-            controller.mockDelegate = recorder
-            doExternal(controller) {
-                staticExpectationClosure(recorder)
-            }
-        } finally {
-            controller.mockDelegate = backup
+            return mock.invokeMockMethod(sender, receiver, methodName, arguments)
         }
     }
 
