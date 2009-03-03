@@ -114,8 +114,6 @@ class InternalMockController implements MockController {
                 def expectation = constructorRecorder.generateExpectation(clazz, mockInstance)
                 classExpectations.addConstructorExpectation(clazz, expectation)
             }
-
-            mpmc.mockInstance = mockInstance
             def mock = new MockInternal(this, mockInstance, mockName, mpmc)
 
             mocks << mock
