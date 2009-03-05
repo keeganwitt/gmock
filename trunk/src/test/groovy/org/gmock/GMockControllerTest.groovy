@@ -95,4 +95,19 @@ class GMockControllerTest extends GroovyTestCase {
         }
     }
 
+    void testDefaultWithMethodOnGMockController() {
+        new GMockController().with {
+            def mock = mock()
+            mock.get(match { true }).returns('correct')
+            with(mock) {
+                load(1).returns(2)
+            }
+
+            play {
+                assertEquals 'correct', mock.get(1)
+                assertEquals 2, mock.load(1)
+            }
+        }
+    }
+
 }
