@@ -17,10 +17,11 @@ package org.gmock.internal.metaclass
 
 import static org.gmock.internal.InternalModeHelper.doInternal
 import static org.gmock.internal.metaclass.MetaClassHelper.getGMockMethod
+import org.gmock.internal.util.WeakIdentityHashMap
 
 class DispatcherProxyMetaClass extends ProxyMetaClass {
 
-    private Map metaClasses = [:]
+    private Map metaClasses = new WeakIdentityHashMap()
     def controller
 
     private DispatcherProxyMetaClass(MetaClassRegistry registry, Class clazz, MetaClass originalMetaClass) {
@@ -31,7 +32,7 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
         MetaClassRegistry registry = GroovySystem.metaClassRegistry
         MetaClass metaClass = registry.getMetaClass(clazz)
         if (metaClass instanceof DispatcherProxyMetaClass) {
-            return metaClass as DispatcherProxyMetaClass
+            return metaClass
         } else {
             DispatcherProxyMetaClass filterMetaClass = new DispatcherProxyMetaClass(registry, clazz, metaClass)
             registry.setMetaClass(clazz, filterMetaClass)
@@ -77,7 +78,7 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
 
     void setMetaClassForInstance(Object instance, MetaClass mc) {
         doInternal(controller) {
-            metaClasses.put(new InstanceWrapper(instance), mc)
+            metaClasses.put(instance, mc)
         }
     }
 
@@ -85,34 +86,20 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
         doInternal(controller) {
             adaptee
         } {
-            MetaClass mc = metaClasses.get(new InstanceWrapper(instance))
-            return mc ?: adaptee
+            if (metaClasses.empty) {
+                stopProxy()
+                return adaptee
+            } else {
+                MetaClass mc = metaClasses.get(instance)
+                return mc ?: adaptee
+            }
         }
     }
 
-}
-
-/**
- * This wrapper overrides the equals() method so that the wrapped instances are equal if and only if they are exactly
- * the same instance.
- */
-class InstanceWrapper {
-
-    def instance
-
-    InstanceWrapper(instance) {
-        this.instance = instance
-    }
-
-    int hashCode() {
-        System.identityHashCode(instance)
-    }
-
-    boolean equals(Object obj) {
-        if (obj instanceof InstanceWrapper) {
-            return instance.is(obj.instance)
-        } else {
-            return instance.is(obj)
+    private void stopProxy() {
+        MetaClass metaClass = registry.getMetaClass(theClass)
+        if (metaClass.is(this)) {
+            registry.setMetaClass(theClass, adaptee)
         }
     }
 
