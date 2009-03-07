@@ -60,7 +60,7 @@ class MockInternal {
 
 
     Object invokeMockMethod(String methodName, Object[] arguments) {
-        def signature = newSignatureForMethod(mockProxyMetaClass, methodName, arguments)
+        def signature = new MethodSignature(mockProxyMetaClass, methodName, arguments)
         if (controller.replay){
             def result =  findExpectation(expectations, signature, "Unexpected method call", arguments, controller)
             return result

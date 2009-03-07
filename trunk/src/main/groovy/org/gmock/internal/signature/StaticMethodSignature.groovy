@@ -15,37 +15,41 @@
  */
 package org.gmock.internal.signature
 
-class PropertyGetSignature extends BasePropertyGetSignature {
+class StaticMethodSignature extends BaseMethodSignature {
 
-    def object
+    Class clazz
 
-    PropertyGetSignature(object, getterName) {
-        super(getterName)
-        this.object = object
+    StaticMethodSignature(clazz, methodName, arguments) {
+        super(methodName, arguments)
+        this.clazz = clazz
     }
 
     String toString(boolean showMockName = false) {
-        "'$getterName'${object.mockName.toString(showMockName)}"
+        "'${clazz.simpleName}.$methodName($arguments)'"
     }
 
     boolean equals(Object signature) {
         if (!super.equals(signature)) return false
-        if (!object.is(signature.object)) return false
+        if (clazz != signature.clazz) return false
         return true
     }
 
     boolean match(Object signature) {
         if (!super.match(signature)) return false
-        if (!object.is(signature.object)) return false
+        if (clazz != signature.clazz) return false
         return true
     }
 
-    protected List getAcceptedClasses() {
-        [PropertyGetSignature, MethodSignature]
+    protected Class getGetterClass() {
+        StaticPropertyGetSignature
+    }
+
+    protected Class getSetterClass() {
+        StaticPropertySetSignature
     }
 
     int hashCode() {
-        object.hashCode() * 31 + super.hashCode()
+        clazz.hashCode() * 51  + super.hashCode()
     }
 
 }

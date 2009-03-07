@@ -15,47 +15,41 @@
  */
 package org.gmock.internal.signature
 
-class MethodSignature {
+class MethodSignature extends BaseMethodSignature {
 
     def object
-    def methodName
-    def arguments
 
     MethodSignature(object, methodName, arguments) {
+        super(methodName, arguments)
         this.object = object
-        this.methodName = methodName
-        this.arguments = new ParameterSignature(arguments)
     }
 
     String toString(boolean showMockName = false) {
-        def mockName = showMockName ? " on '$object.mockName'" : ""
-        "'$methodName($arguments)'$mockName"
+        "'$methodName($arguments)'${object.mockName.toString(showMockName)}"
     }
 
-    def validate(){
-    }
-
-    private boolean equalsWithoutArguments(Object method) {
-        if (method == null || getClass() != method.getClass()) return false
-        if (!object.is(method.object)) return false
-        if (methodName != method.methodName) return false
+    boolean equals(Object signature) {
+        if (!super.equals(signature)) return false
+        if (!object.is(signature.object)) return false
         return true
     }
 
-    boolean equals(Object method) {
-        if (!equalsWithoutArguments(method)) return false
-        if (arguments != method.arguments) return false
+    boolean match(Object signature) {
+        if (!super.match(signature)) return false
+        if (!object.is(signature.object)) return false
         return true
     }
 
-    boolean match(Object method) {
-        if (!equalsWithoutArguments(method)) return false
-        if (!arguments.match(method.arguments)) return false
-        return true
+    protected Class getGetterClass() {
+        PropertyGetSignature
+    }
+
+    protected Class getSetterClass() {
+        PropertySetSignature
     }
 
     int hashCode() {
-        object.hashCode() * 51 + methodName.hashCode() * 31 + arguments.hashCode()
+        object.hashCode() * 51 + super.hashCode()
     }
 
 }

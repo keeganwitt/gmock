@@ -461,4 +461,64 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testRegexStaticMethodName() {
+        mock(Loader).static {
+            /\w{4}/().returns(true)
+            /isE\w*/().returns(true)
+        }
+        play {
+            assertTrue Loader.init()
+            assertTrue Loader.isEmpty()
+        }
+    }
+
+    void testNoCrossUsageToStaticPropertyGetterWithRegexStaticMethodName() {
+        mock(Loader).static./isE\w*/().returns(true)
+        def expected = "Unexpected static property getter call 'Loader.empty'\n" +
+                       "  'Loader.\"isE\\w*\"()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.empty
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testNoCrossUsageToStaticPropertySetterWithRegexStaticMethodName() {
+        mock(Loader).static./setF\w*/(true)
+        def expected = "Unexpected static property setter call 'Loader.full = true'\n" +
+                       "  'Loader.\"setF\\w*\"(true)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.full = true
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testRegexStaticPropertyName() {
+        mock(Loader).static {
+            it./(?i)Empty/.returns(true).times(2)
+            it./(?i)Full/.set(false).times(2)
+        }
+        play {
+            assertTrue Loader.empty
+            assertTrue Loader.isEmpty()
+            Loader.full = false
+            Loader.setFull(false)
+        }
+    }
+
+    void testRegexStaticPropertyNameAndFailed() {
+        mock(Loader).static./.*/.returns(true)
+        def expected = "Unexpected static property setter call 'Loader.something = true'\n" +
+                       "  'Loader.\".*\"': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.something = true
+            }
+        }
+        assertEquals expected, message
+    }
+
 }

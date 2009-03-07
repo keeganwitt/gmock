@@ -23,7 +23,7 @@ class ParameterSignature {
 
     static {
         try {
-            HAMCREST_MATCHER_CLASS = Class.forName("org.hamcrest.Matcher")
+            HAMCREST_MATCHER_CLASS = ParameterSignature.classLoader.loadClass("org.hamcrest.Matcher")
         } catch (e) {
             HAMCREST_MATCHER_CLASS = null
         }
@@ -43,7 +43,7 @@ class ParameterSignature {
     }
 
     private boolean equalsWithoutArguments(Object signature) {
-        if (signature == null || !(signature instanceof ParameterSignature)) return false
+        if (signature?.class != ParameterSignature) return false
         return true
     }
 
@@ -57,7 +57,6 @@ class ParameterSignature {
         if (arguments.size() != signature.arguments.size()) return false
         return [arguments, signature.arguments].transpose().every { arg1, arg2 ->
             if (isMatcher(arg1)) return arg1.matches(arg2)
-            else if (isMatcher(arg2)) return arg2.matches(arg1)
             else return arg1 == arg2
         }
     }
@@ -72,6 +71,10 @@ class ParameterSignature {
 
     int hashCode() {
         arguments.hashCode()
+    }
+
+    int size() {
+        arguments.size()
     }
 
 }

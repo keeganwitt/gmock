@@ -15,56 +15,37 @@
  */
 package org.gmock.internal.signature
 
-class StaticPropertySetSignature {
+class StaticPropertySetSignature extends BasePropertySetSignature {
 
-    def clazz
-    def property
-    def argument
-    def method
+    Class clazz
 
-    StaticPropertySetSignature(clazz, property, argument, method = null) {
+    StaticPropertySetSignature(clazz, setterName, arguments) {
+        super(setterName, arguments)
         this.clazz = clazz
-        this.property = property
-        this.argument = new ParameterSignature([argument])
-        this.method = method
     }
-
-    def validate() {}
 
     String toString(boolean showMockName = false) {
-        if (method) {
-            return "'${clazz.simpleName}.$method($argument)'"
-        } else {
-            return "'${clazz.simpleName}.$property = $argument'"
-        }
+        "'${clazz.simpleName}.$setterName = $arguments'"
     }
 
-    private boolean equalsWithoutArgument(Object signature) {
-        if (signature == null || getClass() != signature.getClass()) return false
+    boolean equals(Object signature) {
+        if (!super.equals(signature)) return false
         if (clazz != signature.clazz) return false
         return true
     }
 
-    boolean equals(Object signature) {
-        if (!equalsWithoutArgument(signature)) return false
-        if (method || signature.method) {
-            if (method != signature.method) return false
-        } else {
-            if (property != signature.property) return false
-        }
-        if (argument != signature.argument) return false
+    boolean match(Object signature) {
+        if (!super.match(signature)) return false
+        if (clazz != signature.clazz) return false
         return true
     }
 
-    boolean match(Object signature) {
-        if (!equalsWithoutArgument(signature)) return false
-        if (property != signature.property) return false
-        if (!argument.match(signature.argument)) return false
-        return true
+    protected List getAcceptedClasses() {
+        [StaticPropertySetSignature, StaticMethodSignature]
     }
 
     int hashCode() {
-        clazz.hashCode() * 51 + property.hashCode() * 31 + argument.hashCode()
+        clazz.hashCode() * 51 + super.hashCode()
     }
 
 }

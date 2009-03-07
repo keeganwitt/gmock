@@ -15,7 +15,9 @@
  */
 package org.gmock.internal.signature
 
-class PropertySetSignatureTest extends GroovyTestCase {
+import org.gmock.GMockTestCase
+
+class PropertySetSignatureTest extends GMockTestCase {
 
     void testEquals() {
         def object = new Object()
@@ -65,8 +67,14 @@ class PropertySetSignatureTest extends GroovyTestCase {
     }
 
     void testToString() {
-        def signature = new PropertySetSignature(new Object(), "name", "tostring")
-        assertEquals "'name = \"tostring\"'", signature.toString()
+        def object = mock {
+            mockName.returns(it)
+            toString(false).returns('')
+        }
+        def signature = new PropertySetSignature(object, "name", "tostring")
+        play {
+            assertEquals "'name = \"tostring\"'", signature.toString()
+        }
     }
 
 }
