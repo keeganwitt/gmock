@@ -15,58 +15,37 @@
  */
 package org.gmock.internal.signature
 
-class PropertySetSignature {
+class PropertySetSignature extends BasePropertySetSignature {
 
     def object
-    def propertyName
-    def argument
-    def methodName
 
-    PropertySetSignature(object, propertyName, argument, methodName = null) {
+    PropertySetSignature(object, setterName, arguments) {
+        super(setterName, arguments)
         this.object = object
-        this.propertyName = propertyName
-        this.argument = new ParameterSignature([argument])
-        this.methodName = methodName
     }
 
     String toString(boolean showMockName = false) {
-        def mockName = showMockName ? " on '$object.mockName'" : ""
-        if (methodName) {
-            return "'$methodName($argument)'$mockName"
-        } else {
-            return "'$propertyName = $argument'$mockName"
-        }
+        "'$setterName = $arguments'${object.mockName.toString(showMockName)}"
     }
 
-    def validate(){
-    }
-
-    private boolean equalsWithoutName(Object setSignature) {
-        if (setSignature == null || getClass() != setSignature.getClass()) return false
-        if (!object.is(setSignature.object)) return false
+    boolean equals(Object signature) {
+        if (!super.equals(signature)) return false
+        if (!object.is(signature.object)) return false
         return true
     }
 
-    boolean equals(Object setSignature) {
-        if (!equalsWithoutName(setSignature)) return false
-        if (methodName || setSignature.methodName) {
-            if (methodName != setSignature.methodName) return false
-        } else {
-            if (propertyName != setSignature.propertyName) return false
-        }
-        if (argument != setSignature.argument) return false
+    boolean match(Object signature) {
+        if (!super.match(signature)) return false
+        if (!object.is(signature.object)) return false
         return true
     }
 
-    boolean match(Object setSignature) {
-        if (!equalsWithoutName(setSignature)) return false
-        if (propertyName != setSignature.propertyName) return false
-        if (!argument.match(setSignature.argument)) return false
-        return true
+    protected List getAcceptedClasses() {
+        [PropertySetSignature, MethodSignature]
     }
 
     int hashCode() {
-        object.hashCode() * 51 + propertyName.hashCode() * 31 + argument.hashCode()
+        object.hashCode() * 51 + super.hashCode()
     }
 
 }

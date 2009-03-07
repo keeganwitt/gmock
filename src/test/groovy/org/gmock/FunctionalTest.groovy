@@ -797,4 +797,65 @@ class FunctionalTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testRegexMethodName() {
+        def mock = mock()
+        mock./[a-z]/().returns(0)
+        mock./get.*/().returns(1)
+        play {
+            assertEquals 0, mock.k()
+            assertEquals 1, mock.getSomething()
+        }
+    }
+
+    void testNoCrossUsageToPropertyGetterWithRegexMethodName() {
+        def mock = mock()
+        mock./getA.*/().returns(0)
+        def expected = "Unexpected property getter call 'abc'\n" +
+                       "  '\"getA.*\"()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                mock.abc
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testNoCrossUsageToPropertySetterWithRegexMethodName() {
+        def mock = mock()
+        mock./setX.*/(1)
+        def expected = "Unexpected property setter call 'xyz = 1'\n" +
+                       "  '\"setX.*\"(1)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                mock.xyz = 1
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testRegexPropertyName() {
+        def mock = mock()
+        mock./\w{4}\d/.returns(1).times(2)
+        mock./(?i)gmock\djava/.set('cool').times(2)
+        play {
+            assertEquals 1, mock.user1
+            assertEquals 1, mock.getUser1()
+            mock.gmock4Java = 'cool'
+            mock.setGMock4Java('cool')
+        }
+    }
+
+    void testRegexPropertyNameAndFailed() {
+        def mock = mock()
+        mock./a.*/.returns(1)
+        def expected = "Unexpected property getter call 'bbb'\n" +
+                       "  '\"a.*\"': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                mock.bbb
+            }
+        }
+        assertEquals expected, message
+    }
+
 }

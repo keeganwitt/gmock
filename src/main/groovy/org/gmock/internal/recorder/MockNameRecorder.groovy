@@ -35,4 +35,8 @@ class MockNameRecorder {
         mockName
     }
 
+    String toString(boolean show) {
+        show ? " on '$mockName'" : ""
+    }
+
 }

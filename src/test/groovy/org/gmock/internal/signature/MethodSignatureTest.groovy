@@ -15,7 +15,9 @@
  */
 package org.gmock.internal.signature
 
-class MethodSignatureTest extends GroovyTestCase {
+import org.gmock.GMockTestCase
+
+class MethodSignatureTest extends GMockTestCase {
 
     void testEquals(){
         def object = new Object()
@@ -64,8 +66,14 @@ class MethodSignatureTest extends GroovyTestCase {
     }
 
     void testToString() {
-        def signature = new MethodSignature(new Object(), "someOperate", ["test", 3, true])
-        assertEquals "'someOperate(\"test\", 3, true)'", signature.toString()
+        def object = mock {
+            mockName.returns(it)
+            toString(false).returns('')
+        }
+        def signature = new MethodSignature(object, "someOperate", ["test", 3, true])
+        play {
+            assertEquals "'someOperate(\"test\", 3, true)'", signature.toString()
+        }
     }
 
 }

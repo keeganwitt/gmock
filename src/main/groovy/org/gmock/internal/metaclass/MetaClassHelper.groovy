@@ -16,7 +16,6 @@
 package org.gmock.internal.metaclass
 
 import org.gmock.GMock
-import org.gmock.internal.signature.*
 
 class MetaClassHelper {
 
@@ -38,26 +37,6 @@ class MetaClassHelper {
         }
     }
 
-    static newSignatureForMethod(mock, methodName, arguments) {
-        if (isGetter(methodName, arguments)) {
-            return new PropertyGetSignature(mock, getPropertyForGetter(methodName), methodName)
-        } else if (isSetter(methodName, arguments)) {
-            return new PropertySetSignature(mock, getPropertyForSetter(methodName), arguments[0], methodName)
-        } else {
-            return new MethodSignature(mock, methodName, arguments)
-        }
-    }
-
-    static newSignatureForStaticMethod(aClass, methodName, arguments) {
-        if (isGetter(methodName, arguments)) {
-            return new StaticPropertyGetSignature(aClass, getPropertyForGetter(methodName), methodName)
-        } else if (isSetter(methodName, arguments)) {
-            return new StaticPropertySetSignature(aClass, getPropertyForSetter(methodName), arguments[0], methodName)
-        } else {
-            return new StaticSignature(aClass, methodName, arguments)
-        }
-    }
-
     static getGMockMethod(String methodName, Class[] arguments, MetaClass metaClass, controller) {
         def method = null, delegator = null
         if (arguments.length == 1 && Closure.isAssignableFrom(arguments[0])) {
@@ -70,38 +49,6 @@ class MetaClassHelper {
             }
         }
         return method ? new DelegateMetaMethod(metaClass, methodName, arguments, method, delegator) : null
-    }
-
-    private static isSetter(method, arguments) {
-        return method.startsWith("set") && method.size() > 3 && Character.isUpperCase(method.charAt(3)) && arguments.size() == 1
-    }
-
-    private static isGetter(method, arguments) {
-        def firstChar
-        if (method.startsWith("get") && method.size() > 3) {
-            firstChar = method.charAt(3)
-        } else if (method.startsWith("is") && method.size() > 2) {
-            firstChar = method.charAt(2)
-        } else {
-            return false
-        }
-        return Character.isUpperCase(firstChar) && arguments.size() == 0
-    }
-
-    private static getPropertyForSetter(method) {
-        return convertPropertyName(method.substring(3))
-    }
-
-    private static getPropertyForGetter(method) {
-        if (method.startsWith("get")) {
-            return convertPropertyName(method.substring(3))
-        } else {
-            return convertPropertyName(method.substring(2))
-        }
-    }
-
-    private static convertPropertyName(method) {
-        method[0].toLowerCase() + method.substring(1)
     }
 
 }

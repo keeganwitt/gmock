@@ -18,8 +18,8 @@ package org.gmock.internal.recorder
 import org.gmock.internal.Expectation
 import static org.gmock.internal.InternalModeHelper.doInternal
 import static org.gmock.internal.metaclass.MetaClassHelper.getGMockMethod
-import static org.gmock.internal.metaclass.MetaClassHelper.newSignatureForStaticMethod
 import org.gmock.internal.metaclass.ProxyMetaMethod
+import org.gmock.internal.signature.StaticMethodSignature
 
 class StaticMethodRecoder implements GroovyInterceptable {
 
@@ -39,7 +39,7 @@ class StaticMethodRecoder implements GroovyInterceptable {
     }
 
     Object invokeMethod(String name, Object args) {
-        def expectation = new Expectation(signature: newSignatureForStaticMethod(aClass, name, args))
+        def expectation = new Expectation(signature: new StaticMethodSignature(aClass, name, args))
         classExpectations.addStaticExpectation(aClass, expectation)
         missingExpectation = false
         return new ReturnMethodRecorder(expectation)
