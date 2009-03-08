@@ -16,11 +16,12 @@
 package org.gmock
 
 import org.gmock.utils.FakeTagLib
+import junit.framework.AssertionFailedError
 
-class FunctionnalMockMethodOutTest extends GMockTestCase{
+class FunctionnalMockMethodOutTest extends GMockTestCase {
 
 
-    void testMockMethodOut(){
+    void testMockMethodOut() {
         def tagLib = new FakeTagLib()
         def mockTabLib = mock(tagLib)
 
@@ -29,10 +30,28 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
         play {
             tagLib.linkHello([some: "attr"])
         }
+    }
+
+
+    void testMockMethodOutUnexpectedCall() {
+        def tagLib = new FakeTagLib()
+        def mockTabLib = mock(tagLib)
+
+        mockTabLib.link([some: "attr"], "goodBye").returns("<a>link</a>")
+
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                tagLib.linkHello([some: "attr"])
+            }
+        }
+        def expected = """Unexpected method call 'link(["some":"attr"], "hello")'
+  'link(["some":"attr"], "goodBye")': expected 1, actual 0"""
+        assertEquals expected, message
 
     }
 
-    void testMockMethodCanStillCallOriginalImplementation(){
+
+    void testMockMethodCanStillCallOriginalImplementation() {
         def tagLib = new FakeTagLib()
         def mockTabLib = mock(tagLib)
 
@@ -46,7 +65,7 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
 
     }
 
-    void testMockGetPropertyOut(){
+    void testMockGetPropertyOut() {
         def tagLib = new FakeTagLib()
         def mockTabLib = mock(tagLib)
         def mockOut = mock()
@@ -60,7 +79,7 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
 
     }
 
-    void testMockSetPropertyOut(){
+    void testMockSetPropertyOut() {
         def tagLib = new FakeTagLib()
         def mockTabLib = mock(tagLib)
 
@@ -73,13 +92,13 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
 
     }
 
-    void testMockGetPropertyOutUsingGetter(){
+    void testMockGetPropertyOutUsingGetter() {
         def tagLib = new FakeTagLib()
         def mockTabLib = mock(tagLib)
         def mockOut = mock()
 
         mockTabLib.getOut().returns(mockOut)
-        mockOut.leftShift( "hello" )
+        mockOut.leftShift("hello")
 
         play {
             tagLib.hello()
@@ -87,7 +106,7 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
 
     }
 
-    void testMockGetPropertyOutCanStillCallOriginalProperty(){
+    void testMockGetPropertyOutCanStillCallOriginalProperty() {
         def tagLib = new FakeTagLib()
         def mockTabLib = mock(tagLib)
         def mockOut = mock()
@@ -104,7 +123,7 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
 
 
 
-    void testMockMethodResetAfterPlay(){
+    void testMockMethodResetAfterPlay() {
         def tagLib = new FakeTagLib()
         def mockTabLib = mock(tagLib)
 
@@ -117,7 +136,6 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
             assertEquals "something", tagLib.saySomething()
         }
     }
-
 
 
 }
