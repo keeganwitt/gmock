@@ -35,7 +35,7 @@ class InternalMockController implements MockController {
     def mocks = []
     def classExpectations = new ClassExpectations(this)
     def orderedExpectations = new OrderedExpectations(this)
-    def unorderedExpectations = new ExpectationCollection(this)
+    def unorderedExpectations = new UnorderedExpectations()
     def defaultNames = [:]
 
     boolean replay = false

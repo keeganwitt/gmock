@@ -26,45 +26,44 @@ class BaseRecorder {
     }
 
     def stub() {
-        expectation.times = AnyTimes.INSTANCE
-        return null
+        times(AnyTimes.INSTANCE)
     }
 
     def times(IntRange range) {
-        expectation.times = new RangeTimes(range)
-        return null
+        times(new RangeTimes(range))
     }
 
     def times(int times) {
-        expectation.times = new StrictTimes(times)
-        return null
+        times(new StrictTimes(times))
     }
 
     def never() {
-        expectation.times = NeverTimes.INSTANCE
-        return null
+        times(NeverTimes.INSTANCE)
     }
 
     def once() {
-        return times(1)
+        times(1)
     }
 
     def atLeastOnce() {
-        return atLeast(1)
+        atLeast(1)
     }
 
     def atLeast(int times) {
-        expectation.times = new AtLeastTimes(times)
-        return null
+        times(new AtLeastTimes(times))
     }
 
     def atMostOnce() {
-        return atMost(1)
+        atMost(1)
     }
 
     def atMost(int times) {
-        expectation.times = new AtMostTimes(times)
-        return null
+        times(new AtMostTimes(times))
+    }
+
+    protected times(times) {
+        expectation.times = times
+        return this
     }
 
 }

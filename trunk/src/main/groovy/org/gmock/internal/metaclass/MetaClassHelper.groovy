@@ -30,8 +30,7 @@ class MetaClassHelper {
 
     static addToExpectations(expectation, expectations, controller) {
         if (!controller.ordered) {
-            expectations.add(expectation)
-            controller.unorderedExpectations.add(expectation)
+            controller.unorderedExpectations.add(expectation, expectations)
         } else {
             controller.orderedExpectations.add(expectation)
         }

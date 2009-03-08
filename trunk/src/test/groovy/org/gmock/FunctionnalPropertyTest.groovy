@@ -627,4 +627,82 @@ class FunctionnalPropertyTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testMultipleReturnsOnOneExpectation() {
+        def mock = mock()
+        mock.fun.returns(1).set(2).returns(3)
+        play {
+            assertEquals 1, mock.fun
+            mock.fun = 2
+            assertEquals 3, mock.fun
+        }
+    }
+
+    void testMultipleTimesOnOneExpectation() {
+        def mock = mock()
+        mock.fun.set(1).times(2).times(3)
+        mock.foo.returns(2).times(2).atLeastOnce()
+        play {
+            5.times { mock.fun = 1 }
+            4.times {
+                assertEquals 2, mock.foo
+            }
+        }
+    }
+
+    void testMultipleReturnsAndTimesOnOneExpectation() {
+        def mock = mock()
+        mock.fun.returns(1).times(2).set(2).times(3).returns(3).times(4)
+        play {
+            2.times {
+                assertEquals 1, mock.fun
+            }
+            3.times {
+                mock.fun = 2
+            }
+            4.times {
+                assertEquals 3, mock.fun
+            }
+        }
+    }
+
+    void testMultipleReturnsAndRaisesOnOneExpectation() {
+        def mock = mock()
+        mock.fun.set(1).raises(RuntimeException).times(2).raises(RuntimeException).returns(2).raises(RuntimeException)
+        play {
+            3.times {
+                shouldFail(RuntimeException) { mock.fun = 1 }
+            }
+            assertEquals 2, mock.fun
+            shouldFail(RuntimeException) { mock.fun }
+        }
+    }
+
+    void testMultipleReturnsOnOneExpectationShouldCheckTimes() {
+        def mock = mock()
+        def recorder = mock.fun.returns(1).times(1).times(1..2)
+        shouldFail(IllegalStateException) {
+            recorder.once()
+        }
+    }
+
+    void testOnlyTimesSetOnExpectationIsInvalid() {
+        def mock = mock()
+        mock.fun.times(1..2)
+        shouldFail(IllegalStateException) {
+            play {}
+        }
+    }
+
+    void testMultipleReturnsAndRaisesOnOneStaticExpectation() {
+        mock(Loader).static.fun.raises(RuntimeException).times(2).set(1).raises(RuntimeException).returns(2).raises(RuntimeException)
+        play {
+            2.times {
+                shouldFail(RuntimeException) { Loader.fun }
+            }
+            shouldFail(RuntimeException) { Loader.fun = 1 }
+            assertEquals 2, Loader.fun
+            shouldFail(RuntimeException) { Loader.fun }
+        }
+    }
+
 }

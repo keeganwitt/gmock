@@ -15,51 +15,14 @@
  */
 package org.gmock.internal.recorder
 
-import org.gmock.internal.result.ReturnNull
-import org.gmock.internal.result.ReturnValue
-import org.gmock.internal.result.ThrowException
 import org.gmock.internal.signature.StaticPropertyGetSignature
 import org.gmock.internal.signature.StaticPropertySetSignature
 import org.gmock.internal.signature.StaticPropertyUncompleteSignature
 
-class StaticPropertyRecorder extends BaseRecorder {
-
-    def clazz
-    def property
+class StaticPropertyRecorder extends PropertyRecorder {
 
     StaticPropertyRecorder(clazz, property, expectation) {
-        super(expectation)
-        this.clazz = clazz
-        this.property = property
-        this.expectation.signature = new StaticPropertyUncompleteSignature(clazz, property)
-    }
-
-    def set(value) {
-        expectation.signature = new StaticPropertySetSignature(clazz, property, value)
-        expectation.result = ReturnNull.INSTANCE
-        return this
-    }
-
-    def returns(value) {
-        expectation.signature = new StaticPropertyGetSignature(clazz, property)
-        expectation.result = new ReturnValue(value)
-        return this
-    }
-
-    private doRaises(Object[] params) {
-        if (expectation.signature.class == StaticPropertyUncompleteSignature){
-            expectation.signature = new StaticPropertyGetSignature(clazz, property)
-        }
-        expectation.result = ThrowException.metaClass.invokeConstructor(params)
-        return this
-    }
-
-    def raises(Throwable exception) {
-        return doRaises(exception)
-    }
-
-    def raises(Class exceptionClass, Object[] params) {
-        return doRaises(exceptionClass, *params)
+        super(clazz, property, expectation, StaticPropertyUncompleteSignature, StaticPropertySetSignature, StaticPropertyGetSignature)
     }
 
 }

@@ -521,4 +521,17 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testMultipleReturnsAndRaisesOnOneExpectation() {
+        mock(Loader).static.fun().returns(1).raises(RuntimeException).times(2).returns(2).stub()
+        play {
+            assertEquals 1, Loader.fun()
+            2.times {
+                shouldFail(RuntimeException) { Loader.fun() }
+            }
+            2.times {
+                assertEquals 2, Loader.fun()
+            }
+        }
+    }
+
 }

@@ -42,7 +42,7 @@ class StaticMethodRecoder implements GroovyInterceptable {
         def expectation = new Expectation(signature: new StaticMethodSignature(aClass, name, args))
         classExpectations.addStaticExpectation(aClass, expectation)
         missingExpectation = false
-        return new ReturnMethodRecorder(expectation)
+        return new MethodRecorder(expectation)
     }
 
     Object getProperty(String property) {
