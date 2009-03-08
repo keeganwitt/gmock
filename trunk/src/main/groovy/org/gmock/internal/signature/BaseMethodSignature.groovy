@@ -27,6 +27,10 @@ abstract class BaseMethodSignature {
         this.methodName = new IdentifierSignature(methodName)
         this.arguments = new ParameterSignature(arguments)
     }
+    BaseMethodSignature(methodName) {
+        this.methodName = new IdentifierSignature(methodName)
+        this.arguments = new MatchAnyParameterSignature()
+    }
 
     def validate() {}
 

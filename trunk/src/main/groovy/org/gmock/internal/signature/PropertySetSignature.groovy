@@ -24,6 +24,11 @@ class PropertySetSignature extends BasePropertySetSignature {
         this.object = object
     }
 
+    PropertySetSignature(object, setterName) {
+        super(setterName)
+        this.object = object
+    }
+
     String toString(boolean showMockName = false) {
         "'$setterName = $arguments'${object.mockName.toString(showMockName)}"
     }

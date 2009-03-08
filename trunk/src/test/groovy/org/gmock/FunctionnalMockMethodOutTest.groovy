@@ -46,6 +46,64 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
 
     }
 
+    void testMockGetPropertyOut(){
+        def tagLib = new FakeTagLib()
+        def mockTabLib = mock(tagLib)
+        def mockOut = mock()
+
+        mockTabLib.out.returns(mockOut)
+        mockOut << "hello"
+
+        play {
+            tagLib.hello()
+        }
+
+    }
+
+    void testMockSetPropertyOut(){
+        def tagLib = new FakeTagLib()
+        def mockTabLib = mock(tagLib)
+
+        mockTabLib.something.set("hello")
+
+        play {
+            tagLib.something = "hello"
+            tagLib.somethingElse = "else"
+        }
+
+    }
+
+    void testMockGetPropertyOutUsingGetter(){
+        def tagLib = new FakeTagLib()
+        def mockTabLib = mock(tagLib)
+        def mockOut = mock()
+
+        mockTabLib.getOut().returns(mockOut)
+        mockOut.leftShift( "hello" )
+
+        play {
+            tagLib.hello()
+        }
+
+    }
+
+    void testMockGetPropertyOutCanStillCallOriginalProperty(){
+        def tagLib = new FakeTagLib()
+        def mockTabLib = mock(tagLib)
+        def mockOut = mock()
+
+        mockTabLib.out.returns(mockOut)
+        mockOut << "hello"
+
+        play {
+            tagLib.hello()
+            assertEquals "something", tagLib.something
+        }
+
+    }
+
+
+
     void testMockMethodResetAfterPlay(){
         def tagLib = new FakeTagLib()
         def mockTabLib = mock(tagLib)
