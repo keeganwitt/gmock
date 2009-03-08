@@ -19,7 +19,6 @@ import java.lang.reflect.Modifier
 import net.sf.cglib.proxy.Callback
 import net.sf.cglib.proxy.Enhancer
 import net.sf.cglib.proxy.MethodInterceptor
-import org.gmock.GMockController
 import org.gmock.internal.metaclass.DispatcherProxyMetaClass
 import org.gmock.internal.metaclass.MockProxyMetaClass
 import org.gmock.internal.recorder.ConstructorRecorder
@@ -42,7 +41,6 @@ class InternalMockController implements MockController {
     boolean replay = false
     Order order = Order.NONE
     def mockDelegate = null
-    def mockFactory = new MockFactory()
 
     // while running in internal mode, we should not mock any methods, instead, we should invoke the original implements
     // it is a little like the kernel mode in OS
@@ -73,10 +71,9 @@ class InternalMockController implements MockController {
     }
 
     def mock(Class clazz = Object, Object ... args) {
-        def mockArgs = mockFactory.parseMockArgument(clazz, args)
+        def mockArgs = MockFactory.parseMockArgument(clazz, args)
         return doMock(mockArgs)
     }
-
 
     private doMock(mockArgs) {
         def mockInstance
@@ -89,13 +86,7 @@ class InternalMockController implements MockController {
             def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
             if (mockArgs.concreteInstance) {
                 mpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, this, mockArgs.concreteInstance, mockName)
-                if (GroovyObject.isAssignableFrom(mockArgs.concreteInstance.class)) {
-                    mockArgs.concreteInstance.metaClass = mpmc
-                } else {
-                    def dpmc = DispatcherProxyMetaClass.getInstance(mockArgs.clazz)
-                    dpmc.controller = this
-                    dpmc.setMetaClassForInstance(mockArgs.concreteInstance, mpmc)
-                }
+                setMetaClassTo(mockArgs.concreteInstance, mockArgs.clazz, mpmc)
             } else {
                 mpmc = new MockProxyMetaClass(mockArgs.clazz, classExpectations, this, mockName)
             }
@@ -255,14 +246,18 @@ class InternalMockController implements MockController {
 
     private mockFinalClass(Class clazz, ProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder) {
         def mockInstance = newInstance(clazz, invokeConstructorRecorder)
+        setMetaClassTo(mockInstance, clazz, mpmc)
+        return mockInstance
+    }
+
+    private setMetaClassTo(object, Class clazz, MetaClass mc) {
         if (GroovyObject.isAssignableFrom(clazz)) {
-            mockInstance.metaClass = mpmc
+            object.metaClass = mc
         } else {
             def dpmc = DispatcherProxyMetaClass.getInstance(clazz)
             dpmc.controller = this
-            dpmc.setMetaClassForInstance(mockInstance, mpmc)
+            dpmc.setMetaClassForInstance(object, mc)
         }
-        return mockInstance
     }
 
     private newInstance(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder) {
@@ -292,5 +287,4 @@ class InternalMockController implements MockController {
 
 }
 
-enum Order {NONE, STRICT, LOOSE
-}
+enum Order {NONE, STRICT, LOOSE}
