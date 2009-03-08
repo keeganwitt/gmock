@@ -130,8 +130,8 @@ class MockInternal {
         }
     }
 
-    def hasMethodExpectation(methodName){
-        expectations.hasMethodExpectation(methodName)
+    def findSignature(signature) {
+        return expectations.findSignature(signature)
     }
 
 }

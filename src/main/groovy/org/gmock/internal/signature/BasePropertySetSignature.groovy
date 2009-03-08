@@ -25,6 +25,11 @@ abstract class BasePropertySetSignature {
         this.arguments = new ParameterSignature([arguments])
     }
 
+    BasePropertySetSignature(setterName) {
+        this.setterName = new IdentifierSignature(setterName)
+        this.arguments = new MatchAnyParameterSignature()
+    }
+
     def validate() {}
 
     boolean equals(Object signature) {

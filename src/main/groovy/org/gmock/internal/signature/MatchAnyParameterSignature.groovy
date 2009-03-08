@@ -13,30 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.utils
+package org.gmock.internal.signature
 
-class FakeTagLib {
+class MatchAnyParameterSignature {
 
-
-    def hello = { attrs ->
-        out << "hello"
+    boolean equals(Object signature) {
+        return true
     }
 
-    def linkHello = { attrs ->
-        link(attrs, "hello")
-    }
-
-    def saySomething(){
-        return "something"
-    }
-
-    def getSomething(){
-        return "something"
-    }
-
-    def setSomething(something){
-    }
-    def setSomethingElse(something){
+    boolean match(Object signature) {
+        return true
     }
 
 }

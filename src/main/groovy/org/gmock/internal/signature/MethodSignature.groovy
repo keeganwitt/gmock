@@ -24,6 +24,11 @@ class MethodSignature extends BaseMethodSignature {
         this.object = object
     }
 
+    MethodSignature(object, methodName) {
+        super(methodName)
+        this.object = object
+    }
+
     String toString(boolean showMockName = false) {
         "'$methodName($arguments)'${object.mockName.toString(showMockName)}"
     }
