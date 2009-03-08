@@ -21,7 +21,7 @@ import org.gmock.internal.result.HashCodeDefaultBehavior
 import org.gmock.internal.result.EqualsDefaultBehavior
 import org.gmock.internal.matcher.AlwaysMatchMatcher
 import org.gmock.internal.times.AnyTimes
-import org.gmock.internal.recorder.ReturnMethodRecorder
+import org.gmock.internal.recorder.MethodRecorder
 import static org.gmock.internal.metaclass.MetaClassHelper.*
 import org.gmock.internal.recorder.StaticMethodRecoder
 import static org.gmock.internal.InternalModeHelper.doExternal
@@ -86,7 +86,7 @@ class MockInternal {
             } else {
                 def expectation = new Expectation(signature: signature)
                 addToExpectations(expectation, expectations, controller)
-                return new ReturnMethodRecorder(expectation)
+                return new MethodRecorder(expectation)
             }
         }
     }

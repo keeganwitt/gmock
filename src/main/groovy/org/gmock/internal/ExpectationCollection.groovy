@@ -16,13 +16,11 @@
 package org.gmock.internal
 
 import org.gmock.internal.times.StrictTimes
-import org.gmock.internal.callstate.UnorderedCallState
 
 class ExpectationCollection {
 
     def expectations = []
     def controller
-    def callStateTitle = "unordered"
 
     ExpectationCollection(controller) {
         this.controller = controller
@@ -49,17 +47,6 @@ class ExpectationCollection {
 
     def satisfied() {
         isVerified()
-    }
-
-    def appendToCallState(callState) {
-        if (!empty) {
-            def unorderedCallState = new UnorderedCallState(callState, callStateTitle)
-            expectations.each { unorderedCallState.append(it) }
-        }
-    }
-
-    def empty(){
-        expectations.size() == 0
     }
 
     def validate(){

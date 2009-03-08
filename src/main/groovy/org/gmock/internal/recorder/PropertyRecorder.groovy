@@ -26,12 +26,19 @@ class PropertyRecorder extends BaseRecorder {
 
     def mock
     def propertyName
+    Class setterClass
+    Class getterClass
 
-    PropertyRecorder(mock, propertyName, expectation) {
+    PropertyRecorder(mock, propertyName, expectation, Class uncompleteClass = PropertyUncompleteSignature,
+                     Class setterClass = PropertySetSignature, Class getterClass = PropertyGetSignature) {
         super(expectation)
         this.mock = mock
         this.propertyName = propertyName
-        this.expectation.signature = new PropertyUncompleteSignature(mock, propertyName)
+        this.setterClass = setterClass
+        this.getterClass = getterClass
+        if (uncompleteClass) {
+            expectation.signature = uncompleteClass.newInstance(mock, propertyName)
+        }
     }
 
     def sets(value) {
@@ -39,23 +46,21 @@ class PropertyRecorder extends BaseRecorder {
     }
 
     def set(value) {
-        expectation.signature = new PropertySetSignature(mock, propertyName, value)
+        expectation.signature = setterClass.newInstance(mock, propertyName, value)
         expectation.result = ReturnNull.INSTANCE
-        return this
+        return new PropertySetterRecorder(this)
     }
 
     def returns(value) {
-        expectation.signature = new PropertyGetSignature(mock, propertyName)
+        expectation.signature = getterClass.newInstance(mock, propertyName)
         expectation.result = new ReturnValue(value)
-        return this
+        return new PropertyGetterRecorder(this)
     }
 
-    private doRaises(Object[] params) {
-        if (expectation.signature.class == PropertyUncompleteSignature){
-            expectation.signature = new PropertyGetSignature(mock, propertyName)
-        }
-        expectation.result = ThrowException.metaClass.invokeConstructor(params)
-        return this
+    protected doRaises(Object[] params) {
+        expectation.signature = getterClass.newInstance(mock, propertyName)
+        expectation.result = ThrowException.newInstance(params)
+        return new PropertyGetterRecorder(this)
     }
 
     def raises(Throwable exception) {
@@ -64,6 +69,60 @@ class PropertyRecorder extends BaseRecorder {
 
     def raises(Class exceptionClass, Object[] params) {
         return doRaises(exceptionClass, *params)
+    }
+
+    def times(times) {
+        super.times(times)
+        return new PropertyTimesRecorder(this)
+    }
+
+}
+
+class PropertySetterRecorder extends PropertyRecorder {
+
+    PropertySetterRecorder(recorder) {
+        super(recorder.mock, recorder.propertyName, recorder.expectation, null, recorder.setterClass, recorder.getterClass)
+    }
+
+    def set(value) {
+        expectation = expectation.duplicate()
+        return super.set(value)
+    }
+
+    def returns(value) {
+        expectation = expectation.duplicate()
+        return super.returns(value)
+    }
+
+    protected doRaises(Object[] params) {
+        expectation.result = ThrowException.newInstance(params)
+        return new PropertyGetterRecorder(this)
+    }
+
+}
+
+class PropertyGetterRecorder extends PropertySetterRecorder {
+
+    PropertyGetterRecorder(recorder) {
+        super(recorder)
+    }
+
+    protected doRaises(Object[] params) {
+        expectation = expectation.duplicate()
+        return super.doRaises(params)
+    }
+
+}
+
+class PropertyTimesRecorder extends PropertyGetterRecorder {
+
+    PropertyTimesRecorder(recorder) {
+        super(recorder)
+    }
+
+    def times(times) {
+        expectation = expectation.duplicate()
+        return super.times(times)
     }
 
 }

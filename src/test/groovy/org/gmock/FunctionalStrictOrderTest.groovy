@@ -1137,4 +1137,24 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testMultipleReturnsAndRaisesOnOneExpectation() {
+        def mock = mock {
+            strict {
+                fun().returns(1).raises(RuntimeException).returns(2).times(2)
+                loose {
+                    foo().returns(1).returns(2)
+                }
+            }
+        }
+        play {
+            assertEquals 1, mock.fun()
+            shouldFail(RuntimeException) { mock.fun() }
+            2.times {
+                assertEquals 2, mock.fun()
+            }
+            assertEquals 1, mock.foo()
+            assertEquals 2, mock.foo()
+        }
+    }
+
 }

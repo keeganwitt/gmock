@@ -858,4 +858,56 @@ class FunctionalTest extends GMockTestCase {
         assertEquals expected, message
     }
 
+    void testMultipleReturnsOnOneExpectation() {
+        def mock = mock()
+        mock.fun().returns(1).returns(2)
+        play {
+            assertEquals 1, mock.fun()
+            assertEquals 2, mock.fun()
+        }
+    }
+
+    void testMultipleTimesOnOneExpectation() {
+        def mock = mock()
+        mock.fun().times(2).times(3)
+        mock.foo().returns(1).times(2).atLeastOnce()
+        play {
+            5.times { mock.fun() }
+            4.times {
+                assertEquals 1, mock.foo()
+            }
+        }
+    }
+
+    void testMultipleReturnsAndTimesOnOneExpectation() {
+        def mock = mock()
+        mock.fun().returns(1).times(2).returns(2).times(3).returns(3).times(4)
+        play {
+            (1..3).each { n ->
+                (n + 1).times {
+                    assertEquals n, mock.fun()
+                }
+            }
+        }
+    }
+
+    void testMultipleReturnsAndRaisesOnOneExpectation() {
+        def mock = mock()
+        mock.fun().returns(1).raises(RuntimeException).times(2)
+        play {
+            assertEquals 1, mock.fun()
+            2.times {
+                shouldFail(RuntimeException) { mock.fun() }
+            }
+        }
+    }
+
+    void testMultipleReturnsOnOneExpectationShouldCheckTimes() {
+        def mock = mock()
+        def recorder = mock.fun().times(1).times(1..2)
+        shouldFail(IllegalStateException) {
+            recorder.once()
+        }
+    }
+
 }

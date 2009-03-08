@@ -77,10 +77,10 @@ class ExpectationCollectionTest extends GMockTestCase {
 
     void testEmpty() {
         expectations.expectations = []
-        assert expectations.empty()
+        assert expectations.empty
 
         expectations.expectations = [new Expectation()]
-        assertFalse expectations.empty()
+        assertFalse expectations.empty
     }
 
     void testCheckTimes() {

@@ -83,7 +83,7 @@ class PropertyRecorderTest extends GMockTestCase {
         PropertyRecorder propertyRecorder = new PropertyRecorder(new Object(), "name", expectation)
         def exception = new RuntimeException()
 
-        assertEquals propertyRecorder, propertyRecorder.raises(exception)
+        propertyRecorder.raises(exception)
 
         assertEquals ThrowException, expectation.result.class
         assertEquals exception, expectation.result.exception
@@ -98,7 +98,7 @@ class PropertyRecorderTest extends GMockTestCase {
         PropertyRecorder propertyRecorder = new PropertyRecorder(new Object(), "name", expectation)
         def cause = new RuntimeException()
 
-        assertEquals propertyRecorder, propertyRecorder.raises(Exception, "test", cause)
+        propertyRecorder.raises(Exception, "test", cause)
 
         assertEquals ThrowException, expectation.result.class
         assertEquals Exception, expectation.result.exception.class

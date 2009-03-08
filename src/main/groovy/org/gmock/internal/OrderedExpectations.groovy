@@ -15,9 +15,9 @@
  */
 package org.gmock.internal
 
-import org.gmock.internal.ExpectationCollection as LooseGroup
 import org.gmock.internal.times.StrictTimes
 import org.gmock.internal.callstate.OrderedCallState
+import org.gmock.internal.callstate.UnorderedCallState
 
 class OrderedExpectations {
 
@@ -91,6 +91,7 @@ class StrictGroup {
     def add(expectation) {
         if (controller.strictOrdered) {
             expectation.signatureObserver = this
+            expectation.expectations = this
             expectations << expectation
         } else { // looseOrdered
             expectations.last().add(expectation)
@@ -99,7 +100,6 @@ class StrictGroup {
 
     def newLooseGroup() {
         def looseGroup = new LooseGroup(controller)
-        looseGroup.callStateTitle = "loose"
         expectations << looseGroup
     }
 
@@ -168,6 +168,36 @@ class StrictGroup {
                 }
             }
         }
+    }
+
+    def duplicate(expectation, newExpectation) {
+        newExpectation.signatureObserver = this
+        newExpectation.expectations = this
+        expectations << newExpectation
+    }
+
+}
+
+class LooseGroup extends ExpectationCollection {
+
+    LooseGroup(controller) {
+        super(controller)
+    }
+
+    void add(expectation) {
+        expectation.expectations = this
+        super.add(expectation)
+    }
+
+    def appendToCallState(callState) {
+        if (!empty) {
+            def unorderedCallState = new UnorderedCallState(callState, "loose")
+            expectations.each { unorderedCallState.append(it) }
+        }
+    }
+
+    def duplicate(expectation, newExpectation) {
+        add(newExpectation)
     }
 
 }

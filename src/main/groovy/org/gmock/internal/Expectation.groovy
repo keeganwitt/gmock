@@ -27,6 +27,13 @@ class Expectation {
     def times = new StrictTimes(1)
     def called = 0
     def hidden = false
+    def expectations
+
+    def duplicate() {
+        def result = new Expectation(signature: signature, signatureObserver: signatureObserver, result: result, expectations: expectations)
+        expectations.duplicate(this, result)
+        return result
+    }
 
     void setSignature(signature) {
         this.signature = signature
