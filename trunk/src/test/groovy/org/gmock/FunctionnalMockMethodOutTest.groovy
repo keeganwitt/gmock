@@ -27,7 +27,6 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
         mockTabLib.link([some: "attr"], "hello").returns("<a>link</a>")
 
         play {
-            println "playing"
             tagLib.linkHello([some: "attr"])
         }
 
@@ -46,5 +45,21 @@ class FunctionnalMockMethodOutTest extends GMockTestCase{
         }
 
     }
+
+    void testMockMethodResetAfterPlay(){
+        def tagLib = new FakeTagLib()
+        def mockTabLib = mock(tagLib)
+
+        mockTabLib.saySomething().returns("other thing")
+
+        play {
+            assertEquals "other thing", tagLib.saySomething()
+        }
+        play {
+            assertEquals "something", tagLib.saySomething()
+        }
+    }
+
+
 
 }

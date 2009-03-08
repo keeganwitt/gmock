@@ -11,8 +11,6 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
     def mockName
     MockInternal mock
 
-    LinkedHashSet mockedMethod = new LinkedHashSet()
-
     ConcreteMockProxyMetaClass(Class clazz, controller, concreteObject, mockName) {
         super(GroovySystem.metaClassRegistry, clazz, GroovySystem.metaClassRegistry.getMetaClass(clazz))
         this.controller = controller
@@ -26,13 +24,12 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
 
     Object invokeMethod(Class sender, Object receiver, String methodName, Object[] arguments, boolean isCallToSuper, boolean fromInsideClass) {
         if (controller.replay) {
-            if (mockedMethod.contains(methodName)) {
+            if (mock.hasMethodExpectation(methodName)) {
                 return mock.invokeMockMethod(methodName, arguments)
             } else {
                 return adaptee.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
             }
         } else {
-            mockedMethod.add(methodName)
             return mock.invokeMockMethod(methodName, arguments)
         }
     }

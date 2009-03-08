@@ -129,4 +129,9 @@ class MockInternal {
                     "Are you trying to mock a setter? Use '${property}.set(${value.inspect()})' instead.")
         }
     }
+
+    def hasMethodExpectation(methodName){
+        expectations.hasMethodExpectation(methodName)
+    }
+
 }

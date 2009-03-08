@@ -92,4 +92,9 @@ class ExpectationCollection {
         expectations.empty
     }
 
+    def hasMethodExpectation(methodName){
+        expectations.find { it.isMethodExpectation(methodName) }
+    }
+
+
 }

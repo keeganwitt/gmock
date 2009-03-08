@@ -17,6 +17,7 @@ package org.gmock.internal
 
 import org.gmock.internal.result.ReturnNull
 import org.gmock.internal.times.StrictTimes
+import org.gmock.internal.signature.MethodSignature
 
 class Expectation {
 
@@ -70,6 +71,10 @@ class Expectation {
 
     def findSignature(signature) {
         signature.match(this.signature) ? this : null
+    }
+
+    def isMethodExpectation(methodName){
+        return  signature instanceof MethodSignature && signature.methodName.identifier == methodName
     }
 
 }
