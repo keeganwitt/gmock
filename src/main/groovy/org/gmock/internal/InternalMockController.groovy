@@ -25,10 +25,12 @@ import org.gmock.internal.recorder.ConstructorRecorder
 import org.gmock.internal.recorder.InvokeConstructorRecorder
 import org.gmock.internal.recorder.MockNameRecorder
 import org.objenesis.ObjenesisHelper
-import static org.gmock.internal.InternalModeHelper.doInternal
 import junit.framework.Assert
 import org.gmock.internal.callstate.CallState
 import org.gmock.internal.metaclass.ConcreteMockProxyMetaClass
+import org.gmock.internal.expectation.UnorderedExpectations
+import org.gmock.internal.expectation.OrderedExpectations
+import org.gmock.internal.expectation.ClassExpectations
 
 class InternalMockController implements MockController {
 
@@ -77,7 +79,7 @@ class InternalMockController implements MockController {
 
     private doMock(mockArgs) {
         def mockInstance
-        doInternal(this) {
+        doInternal {
             if (replay) {
                 throw new IllegalStateException("Cannot create mocks in play closure.")
             }
@@ -145,7 +147,7 @@ class InternalMockController implements MockController {
     }
 
     def play(Closure closure) {
-        doInternal(this) {
+        doInternal {
             if (replay) {
                 throw new IllegalStateException("Cannot nest play closures.")
             }
@@ -165,17 +167,17 @@ class InternalMockController implements MockController {
                 closure.call()
             } finally {
                 replay = false
-                doInternal(this) {
+                doInternal {
                     classExpectations.stopProxy()
                 }
             }
-            doInternal(this) {
+            doInternal {
                 mocks*.verify()
                 classExpectations.verify()
                 orderedExpectations.verify()
             }
         } finally {
-            doInternal(this) {
+            doInternal {
                 mocks*.reset()
                 classExpectations.reset()
                 orderedExpectations.reset()
@@ -283,6 +285,32 @@ class InternalMockController implements MockController {
             callState.nowCalling(signature)
         }
         return callState
+    }
+
+    def doInternal(Closure invokeOriginal, Closure work) {
+        if (!internal) {
+            return doInternal(work)
+        } else {
+            return invokeOriginal()
+        }
+    }
+
+    def doInternal(Closure work) {
+        doWork(work, true)
+    }
+
+    def doExternal(Closure work) {
+        doWork(work, false)
+    }
+
+    private doWork(Closure work, boolean mode) {
+        def backup = internal
+        internal = mode
+        try {
+            return work()
+        } finally {
+            internal = backup
+        }
     }
 
 }

@@ -24,11 +24,11 @@ import org.gmock.internal.times.AnyTimes
 import org.gmock.internal.recorder.MethodRecorder
 import static org.gmock.internal.metaclass.MetaClassHelper.*
 import org.gmock.internal.recorder.StaticMethodRecoder
-import static org.gmock.internal.InternalModeHelper.doExternal
 import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.recorder.PropertyRecorder
 import org.gmock.internal.signature.PropertySetSignature
-
+import org.gmock.internal.expectation.Expectation
+import org.gmock.internal.expectation.ExpectationCollection
 
 class MockInternal {
 
@@ -97,7 +97,7 @@ class MockInternal {
         def backup = controller.mockDelegate
         try {
             controller.mockDelegate = recorder
-            doExternal(controller) {
+            controller.doExternal {
                 staticExpectationClosure(recorder)
             }
         } finally {

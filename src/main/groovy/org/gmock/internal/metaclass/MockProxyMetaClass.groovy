@@ -15,7 +15,6 @@
  */
 package org.gmock.internal.metaclass
 
-import static org.gmock.internal.InternalModeHelper.doInternal
 import org.gmock.internal.MockInternal
 import static org.gmock.internal.metaclass.MetaClassHelper.getGMockMethod
 
@@ -39,7 +38,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     Object invokeMethod(Class sender, Object receiver, String methodName, Object[] arguments, boolean isCallToSuper, boolean fromInsideClass) {
-        doInternal(controller) {
+        controller.doInternal {
             adaptee.invokeMethod(receiver, methodName, arguments)
         } {
             return mock.invokeMockMethod(methodName, arguments)
@@ -51,7 +50,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     Object getProperty(Class sender, Object receiver, String property, boolean isCallToSuper, boolean fromInsideClass) {
-        doInternal(controller) {
+        controller.doInternal {
             adaptee.getProperty(receiver, property)
         } {
             return mock.getMockProperty(property)
@@ -63,7 +62,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     void setProperty(Class sender, Object receiver, String property, Object value, boolean isCallToSuper, boolean fromInsideClass) {
-        doInternal(controller) {
+        controller.doInternal {
             adaptee.setProperty(receiver, property, value)
         } {
             return mock.setMockProperty(property, value)
@@ -71,7 +70,7 @@ class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     MetaMethod pickMethod(String methodName, Class[] arguments) {
-        doInternal(controller) {
+        controller.doInternal {
             adaptee.pickMethod(methodName, arguments)
         } {
             if (!controller.replay) {

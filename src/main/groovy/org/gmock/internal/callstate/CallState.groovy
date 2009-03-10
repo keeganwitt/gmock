@@ -15,7 +15,7 @@
  */
 package org.gmock.internal.callstate
 
-import org.gmock.internal.Expectation
+import org.gmock.internal.expectation.Expectation
 
 class CallState {
 
