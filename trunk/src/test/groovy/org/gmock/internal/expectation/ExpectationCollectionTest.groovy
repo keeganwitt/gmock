@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal
+package org.gmock.internal.expectation
 
-import junit.framework.AssertionFailedError
 import org.gmock.GMockTestCase
 import org.gmock.internal.signature.MethodSignature
 import org.gmock.internal.times.RangeTimes
 import org.gmock.internal.times.StrictTimes
-import org.gmock.internal.callstate.CallState
 
 class ExpectationCollectionTest extends GMockTestCase {
 

@@ -17,7 +17,7 @@ package org.gmock.internal.recorder
 
 import org.gmock.internal.result.ThrowException
 import org.gmock.internal.signature.ConstructorSignature
-import org.gmock.internal.Expectation
+import org.gmock.internal.expectation.Expectation
 import org.gmock.internal.result.ReturnValue
 
 class ConstructorRecorder {

@@ -15,8 +15,7 @@
  */
 package org.gmock.internal.recorder
 
-import org.gmock.internal.Expectation
-import static org.gmock.internal.InternalModeHelper.doInternal
+import org.gmock.internal.expectation.Expectation
 import static org.gmock.internal.metaclass.MetaClassHelper.getGMockMethod
 import org.gmock.internal.metaclass.ProxyMetaMethod
 import org.gmock.internal.signature.StaticMethodSignature
@@ -69,7 +68,7 @@ class StaticMethodRecorderProxyMetaClass extends ProxyMetaClass {
     }
 
     MetaMethod pickMethod(String methodName, Class[] arguments) {
-        doInternal(controller) {
+        controller.doInternal {
             adaptee.pickMethod(methodName, arguments)
         } {
             if (!controller.replay) {

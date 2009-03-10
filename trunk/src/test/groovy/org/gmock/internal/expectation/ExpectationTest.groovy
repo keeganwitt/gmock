@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal
+package org.gmock.internal.expectation
 
 import org.gmock.GMockTestCase
 import org.gmock.internal.signature.MethodSignature

@@ -15,7 +15,6 @@
  */
 package org.gmock.internal.metaclass
 
-import static org.gmock.internal.InternalModeHelper.doInternal
 import static org.gmock.internal.metaclass.MetaClassHelper.getGMockMethod
 import org.gmock.internal.util.WeakIdentityHashMap
 
@@ -65,7 +64,7 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
     }
 
     MetaMethod pickMethod(String methodName, Class[] arguments) {
-        doInternal(controller) {
+        controller.doInternal {
             adaptee.pickMethod(methodName, arguments)
         } {
             if (!controller.replay) {
@@ -77,13 +76,13 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
     }
 
     void setMetaClassForInstance(Object instance, MetaClass mc) {
-        doInternal(controller) {
+        controller.doInternal {
             metaClasses.put(instance, mc)
         }
     }
 
     MetaClass getMetaClassForInstance(Object instance) {
-        doInternal(controller) {
+        controller.doInternal {
             adaptee
         } {
             if (metaClasses.empty) {

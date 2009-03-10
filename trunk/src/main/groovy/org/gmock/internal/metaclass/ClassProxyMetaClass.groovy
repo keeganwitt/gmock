@@ -16,8 +16,7 @@
 package org.gmock.internal.metaclass
 
 import java.beans.IntrospectionException
-import org.gmock.internal.ExpectationCollection
-import static org.gmock.internal.InternalModeHelper.doInternal
+import org.gmock.internal.expectation.ExpectationCollection
 import org.gmock.internal.signature.ConstructorSignature
 import org.gmock.internal.signature.StaticPropertyGetSignature
 import org.gmock.internal.signature.StaticPropertySetSignature
@@ -118,7 +117,7 @@ class ClassProxyMetaClass extends ProxyMetaClass {
         if (condition) {
             return invokeOriginal()
         } else {
-            return doInternal(controller, invokeOriginal, work)
+            return controller.doInternal(invokeOriginal, work)
         }
     }
 

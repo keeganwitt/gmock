@@ -16,7 +16,7 @@
 package org.gmock.internal.recorder
 
 import org.gmock.GMockTestCase
-import org.gmock.internal.Expectation
+import org.gmock.internal.expectation.Expectation
 import org.gmock.internal.result.ReturnNull
 import org.gmock.internal.result.ReturnValue
 import org.gmock.internal.result.ThrowException
@@ -24,6 +24,7 @@ import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
 import org.gmock.internal.signature.PropertyUncompleteSignature
 import org.gmock.internal.times.AnyTimes
+import org.gmock.internal.expectation.Expectation
 
 class PropertyRecorderTest extends GMockTestCase {
 
