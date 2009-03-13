@@ -534,4 +534,13 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         }
     }
 
+    void testDelegateOfStaticClosureShouldBehaveTheSame() {
+        mock(Loader).static {
+            it.match(match{it}, delegate.match{it}).returns('yes')
+        }
+        play {
+            assertEquals 'yes', Loader.match {true}{true}
+        }
+    }
+
 }

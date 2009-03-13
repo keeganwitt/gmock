@@ -176,4 +176,13 @@ class FunctionnalExpectationClosureTest extends GMockTestCase {
         }
     }
 
+    void testDelegateOfExpectationClosureShouldBehaveTheSame() {
+        def s = mock {
+            it.match(match{it}, delegate.match{it}).returns('yes')
+        }
+        play {
+            assertEquals 'yes', s.match {true}{true}
+        }
+    }
+
 }

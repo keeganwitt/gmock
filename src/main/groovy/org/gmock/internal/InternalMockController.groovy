@@ -136,10 +136,9 @@ class InternalMockController implements MockController {
 
     private callClosureWithDelegate(Closure closure, delegate) {
         closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure.delegate = delegate
         def backup = mockDelegate
         try {
-            mockDelegate = delegate
+            mockDelegate = closure.delegate = new MockDelegate(delegate, this)
             closure(delegate)
         } finally {
             mockDelegate = backup
@@ -257,7 +256,6 @@ class InternalMockController implements MockController {
             object.metaClass = mc
         } else {
             def dpmc = DispatcherProxyMetaClass.getInstance(clazz)
-            dpmc.controller = this
             dpmc.setMetaClassForInstance(object, mc)
         }
     }

@@ -13,19 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.metaclass
+package org.gmock.internal
 
-class DelegateMetaMethod extends ProxyMetaMethod {
+import org.gmock.internal.metaclass.MockDelegateMetaClass
 
-    Object delegate
+class MockDelegate {
 
-    DelegateMetaMethod(MetaClass metaClass, String name, Class[] parameterTypes, Object delegate) {
-        super(metaClass, name, parameterTypes)
-        this.delegate = delegate
-    }
-
-    Object invoke(Object object, Object[] arguments) {
-        delegate."$name"(*arguments)
+    MockDelegate(delegate, controller) {
+        metaClass = new MockDelegateMetaClass(this.class, delegate, controller)
     }
 
 }

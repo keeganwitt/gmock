@@ -91,12 +91,11 @@ class MockInternal {
         }
     }
     private invokeStaticExpectationClosure(Closure staticExpectationClosure) {
-        def recorder = new StaticMethodRecoder(mockProxyMetaClass.theClass, mockProxyMetaClass.classExpectations, controller)
+        def recorder = new StaticMethodRecoder(mockProxyMetaClass.theClass, mockProxyMetaClass.classExpectations)
         staticExpectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
-        staticExpectationClosure.delegate = recorder
         def backup = controller.mockDelegate
         try {
-            controller.mockDelegate = recorder
+            controller.mockDelegate = staticExpectationClosure.delegate = new MockDelegate(recorder, controller)
             controller.doExternal {
                 staticExpectationClosure(recorder)
             }
@@ -111,7 +110,7 @@ class MockInternal {
             return findExpectation(expectations, signature, "Unexpected property getter call", [], controller)
         } else {
             if (property == "static"){
-                return new StaticMethodRecoder(mockProxyMetaClass.theClass, mockProxyMetaClass.classExpectations, controller)
+                return new StaticMethodRecoder(mockProxyMetaClass.theClass, mockProxyMetaClass.classExpectations)
             } else {
                 def expectation = new Expectation()
                 addToExpectations(expectation, expectations, controller)
