@@ -16,7 +16,6 @@
 package org.gmock.internal.metaclass
 
 import org.gmock.internal.MockInternal
-import static org.gmock.internal.metaclass.MetaClassHelper.getGMockMethod
 
 class MockProxyMetaClass extends ProxyMetaClass {
 
@@ -73,13 +72,8 @@ class MockProxyMetaClass extends ProxyMetaClass {
         controller.doInternal {
             adaptee.pickMethod(methodName, arguments)
         } {
-            if (!controller.replay) {
-                def method = getGMockMethod(methodName, arguments, this, controller)
-                if (method) return method
-            }
             return new ProxyMetaMethod(this, methodName, arguments)
         }
     }
-
 
 }

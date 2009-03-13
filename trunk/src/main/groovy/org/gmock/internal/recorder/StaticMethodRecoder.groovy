@@ -16,8 +16,6 @@
 package org.gmock.internal.recorder
 
 import org.gmock.internal.expectation.Expectation
-import static org.gmock.internal.metaclass.MetaClassHelper.getGMockMethod
-import org.gmock.internal.metaclass.ProxyMetaMethod
 import org.gmock.internal.signature.StaticMethodSignature
 
 class StaticMethodRecoder implements GroovyInterceptable {
@@ -26,10 +24,9 @@ class StaticMethodRecoder implements GroovyInterceptable {
     def aClass
     boolean missingExpectation = true
 
-    StaticMethodRecoder(aClass, classExpectations, controller){
+    StaticMethodRecoder(aClass, classExpectations){
         this.classExpectations = classExpectations
         this.aClass = aClass
-        this.metaClass = new StaticMethodRecorderProxyMetaClass(StaticMethodRecoder, controller)
         classExpectations.addStaticValidator { ->
             if (this.@missingExpectation) {
                 throw new IllegalStateException("Missing static expectation for ${aClass.simpleName}")
@@ -54,41 +51,6 @@ class StaticMethodRecoder implements GroovyInterceptable {
     void setProperty(String property, Object value) {
         throw new MissingPropertyException("Cannot use property setter in record mode. " +
                 "Are you trying to mock a setter? Use 'static.${property}.set(${value.inspect()})' instead.")
-    }
-
-}
-
-class StaticMethodRecorderProxyMetaClass extends ProxyMetaClass {
-
-    def controller
-
-    StaticMethodRecorderProxyMetaClass(Class clazz, controller) {
-        super(GroovySystem.metaClassRegistry, clazz, GroovySystem.metaClassRegistry.getMetaClass(clazz))
-        this.controller = controller
-    }
-
-    MetaMethod pickMethod(String methodName, Class[] arguments) {
-        controller.doInternal {
-            adaptee.pickMethod(methodName, arguments)
-        } {
-            if (!controller.replay) {
-                def method = getGMockMethod(methodName, arguments, this, controller)
-                if (method) return method
-            }
-            return new StaticMethodRecorderProxyMetaMethod(this, methodName, arguments)
-        }
-    }
-
-}
-
-class StaticMethodRecorderProxyMetaMethod extends ProxyMetaMethod {
-
-    StaticMethodRecorderProxyMetaMethod(MetaClass metaClass, String name, Class[] parameterTypes) {
-        super(metaClass, name, parameterTypes)
-    }
-
-    Object invoke(Object object, Object[] arguments) {
-        object."$name"(*arguments)
     }
 
 }

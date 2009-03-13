@@ -15,8 +15,6 @@
  */
 package org.gmock.internal.metaclass
 
-import org.gmock.GMock
-
 class MetaClassHelper {
 
     static findExpectation(expectations, signature, message, arguments, controller) {
@@ -34,20 +32,6 @@ class MetaClassHelper {
         } else {
             controller.orderedExpectations.add(expectation)
         }
-    }
-
-    static getGMockMethod(String methodName, Class[] arguments, MetaClass metaClass, controller) {
-        def method = null, delegator = null
-        if (arguments.length == 1 && Closure.isAssignableFrom(arguments[0])) {
-            if (methodName == "match") {
-                method = GMock.metaClass.pickMethod(methodName, arguments)
-                delegator = GMock
-            } else if (methodName == "strict" || methodName == "loose") {
-                method = controller.metaClass.pickMethod(methodName, arguments)
-                delegator = controller
-            }
-        }
-        return method ? new DelegateMetaMethod(metaClass, methodName, arguments, method, delegator) : null
     }
 
 }
