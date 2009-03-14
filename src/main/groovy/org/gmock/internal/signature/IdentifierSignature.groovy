@@ -35,8 +35,8 @@ class IdentifierSignature {
 
     boolean match(Object signature) {
         if (signature?.class != IdentifierSignature) return false
-        if (!(signature.identifier ==~ identifier)) return false
-        return true
+        if (bidirectRegexMatch(signature.identifier, identifier)) return true
+        return false
     }
 
     int hashCode() {
@@ -77,6 +77,10 @@ class IdentifierSignature {
 
     private convertPropertyName(String name) {
         new IdentifierSignature(name[0].toLowerCase() + name.substring(1))
+    }
+
+    private bidirectRegexMatch(a,b){
+        return a ==~ b || b ==~ a
     }
 
 }
