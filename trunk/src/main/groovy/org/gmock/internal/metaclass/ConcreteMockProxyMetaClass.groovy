@@ -35,7 +35,11 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
                 return adaptee.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
             }
         } else {
-            return mock.invokeMockMethod(methodName, arguments)
+            if (receiver == concreteObject){
+                return adaptee.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
+            } else {
+                return mock.invokeMockMethod(methodName, arguments)
+            }
         }
     }
 
@@ -55,7 +59,11 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
                     return adaptee.getProperty(sender, receiver, property, isCallToSuper, fromInsideClass)
                 }
             } else {
-                return mock.getMockProperty(property)
+                if (receiver == concreteObject){
+                    return adaptee.getProperty(sender, receiver, property, isCallToSuper, fromInsideClass)
+                } else {
+                    return mock.getMockProperty(property)
+                }
             }
         }
     }
@@ -76,7 +84,11 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
                     return adaptee.setProperty(sender, receiver, property, value, isCallToSuper, fromInsideClass)
                 }
             } else {
-                return mock.setMockProperty(property, value)
+                if (receiver == concreteObject){
+                    return adaptee.setProperty(sender, receiver, property, value, isCallToSuper, fromInsideClass)
+                } else {
+                    return mock.setMockProperty(property, value)
+                }
             }
         }
     }

@@ -145,5 +145,13 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
         }
     }
 
+    void testConcreteObjectShouldNotBeMockedOutsidePlayClosure() {
+        def tagLib = new FakeTagLib()
+        mock(tagLib)
+        tagLib.saySomething()
+        tagLib.something
+        tagLib.something = "goodbye"
+        play {}
+    }
 
 }
