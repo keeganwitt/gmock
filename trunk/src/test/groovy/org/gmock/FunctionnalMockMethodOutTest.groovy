@@ -125,9 +125,9 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
 
     void testMockMethodResetAfterPlay() {
         def tagLib = new FakeTagLib()
-        def mockTabLib = mock(tagLib)
+        def mockTagLib = mock(tagLib)
 
-        mockTabLib.saySomething().returns("other thing")
+        mockTagLib.saySomething().returns("other thing")
 
         play {
             assertEquals "other thing", tagLib.saySomething()
@@ -152,6 +152,18 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
         tagLib.something
         tagLib.something = "goodbye"
         play {}
+    }
+
+    void testCallOnMockDuringPlayDelegateToConcrete() {
+        def tagLib = new FakeTagLib()
+        def mockTagLib = mock(tagLib)
+        mockTagLib.say().stub()
+        play {
+            tagLib.say()
+            mockTagLib.say()
+            assertEquals("something", tagLib.getSomething())
+            assertEquals("something", mockTagLib.getSomething())
+        }
     }
 
 }
