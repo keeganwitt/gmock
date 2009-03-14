@@ -27,18 +27,24 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
     }
 
     Object invokeMethod(Class sender, Object receiver, String methodName, Object[] arguments, boolean isCallToSuper, boolean fromInsideClass) {
-        if (controller.replay) {
-            def signature = new MethodSignature(this, methodName)
-            if (mock.findSignature(signature)) {
-                return mock.invokeMockMethod(methodName, arguments)
+        controller.doInternal {
+            return adaptee.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
+        } {
+            if (controller.replay) {
+                def signature = new MethodSignature(this, methodName)
+                if (mock.findSignature(signature)) {
+                    return mock.invokeMockMethod(methodName, arguments)
+                } else {
+                    return controller.doExternal {
+                        adaptee.invokeMethod(sender, concreteObject, methodName, arguments, isCallToSuper, fromInsideClass)
+                    }
+                }
             } else {
-                return adaptee.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
-            }
-        } else {
-            if (receiver == concreteObject){
-                return adaptee.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
-            } else {
-                return mock.invokeMockMethod(methodName, arguments)
+                if (receiver == concreteObject){
+                    return adaptee.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass)
+                } else {
+                    return mock.invokeMockMethod(methodName, arguments)
+                }
             }
         }
     }
@@ -56,7 +62,9 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
                 if (mock.findSignature(signature)) {
                     return mock.getMockProperty(property)
                 } else {
-                    return adaptee.getProperty(sender, receiver, property, isCallToSuper, fromInsideClass)
+                    return controller.doExternal {
+                        return adaptee.getProperty(sender, concreteObject, property, isCallToSuper, fromInsideClass)
+                    }
                 }
             } else {
                 if (receiver == concreteObject){
@@ -81,7 +89,9 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
                 if (mock.findSignature(signature)) {
                     return mock.setMockProperty(property, value)
                 } else {
-                    return adaptee.setProperty(sender, receiver, property, value, isCallToSuper, fromInsideClass)
+                    return controller.doExternal {
+                        return adaptee.setProperty(sender, concreteObject, property, value, isCallToSuper, fromInsideClass)
+                    }
                 }
             } else {
                 if (receiver == concreteObject){
