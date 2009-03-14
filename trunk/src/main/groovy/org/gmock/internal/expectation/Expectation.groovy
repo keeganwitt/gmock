@@ -80,8 +80,5 @@ class Expectation {
         signature.match(this.signature) ? this : null
     }
 
-    def isMethodExpectation(methodName){
-        return  signature instanceof MethodSignature && signature.methodName.identifier == methodName
-    }
 
 }

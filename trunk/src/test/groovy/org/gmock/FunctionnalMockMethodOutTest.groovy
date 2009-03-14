@@ -137,5 +137,13 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
         }
     }
 
+    void testRegexMethodName() {
+        def tagLib = new FakeTagLib()
+        mock(tagLib)./say.*/().returns('regex')
+        play {
+            assertEquals 'regex', tagLib.saySomething()
+        }
+    }
+
 
 }
