@@ -34,12 +34,13 @@ import static org.gmock.internal.metaclass.MetaClassHelper.setMetaClassTo
 
 class InternalMockController implements MockController {
 
+    def mockFactory
+
     def mocks = []
     def concreteMocks = []
     def classExpectations = new ClassExpectations(this)
     def orderedExpectations = new OrderedExpectations(this)
     def unorderedExpectations = new UnorderedExpectations()
-    def defaultNames = [:]
 
     boolean replay = false
     Order order = Order.NONE
@@ -48,6 +49,11 @@ class InternalMockController implements MockController {
     // while running in internal mode, we should not mock any methods, instead, we should invoke the original implements
     // it is a little like the kernel mode in OS
     boolean internal = false
+
+
+    InternalMockController(){
+        mockFactory = new MockFactory(this)
+    }
 
     boolean isOrdered() {
         order != Order.NONE
@@ -79,60 +85,28 @@ class InternalMockController implements MockController {
     }
 
     private doMock(mockArgs) {
-        def mockInstance
+        def mock
         doInternal {
             if (replay) {
                 throw new IllegalStateException("Cannot create mocks in play closure.")
             }
-
-            def mpmc
-            def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
             if (mockArgs.containsKey('concreteInstance')) {
-                mpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, this, mockArgs.concreteInstance, mockName)
-                concreteMocks << mpmc
+                mock = mockFactory.createConcreteMock(mockArgs)
+                mocks << mock
             } else {
-                mpmc = new MockProxyMetaClass(mockArgs.clazz, classExpectations, this, mockName)
+                mock = mockFactory.createMock(mockArgs)
+                mocks << mock
             }
-
-            if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
-                mockInstance = mockNonFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder, mockName)
-            } else {
-                mockInstance = mockFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder)
-            }
-
             if (mockArgs.constructorRecorder) {
-                def expectation = mockArgs.constructorRecorder.generateExpectation(mockArgs.clazz, mockInstance)
+                def expectation = mockArgs.constructorRecorder.generateExpectation(mockArgs.clazz, mock.mockInstance)
                 classExpectations.addConstructorExpectation(mockArgs.clazz, expectation)
             }
-            def mock = new MockInternal(this, mockInstance, mockName, mpmc)
-
-            mocks << mock
         }
         if (mockArgs.expectationClosure) {
-            callClosureWithDelegate(mockArgs.expectationClosure, mockInstance)
+            callClosureWithDelegate(mockArgs.expectationClosure, mock.mockInstance)
         }
 
-        return mockInstance
-    }
-
-    private getMockName(Class clazz, MockNameRecorder mockNameRecorder) {
-        def mockName
-        if (mockNameRecorder) {
-            mockName = mockNameRecorder
-        } else {
-            mockName = new MockNameRecorder(clazz)
-            if (!defaultNames[clazz]) {
-                defaultNames[clazz] = mockName
-            } else {
-                if (defaultNames[clazz] instanceof MockNameRecorder) {
-                    defaultNames[clazz].count = 1
-                    mockName.count = defaultNames[clazz] = 2
-                } else { // defaultNames[clazz] instanceof Integer
-                    mockName.count = ++defaultNames[clazz]
-                }
-            }
-        }
-        return mockName
+        return mock.mockInstance
     }
 
     private callClosureWithDelegate(Closure closure, delegate) {
@@ -227,38 +201,6 @@ class InternalMockController implements MockController {
             closure(mockDelegate)
         } finally {
             this.order = backup
-        }
-    }
-
-    private mockNonFinalClass(Class clazz, ProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder, mockName) {
-        def groovyMethodInterceptor = new GroovyMethodInterceptor(mpmc)
-        def javaMethodInterceptor = new JavaMethodInterceptor(this, mpmc, mockName)
-
-        def superClass = clazz.isInterface() ? Object : clazz
-        def interfaces = clazz.isInterface() ? [clazz, GroovyObject] : [GroovyObject]
-
-        def enhancer = new Enhancer(superclass: superClass, interfaces: interfaces,
-                callbackFilter: GroovyObjectMethodFilter.INSTANCE,
-                callbackTypes: [MethodInterceptor, MethodInterceptor])
-        def mockClass = enhancer.createClass()
-
-        def mockInstance = newInstance(mockClass, invokeConstructorRecorder)
-        MockHelper.setCallbacksTo(mockInstance, [groovyMethodInterceptor, javaMethodInterceptor] as Callback[])
-
-        return mockInstance
-    }
-
-    private mockFinalClass(Class clazz, ProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder) {
-        def mockInstance = newInstance(clazz, invokeConstructorRecorder)
-        setMetaClassTo(mockInstance, clazz, mpmc, this)
-        return mockInstance
-    }
-
-    private newInstance(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder) {
-        if (invokeConstructorRecorder) {
-            return clazz.newInstance(invokeConstructorRecorder.args)
-        } else {
-            return ObjenesisHelper.newInstance(clazz)
         }
     }
 
