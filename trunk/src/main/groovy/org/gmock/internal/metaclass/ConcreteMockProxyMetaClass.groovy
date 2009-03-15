@@ -24,7 +24,6 @@ import static org.gmock.internal.metaclass.MetaClassHelper.setMetaClassTo
 import org.gmock.internal.util.WeakIdentityHashMap
 
 class ConcreteMockProxyMetaClass extends ProxyMetaClass {
-    static Map metaClasses = new WeakIdentityHashMap()
 
     def controller
     def mpmc
@@ -39,17 +38,6 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
         this.mockName = mockName
     }
 
-    static getInstance(concreteInstance) {
-        return metaClasses.get(concreteInstance)
-    }
-
-    static createInstance(controller, mockArgs, mockName){
-        def concreteInstance = mockArgs.concreteInstance
-        def mpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, controller, mockArgs.concreteInstance, mockName)
-        MetaClassHelper.setMetaClassTo(mockArgs.concreteInstance, mockArgs.clazz, mpmc)
-        metaClasses.put(concreteInstance, mpmc)
-        return mpmc
-    }
 
     Object invokeMethod(Object object, String methodName, Object[] arguments) {
         invokeMethod(theClass, object, methodName, arguments, false, false)

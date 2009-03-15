@@ -27,6 +27,7 @@ import static org.gmock.internal.metaclass.MetaClassHelper.setMetaClassTo
 import org.gmock.internal.metaclass.ConcreteMockProxyMetaClass
 import java.lang.reflect.Modifier
 import org.objenesis.ObjenesisHelper
+import org.gmock.internal.util.WeakIdentityHashMap
 
 
 class MockFactory {
@@ -34,6 +35,7 @@ class MockFactory {
 
     def controller
     def defaultNames = [:]
+    Map concreteMocks = new WeakIdentityHashMap()
     def mockCollection
 
     MockFactory(controller, mockCollection){
@@ -83,17 +85,23 @@ class MockFactory {
 
     def createConcreteMock(mockArgs){
         def mockInstance
-        def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
-        def mpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, controller, mockArgs.concreteInstance, mockName)
-        controller.concreteMocks << mpmc
-        if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
-            mockInstance = mockNonFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder, mockName)
+        def concreteInstance = mockArgs.concreteInstance
+        if (concreteMocks.containsKey(concreteInstance)){
+            return concreteMocks.get(concreteInstance)
         } else {
-            mockInstance = mockFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder)
+            def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
+            def mpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, controller, mockArgs.concreteInstance, mockName)
+            controller.concreteMocks << mpmc
+            if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
+                mockInstance = mockNonFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder, mockName)
+            } else {
+                mockInstance = mockFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder)
+            }
+            def mock = new MockInternal(controller, mockInstance, mockName, mpmc)
+            mockCollection << mock
+            concreteMocks.put(concreteInstance, mock)
+            return mock
         }
-        def mock = new MockInternal(controller, mockInstance, mockName, mpmc)
-        mockCollection << mock
-        return mock
     }
 
 
