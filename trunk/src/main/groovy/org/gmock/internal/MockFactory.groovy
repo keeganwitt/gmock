@@ -19,8 +19,27 @@ import org.gmock.internal.recorder.ConstructorRecorder
 import org.gmock.internal.recorder.InvokeConstructorRecorder
 import org.gmock.internal.recorder.MockNameRecorder
 import org.gmock.GMockController
+import org.gmock.internal.metaclass.MockProxyMetaClass
+import net.sf.cglib.proxy.Enhancer
+import net.sf.cglib.proxy.Callback
+import net.sf.cglib.proxy.MethodInterceptor
+import static org.gmock.internal.metaclass.MetaClassHelper.setMetaClassTo
+import org.gmock.internal.metaclass.ConcreteMockProxyMetaClass
+import java.lang.reflect.Modifier
+import org.objenesis.ObjenesisHelper
+
 
 class MockFactory {
+
+
+    def controller
+    def defaultNames = [:]
+
+    MockFactory(controller){
+        this.controller = controller
+    }
+
+
 
     private static final ARG_CLASSES = [constructorRecorder: ConstructorRecorder,
                                         invokeConstructorRecorder: InvokeConstructorRecorder,
@@ -46,6 +65,32 @@ class MockFactory {
         return mockArgs
     }
 
+    def createMock(mockArgs){
+        def mockInstance
+        def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
+        def mpmc = new MockProxyMetaClass(mockArgs.clazz, controller.classExpectations, controller, mockName)
+        if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
+            mockInstance = mockNonFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder, mockName)
+        } else {
+            mockInstance = mockFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder)
+        }
+        return new MockInternal(controller, mockInstance, mockName, mpmc)
+    }
+
+    def createConcreteMock(mockArgs){
+        def mockInstance
+        def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
+        def mpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, controller, mockArgs.concreteInstance, mockName)
+        controller.concreteMocks << mpmc
+        if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
+            mockInstance = mockNonFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder, mockName)
+        } else {
+            mockInstance = mockFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder)
+        }
+        return new MockInternal(controller, mockInstance, mockName, mpmc)
+    }
+
+
     private static findArgName(arg) {
         ARG_CLASSES.find {k, Class c -> c.isInstance(arg) }?.key
     }
@@ -65,5 +110,59 @@ class MockFactory {
     private static invalidMockMethod(Class clazz, Object[] args) {
         throw new MissingMethodException("mock", GMockController, [clazz, *args] as Object[])
     }
+
+    private getMockName(Class clazz, MockNameRecorder mockNameRecorder) {
+        def mockName
+        if (mockNameRecorder) {
+            mockName = mockNameRecorder
+        } else {
+            mockName = new MockNameRecorder(clazz)
+            if (!defaultNames[clazz]) {
+                defaultNames[clazz] = mockName
+            } else {
+                if (defaultNames[clazz] instanceof MockNameRecorder) {
+                    defaultNames[clazz].count = 1
+                    mockName.count = defaultNames[clazz] = 2
+                } else { // defaultNames[clazz] instanceof Integer
+                    mockName.count = ++defaultNames[clazz]
+                }
+            }
+        }
+        return mockName
+    }
+
+    private mockNonFinalClass(Class clazz, ProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder, mockName) {
+        def groovyMethodInterceptor = new GroovyMethodInterceptor(mpmc)
+        def javaMethodInterceptor = new JavaMethodInterceptor(controller, mpmc, mockName)
+
+        def superClass = clazz.isInterface() ? Object : clazz
+        def interfaces = clazz.isInterface() ? [clazz, GroovyObject] : [GroovyObject]
+
+        def enhancer = new Enhancer(superclass: superClass, interfaces: interfaces,
+                callbackFilter: GroovyObjectMethodFilter.INSTANCE,
+                callbackTypes: [MethodInterceptor, MethodInterceptor])
+        def mockClass = enhancer.createClass()
+
+        def mockInstance = newInstance(mockClass, invokeConstructorRecorder)
+        MockHelper.setCallbacksTo(mockInstance, [groovyMethodInterceptor, javaMethodInterceptor] as Callback[])
+
+        return mockInstance
+    }
+
+    private mockFinalClass(Class clazz, ProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder) {
+        def mockInstance = newInstance(clazz, invokeConstructorRecorder)
+        setMetaClassTo(mockInstance, clazz, mpmc, controller)
+        return mockInstance
+    }
+
+    private newInstance(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder) {
+        if (invokeConstructorRecorder) {
+            return clazz.newInstance(invokeConstructorRecorder.args)
+        } else {
+            return ObjenesisHelper.newInstance(clazz)
+        }
+    }
+
+
 
 }
