@@ -20,6 +20,7 @@ import org.gmock.internal.util.WeakIdentityHashMap
 class DispatcherProxyMetaClass extends ProxyMetaClass {
 
     private Map metaClasses = new WeakIdentityHashMap()
+    def controller
 
     private DispatcherProxyMetaClass(MetaClassRegistry registry, Class clazz, MetaClass originalMetaClass) {
         super(registry, clazz, originalMetaClass)
@@ -72,6 +73,8 @@ class DispatcherProxyMetaClass extends ProxyMetaClass {
     MetaClass getMetaClassForInstance(Object instance) {
         if (metaClasses.empty) {
             stopProxy()
+            return adaptee
+        } else if (controller.internal) {
             return adaptee
         } else {
             return metaClasses.get(instance) ?: adaptee
