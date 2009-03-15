@@ -36,7 +36,7 @@ class InternalMockController implements MockController {
 
     def mockFactory
 
-    def mocks = []
+    def mockCollection = []
     def concreteMocks = []
     def classExpectations = new ClassExpectations(this)
     def orderedExpectations = new OrderedExpectations(this)
@@ -52,7 +52,7 @@ class InternalMockController implements MockController {
 
 
     InternalMockController(){
-        mockFactory = new MockFactory(this)
+        mockFactory = new MockFactory(this, mockCollection)
     }
 
     boolean isOrdered() {
@@ -92,10 +92,8 @@ class InternalMockController implements MockController {
             }
             if (mockArgs.containsKey('concreteInstance')) {
                 mock = mockFactory.createConcreteMock(mockArgs)
-                mocks << mock
             } else {
                 mock = mockFactory.createMock(mockArgs)
-                mocks << mock
             }
             if (mockArgs.constructorRecorder) {
                 def expectation = mockArgs.constructorRecorder.generateExpectation(mockArgs.clazz, mock.mockInstance)
@@ -129,10 +127,10 @@ class InternalMockController implements MockController {
                 throw new IllegalStateException("Play closures cannot be inside strict closure.")
             }
 
-            mocks*.validate()
+            mockCollection*.validate()
             classExpectations.validate()
             orderedExpectations.validate()
-            mocks*.replay()
+            mockCollection*.replay()
             concreteMocks*.startProxy()
             classExpectations.startProxy()
         }
@@ -148,13 +146,13 @@ class InternalMockController implements MockController {
                 }
             }
             doInternal {
-                mocks*.verify()
+                mockCollection*.verify()
                 classExpectations.verify()
                 orderedExpectations.verify()
             }
         } finally {
             doInternal {
-                mocks*.reset()
+                mockCollection*.reset()
                 classExpectations.reset()
                 orderedExpectations.reset()
                 unorderedExpectations.reset()
@@ -207,12 +205,12 @@ class InternalMockController implements MockController {
     def fail(message, signature = null) {
         def callState = callState(signature).toString()
         if (callState) { callState = "\n$callState" }
-        signature = signature ? ' ' + signature.toString(mocks.size() > 1) : ''
+        signature = signature ? ' ' + signature.toString(mockCollection.size() > 1) : ''
         Assert.fail("$message$signature$callState")
     }
 
     private callState(signature) {
-        def callState = new CallState(mocks.size() > 1, !orderedExpectations.empty)
+        def callState = new CallState(mockCollection.size() > 1, !orderedExpectations.empty)
         orderedExpectations.appendToCallState(callState)
         unorderedExpectations.appendToCallState(callState)
         if (signature) {
