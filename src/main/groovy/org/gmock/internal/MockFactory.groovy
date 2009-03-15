@@ -34,9 +34,11 @@ class MockFactory {
 
     def controller
     def defaultNames = [:]
+    def mockCollection
 
-    MockFactory(controller){
+    MockFactory(controller, mockCollection){
         this.controller = controller
+        this.mockCollection = mockCollection
     }
 
 
@@ -74,7 +76,9 @@ class MockFactory {
         } else {
             mockInstance = mockFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder)
         }
-        return new MockInternal(controller, mockInstance, mockName, mpmc)
+        def mock = new MockInternal(controller, mockInstance, mockName, mpmc)
+        mockCollection << mock
+        return mock
     }
 
     def createConcreteMock(mockArgs){
@@ -87,7 +91,9 @@ class MockFactory {
         } else {
             mockInstance = mockFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder)
         }
-        return new MockInternal(controller, mockInstance, mockName, mpmc)
+        def mock = new MockInternal(controller, mockInstance, mockName, mpmc)
+        mockCollection << mock
+        return mock
     }
 
 
