@@ -19,7 +19,6 @@ import java.lang.reflect.Modifier
 import net.sf.cglib.proxy.Callback
 import net.sf.cglib.proxy.Enhancer
 import net.sf.cglib.proxy.MethodInterceptor
-import org.gmock.internal.metaclass.DispatcherProxyMetaClass
 import org.gmock.internal.metaclass.MockProxyMetaClass
 import org.gmock.internal.recorder.ConstructorRecorder
 import org.gmock.internal.recorder.InvokeConstructorRecorder
@@ -31,10 +30,12 @@ import org.gmock.internal.metaclass.ConcreteMockProxyMetaClass
 import org.gmock.internal.expectation.UnorderedExpectations
 import org.gmock.internal.expectation.OrderedExpectations
 import org.gmock.internal.expectation.ClassExpectations
+import static org.gmock.internal.metaclass.MetaClassHelper.setMetaClassTo
 
 class InternalMockController implements MockController {
 
     def mocks = []
+    def concreteMocks = []
     def classExpectations = new ClassExpectations(this)
     def orderedExpectations = new OrderedExpectations(this)
     def unorderedExpectations = new UnorderedExpectations()
@@ -86,9 +87,9 @@ class InternalMockController implements MockController {
 
             def mpmc
             def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
-            if (mockArgs.concreteInstance) {
+            if (mockArgs.containsKey('concreteInstance')) {
                 mpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, this, mockArgs.concreteInstance, mockName)
-                setMetaClassTo(mockArgs.concreteInstance, mockArgs.clazz, mpmc)
+                concreteMocks << mpmc
             } else {
                 mpmc = new MockProxyMetaClass(mockArgs.clazz, classExpectations, this, mockName)
             }
@@ -158,6 +159,7 @@ class InternalMockController implements MockController {
             classExpectations.validate()
             orderedExpectations.validate()
             mocks*.replay()
+            concreteMocks*.startProxy()
             classExpectations.startProxy()
         }
         try {
@@ -168,6 +170,7 @@ class InternalMockController implements MockController {
                 replay = false
                 doInternal {
                     classExpectations.stopProxy()
+                    concreteMocks*.stopProxy()
                 }
             }
             doInternal {
@@ -247,17 +250,8 @@ class InternalMockController implements MockController {
 
     private mockFinalClass(Class clazz, ProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder) {
         def mockInstance = newInstance(clazz, invokeConstructorRecorder)
-        setMetaClassTo(mockInstance, clazz, mpmc)
+        setMetaClassTo(mockInstance, clazz, mpmc, this)
         return mockInstance
-    }
-
-    private setMetaClassTo(object, Class clazz, MetaClass mc) {
-        if (GroovyObject.isAssignableFrom(clazz)) {
-            object.metaClass = mc
-        } else {
-            def dpmc = DispatcherProxyMetaClass.getInstance(clazz)
-            dpmc.setMetaClassForInstance(object, mc)
-        }
     }
 
     private newInstance(Class clazz, InvokeConstructorRecorder invokeConstructorRecorder) {

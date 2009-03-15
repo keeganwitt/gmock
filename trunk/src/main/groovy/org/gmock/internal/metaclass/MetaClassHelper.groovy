@@ -34,4 +34,23 @@ class MetaClassHelper {
         }
     }
 
+    static setMetaClassTo(object, Class clazz, MetaClass mc, controller) {
+        if (GroovyObject.isInstance(object)) {
+            object.metaClass = mc
+        } else {
+            def dpmc = DispatcherProxyMetaClass.getInstance(clazz)
+            dpmc.controller = controller
+            dpmc.setMetaClassForInstance(object, mc)
+        }
+    }
+
+    static getMetaClassFrom(object) {
+        def metaClass = object.metaClass
+        if (metaClass instanceof DispatcherProxyMetaClass) {
+            return metaClass.getMetaClassForInstance(object)
+        } else {
+            return metaClass
+        }
+    }
+
 }

@@ -166,4 +166,12 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
         }
     }
 
+    void testMockJavaClass() {
+        def s = ''
+        mock(s).doSomething().returns('java class')
+        play {
+            assertEquals 'java class', s.doSomething()
+        }
+    }
+
 }
