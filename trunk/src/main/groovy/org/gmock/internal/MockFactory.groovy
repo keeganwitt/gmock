@@ -122,7 +122,7 @@ class MockFactory {
     private isValidConcreteArgs(args){
         if (args.size() > 1){
             for (a in args[1..-1]){
-                if (!instanceOfKnowClass(a)){
+                if (!instanceOfKnowConcreteClass(a)){
                     return false
                 }
             }
@@ -146,14 +146,13 @@ class MockFactory {
         findConcreteArgName(object)
     }
 
-    private boolean allInstanceOfKnowClass(array) {
-    }
-
     private checkAndSet(Map mockArgs, String name, Object arg, Class clazz, Object[] args) {
-        if (mockArgs[name]) {
-            invalidMockMethod(clazz, args)
-        } else {
-            mockArgs[name] = arg
+        if (name){
+            if (mockArgs[name]) {
+                invalidMockMethod(clazz, args)
+            } else {
+                mockArgs[name] = arg
+            }
         }
     }
 
