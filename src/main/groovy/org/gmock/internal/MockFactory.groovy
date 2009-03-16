@@ -38,7 +38,7 @@ class MockFactory {
     Map concreteMocks = new WeakIdentityHashMap()
     def mockCollection
 
-    MockFactory(controller, mockCollection){
+    MockFactory(controller, mockCollection) {
         this.controller = controller
         this.mockCollection = mockCollection
     }
@@ -46,30 +46,14 @@ class MockFactory {
 
 
     private static final ARG_CLASSES = [constructorRecorder: ConstructorRecorder,
-                                        invokeConstructorRecorder: InvokeConstructorRecorder,
-                                        mockNameRecorder: MockNameRecorder,
-                                        expectationClosure: Closure]
+            invokeConstructorRecorder: InvokeConstructorRecorder,
+            mockNameRecorder: MockNameRecorder,
+            expectationClosure: Closure]
 
-    static parseMockArgument(clazz, args) {
-        def mockArgs = [:]
-        if (clazz == Object && args.size() == 1 && !instanceOfKnowClass(args[0])) {
-            mockArgs.concreteInstance = args[0]
-            mockArgs.clazz = args[0].class
-        } else {
-            mockArgs.clazz = clazz
-            args.each {arg ->
-                def name = findArgName(arg)
-                if (name) {
-                    checkAndSet(mockArgs, name, arg, clazz, args)
-                } else {
-                    invalidMockMethod(clazz, args)
-                }
-            }
-        }
-        return mockArgs
-    }
+    private static final CONCRETE_ARG_CLASSES = [mockNameRecorder: MockNameRecorder,
+            expectationClosure: Closure]
 
-    def createMock(mockArgs){
+    def createMock(mockArgs) {
         def mockInstance
         def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
         def mpmc = new MockProxyMetaClass(mockArgs.clazz, controller.classExpectations, controller, mockName)
@@ -83,10 +67,10 @@ class MockFactory {
         return mock
     }
 
-    def createConcreteMock(mockArgs){
+    def createConcreteMock(mockArgs) {
         def mockInstance
         def concreteInstance = mockArgs.concreteInstance
-        if (concreteMocks.containsKey(concreteInstance)){
+        if (concreteMocks.containsKey(concreteInstance)) {
             return concreteMocks.get(concreteInstance)
         } else {
             def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
@@ -105,15 +89,67 @@ class MockFactory {
     }
 
 
-    private static findArgName(arg) {
+    def parseMockArgument(clazz, args) {
+        def mockArgs = [:]
+        if (isValidMockArgs(args)){
+            mockArgs.clazz = clazz
+            args.each {arg ->
+                def name = findArgName(arg)
+                checkAndSet(mockArgs, name, arg, clazz, args)
+            }
+        } else if (clazz == Object && isValidConcreteArgs(args)){
+            mockArgs.concreteInstance = args[0]
+            mockArgs.clazz = args[0].class
+            args.each {arg ->
+                def name = findConcreteArgName(arg)
+                checkAndSet(mockArgs, name, arg, clazz, args)
+            }
+        } else {
+            invalidMockMethod(clazz, args)
+        }
+        return mockArgs
+    }
+
+    private isValidMockArgs(args){
+        for (a in args){
+            if (!instanceOfKnowClass(a)){
+                return false
+            }
+        }
+        return true
+    }
+
+    private isValidConcreteArgs(args){
+        if (args.size() > 1){
+            for (a in args[1..-1]){
+                if (!instanceOfKnowClass(a)){
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    private findArgName(arg) {
         ARG_CLASSES.find {k, Class c -> c.isInstance(arg) }?.key
     }
 
-    private static boolean instanceOfKnowClass(object) {
+    private findConcreteArgName(arg) {
+        CONCRETE_ARG_CLASSES.find {k, Class c -> c.isInstance(arg) }?.key
+    }
+
+    private boolean instanceOfKnowClass(object) {
         findArgName(object)
     }
 
-    private static checkAndSet(Map mockArgs, String name, Object arg, Class clazz, Object[] args) {
+    private boolean instanceOfKnowConcreteClass(object) {
+        findConcreteArgName(object)
+    }
+
+    private boolean allInstanceOfKnowClass(array) {
+    }
+
+    private checkAndSet(Map mockArgs, String name, Object arg, Class clazz, Object[] args) {
         if (mockArgs[name]) {
             invalidMockMethod(clazz, args)
         } else {
@@ -121,8 +157,8 @@ class MockFactory {
         }
     }
 
-    private static invalidMockMethod(Class clazz, Object[] args) {
-        throw new MissingMethodException("mock", GMockController, [clazz, *args] as Object[])
+    private invalidMockMethod(Class clazz, Object[] args) {
+        throw new MissingMethodException("mock", GMockController, [clazz, * args] as Object[])
     }
 
     private getMockName(Class clazz, MockNameRecorder mockNameRecorder) {
@@ -176,7 +212,6 @@ class MockFactory {
             return ObjenesisHelper.newInstance(clazz)
         }
     }
-
 
 
 }
