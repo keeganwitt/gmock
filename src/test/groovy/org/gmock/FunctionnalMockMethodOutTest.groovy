@@ -32,6 +32,17 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
         }
     }
 
+    void testMockMethodOutUsingClosure() {
+        def tagLib = new FakeTagLib()
+        mock(tagLib){
+            link([some: "attr"], "hello").returns("<a>link</a>")
+        }
+
+        play {
+            tagLib.linkHello([some: "attr"])
+        }
+    }
+
     void testMockMethodOutReturnSameMock() {
         def tagLib = new FakeTagLib()
         mock(tagLib).link([some: "attr"], "hello").returns("<a>link</a>")
