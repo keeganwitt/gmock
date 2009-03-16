@@ -80,7 +80,7 @@ class InternalMockController implements MockController {
     }
 
     def mock(Class clazz = Object, Object ... args) {
-        def mockArgs = MockFactory.parseMockArgument(clazz, args)
+        def mockArgs = mockFactory.parseMockArgument(clazz, args)
         return doMock(mockArgs)
     }
 

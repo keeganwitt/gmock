@@ -177,6 +177,14 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
         }
     }
 
+    void testNameForConcreteMock(){
+        def tagLib = new FakeTagLib()
+        def mockTagLib = mock(tagLib, name("The mock name"))
+        play {
+            assertEquals "The mock name", mockTagLib.toString()
+        }
+    }
+
     void testMockJavaClass() {
         def s = ''
         mock(s).doSomething().returns('java class')
