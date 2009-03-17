@@ -27,7 +27,7 @@ class UnorderedExpectations {
 
     def appendToCallState(callState) {
         if (expectations.size() > 0) {
-            def unorderedCallState = new UnorderedCallState(callState, "unordered")
+            def unorderedCallState = new UnorderedCallState(callState)
             expectations.keySet().each { unorderedCallState.append(it) }
         }
     }

@@ -21,7 +21,6 @@ import org.gmock.internal.signature.PropertyGetSignature
 import org.gmock.internal.signature.PropertySetSignature
 import static org.gmock.internal.metaclass.MetaClassHelper.getMetaClassFrom
 import static org.gmock.internal.metaclass.MetaClassHelper.setMetaClassTo
-import org.gmock.internal.util.WeakIdentityHashMap
 
 class ConcreteMockProxyMetaClass extends ProxyMetaClass {
 

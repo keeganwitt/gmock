@@ -17,8 +17,8 @@ package org.gmock.internal.callstate
 
 class UnorderedCallState extends CallState {
 
-    UnorderedCallState(callState, title) {
-        super(callState.multipleMocks, callState.showTitle, title)
+    UnorderedCallState(callState) {
+        super(callState.multipleMocks, callState.showTitle, "unordered")
         callState.append(this)
     }
 
