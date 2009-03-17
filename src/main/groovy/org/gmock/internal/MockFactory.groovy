@@ -43,8 +43,6 @@ class MockFactory {
         this.mockCollection = mockCollection
     }
 
-
-
     private static final ARG_CLASSES = [constructorRecorder: ConstructorRecorder,
             invokeConstructorRecorder: InvokeConstructorRecorder,
             mockNameRecorder: MockNameRecorder,
@@ -54,96 +52,77 @@ class MockFactory {
             expectationClosure: Closure]
 
     def createMock(mockArgs) {
-        def mockInstance
         def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
         def mpmc = new MockProxyMetaClass(mockArgs.clazz, controller.classExpectations, controller, mockName)
-        if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
-            mockInstance = mockNonFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder, mockName)
-        } else {
-            mockInstance = mockFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder)
-        }
-        def mock = new MockInternal(controller, mockInstance, mockName, mpmc)
-        mockCollection << mock
-        return mock
+        return createMockWithMetaClass(mockArgs, mpmc, mockName)
     }
 
     def createConcreteMock(mockArgs) {
-        def mockInstance
         def concreteInstance = mockArgs.concreteInstance
         if (concreteMocks.containsKey(concreteInstance)) {
             return concreteMocks.get(concreteInstance)
         } else {
             def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
-            def mpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, controller, mockArgs.concreteInstance, mockName)
-            controller.concreteMocks << mpmc
-            if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
-                mockInstance = mockNonFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder, mockName)
-            } else {
-                mockInstance = mockFinalClass(mockArgs.clazz, mpmc, mockArgs.invokeConstructorRecorder)
-            }
-            def mock = new MockInternal(controller, mockInstance, mockName, mpmc)
-            mockCollection << mock
+            def cmpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, controller, mockArgs.concreteInstance, mockName)
+            def mock = createMockWithMetaClass(mockArgs, cmpmc, mockName)
+            controller.concreteMocks << cmpmc
             concreteMocks.put(concreteInstance, mock)
             return mock
         }
     }
 
+    private createMockWithMetaClass(mockArgs, metaClass, mockName) {
+        def mockInstance
+        if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
+            mockInstance = mockNonFinalClass(mockArgs.clazz, metaClass, mockArgs.invokeConstructorRecorder, mockName)
+        } else {
+            mockInstance = mockFinalClass(mockArgs.clazz, metaClass, mockArgs.invokeConstructorRecorder)
+        }
+        def mock = new MockInternal(controller, mockInstance, mockName, metaClass)
+        mockCollection << mock
+        return mock
+    }
 
     def parseMockArgument(clazz, args) {
         def mockArgs = [:]
         if (isValidMockArgs(args)){
             mockArgs.clazz = clazz
-            args.each {arg ->
-                def name = findArgName(arg)
-                checkAndSet(mockArgs, name, arg, clazz, args)
-            }
+            setMockArgs(mockArgs, ARG_CLASSES, clazz, args)
         } else if (clazz == Object && isValidConcreteArgs(args)){
             mockArgs.concreteInstance = args[0]
             mockArgs.clazz = args[0].class
-            args.each {arg ->
-                def name = findConcreteArgName(arg)
-                checkAndSet(mockArgs, name, arg, clazz, args)
-            }
+            setMockArgs(mockArgs, CONCRETE_ARG_CLASSES, clazz, args)
         } else {
             invalidMockMethod(clazz, args)
         }
         return mockArgs
     }
 
-    private isValidMockArgs(args){
-        for (a in args){
-            if (!instanceOfKnowClass(a)){
-                return false
-            }
+    private setMockArgs(mockArgs, argClasses, clazz, args) {
+        args.each { arg ->
+            def name = findArgName(arg, argClasses)
+            checkAndSet(mockArgs, name, arg, clazz, args)
         }
-        return true
+    }
+
+    private findArgName(arg, argClasses) {
+        argClasses.find { k, Class c -> c.isInstance(arg) }?.key
+    }
+
+    private isValidMockArgs(args){
+        args.every { instanceOfKnowClass(it) }
     }
 
     private isValidConcreteArgs(args){
-        if (args.size() > 1){
-            for (a in args[1..-1]){
-                if (!instanceOfKnowConcreteClass(a)){
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    private findArgName(arg) {
-        ARG_CLASSES.find {k, Class c -> c.isInstance(arg) }?.key
-    }
-
-    private findConcreteArgName(arg) {
-        CONCRETE_ARG_CLASSES.find {k, Class c -> c.isInstance(arg) }?.key
+        args.size() >= 1 && args.toList().tail().every { instanceOfKnowConcreteClass(it) }
     }
 
     private boolean instanceOfKnowClass(object) {
-        findArgName(object)
+        ARG_CLASSES.any { k, Class c -> c.isInstance(object) }
     }
 
     private boolean instanceOfKnowConcreteClass(object) {
-        findConcreteArgName(object)
+        CONCRETE_ARG_CLASSES.any { k, Class c -> c.isInstance(object) }
     }
 
     private checkAndSet(Map mockArgs, String name, Object arg, Class clazz, Object[] args) {
