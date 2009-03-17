@@ -10,8 +10,10 @@ Gmock is all about simple syntax and readability of your tests so you spend less
 This documention describes the version 0.7 of Gmock.
 
 
-= Getting Started =
+= Getting Started = 
 
+== Simple Test ==
+ 
 {{{
 import org.gmock.GMockTestCase
 
@@ -30,9 +32,6 @@ class LoaderTest extends GMockTestCase {
   * Create mock objects using the `mock()` method
   * Set up expectations by calling the methods you expect on your mock
   * Run the code you are testing within the `play` closure
-
-
-= Cookbook =
 
 == Expectation and Play mode == 
 
@@ -54,7 +53,31 @@ Gmock supports Java strong typing. The `mock()` method takes an optional class. 
   File mockFile = mock(File)
 }}}
 
+== Strong typing ==
 
+Gmock supports out-of-the-box Java strong typing. You don't need to import any extra libraries - we've done that for you. Mock objects can be used in a pure Java project which makes Gmock a powerful alternative for Java testing.
+{{{
+File mockFile = mock(File)
+}}}
+
+Strong typing works well with constructor call expectations:
+{{{
+File mockFile = mock(File, constructor("/a/path/file.txt"))
+mockFile.getName().returns("file.txt")
+play {
+  def file = new File("/a/path/file.txt")
+  assertEquals "file.txt", file.getName()
+}
+}}}
+
+Sometimes you need to call the original constructor when mocking an object. Use the `invokeConstructor` for that purpose:
+{{{
+JavaLoader mock = mock(JavaLoader, invokeConstructor("loader"), constructor("name"))
+}}}
+This would create a `JavaLoader` using its constructor with "loader" during the creation process of the mock.
+
+
+= Mocking =
 
 == Mock method call ==
 
@@ -142,28 +165,8 @@ play {
 }
 }}}
 
-== Strong typing ==
 
-Gmock supports out-of-the-box Java strong typing. You don't need to import any extra libraries - we've done that for you. Mock objects can be used in a pure Java project which makes Gmock a powerful alternative for Java testing.
-{{{
-File mockFile = mock(File)
-}}}
-
-Strong typing works well with constructor call expectations:
-{{{
-File mockFile = mock(File, constructor("/a/path/file.txt"))
-mockFile.getName().returns("file.txt")
-play {
-  def file = new File("/a/path/file.txt")
-  assertEquals "file.txt", file.getName()
-}
-}}}
-
-Sometimes you need to call the original constructor when mocking an object. Use the `invokeConstructor` for that purpose:
-{{{
-JavaLoader mock = mock(JavaLoader, invokeConstructor("loader"), constructor("name"))
-}}}
-This would create a `JavaLoader` using its constructor with "loader" during the creation process of the mock.
+= Matching =
 
 == Time matching ==
 
@@ -211,11 +214,11 @@ play {
 }
 }}}
 
-== Syntax Shortcuts ==
+= Syntax Shortcuts =
 
 Gmock provides a few syntax shortcut useful in various situation.
 
-=== Expectation in mock closure ===
+== Expectation in mock closure ==
 
 Mock expectations could be setup during the mock creation in a closure. Like:
 {{{
@@ -229,7 +232,7 @@ def mock = mock(Loader)
 mock.load(1).returns("one")
 }}}
 
-=== Using the with Closure ===
+== Using the with Closure ==
 
 Similarly to mock closure you can use the `with` syntax on mock. Like: 
 
@@ -244,7 +247,7 @@ with(mock){
 }}}
 
 
-=== Static closure ===
+== Static closure ==
 
 Static expectations could be setup using the static closure like:
 {{{
@@ -256,6 +259,7 @@ mockMath.static {
 }}} 
 
 
+= One more thing =
 
 == Not extending the GMockTestCase ==
 
