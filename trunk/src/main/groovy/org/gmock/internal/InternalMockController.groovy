@@ -15,22 +15,15 @@
  */
 package org.gmock.internal
 
-import java.lang.reflect.Modifier
-import net.sf.cglib.proxy.Callback
-import net.sf.cglib.proxy.Enhancer
-import net.sf.cglib.proxy.MethodInterceptor
-import org.gmock.internal.metaclass.MockProxyMetaClass
-import org.gmock.internal.recorder.ConstructorRecorder
-import org.gmock.internal.recorder.InvokeConstructorRecorder
-import org.gmock.internal.recorder.MockNameRecorder
-import org.objenesis.ObjenesisHelper
 import junit.framework.Assert
+import org.gmock.internal.MockController
+import org.gmock.internal.MockDelegate
+import org.gmock.internal.MockFactory
 import org.gmock.internal.callstate.CallState
-import org.gmock.internal.metaclass.ConcreteMockProxyMetaClass
-import org.gmock.internal.expectation.UnorderedExpectations
-import org.gmock.internal.expectation.OrderedExpectations
 import org.gmock.internal.expectation.ClassExpectations
-import static org.gmock.internal.metaclass.MetaClassHelper.setMetaClassTo
+import org.gmock.internal.expectation.OrderedExpectations
+import org.gmock.internal.expectation.UnorderedExpectations
+import org.gmock.internal.recorder.ConstructorRecorder
 
 class InternalMockController implements MockController {
 
@@ -124,7 +117,7 @@ class InternalMockController implements MockController {
                 throw new IllegalStateException("Cannot nest play closures.")
             }
             if (ordered) {
-                throw new IllegalStateException("Play closures cannot be inside strict closure.")
+                throw new IllegalStateException("Play closures cannot be inside ordered closure.")
             }
 
             mockCollection*.validate()
@@ -164,28 +157,28 @@ class InternalMockController implements MockController {
         callClosureWithDelegate(withClosure, mock)
     }
 
-    def strict(Closure strictClosure) {
+    def ordered(Closure orderedClosure) {
         if (ordered) {
-            throw new IllegalStateException("Cannot nest strict closures.")
+            throw new IllegalStateException("Cannot nest ordered closures.")
         }
         if (replay) {
-            throw new IllegalStateException("Strict closures cannot be inside play closure.")
+            throw new IllegalStateException("Ordered closures cannot be inside play closure.")
         }
 
         orderedExpectations.newStrictGroup()
-        callClosureWithMockDelegate(strictClosure, Order.STRICT)
+        callClosureWithMockDelegate(orderedClosure, Order.STRICT)
     }
 
-    def loose(Closure looseClosure) {
+    def unordered(Closure unorderedClosure) {
         if (looseOrdered) {
-            throw new IllegalStateException("Cannot nest loose closures.")
+            throw new IllegalStateException("Cannot nest unordered closures.")
         }
         if (!strictOrdered) {
-            throw new IllegalStateException("Loose closures can only be inside strict closure.")
+            throw new IllegalStateException("Unordered closures can only be inside ordered closure.")
         }
 
         orderedExpectations.newLooseGroup()
-        callClosureWithMockDelegate(looseClosure, Order.LOOSE)
+        callClosureWithMockDelegate(unorderedClosure, Order.LOOSE)
     }
 
     private def callClosureWithMockDelegate(Closure closure, Order order) {

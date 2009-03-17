@@ -31,12 +31,12 @@ abstract class GMockTestCase extends GroovyTestCase {
         gMockController.with(mock, withClosure)
     }
 
-    protected strict(Closure strictClosure) {
-        gMockController.strict(strictClosure)
+    protected ordered(Closure orderedClosure) {
+        gMockController.ordered(orderedClosure)
     }
 
-    protected loose(Closure looseClosure) {
-        gMockController.loose(looseClosure)
+    protected unordered(Closure unorderedClosure) {
+        gMockController.unordered(unorderedClosure)
     }
 
     protected constructor(Object... args) {

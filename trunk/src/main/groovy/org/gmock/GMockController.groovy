@@ -33,12 +33,12 @@ class GMockController {
         internalMockController.with(mock, withClosure)
     }
 
-    def strict(Closure strictClosure) {
-        internalMockController.strict(strictClosure)
+    def ordered(Closure orderedClosure) {
+        internalMockController.ordered(orderedClosure)
     }
 
-    def loose(Closure looseClosure) {
-        internalMockController.loose(looseClosure)
+    def unordered(Closure unorderedClosure) {
+        internalMockController.unordered(unorderedClosure)
     }
 
 }

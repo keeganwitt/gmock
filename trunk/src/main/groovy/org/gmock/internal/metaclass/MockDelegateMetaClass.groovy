@@ -58,7 +58,7 @@ class MockDelegateMetaClass extends ProxyMetaClass {
         if (arguments.length == 1 && Closure.isAssignableFrom(arguments[0])) {
             if (methodName == "match") {
                 newDelegate = GMock
-            } else if (methodName == "strict" || methodName == "loose") {
+            } else if (methodName == "ordered" || methodName == "unordered") {
                 newDelegate = controller
             }
         }

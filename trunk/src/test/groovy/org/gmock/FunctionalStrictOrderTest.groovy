@@ -22,7 +22,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testOneStrictClosureWithOneMock() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a().returns(1)
             mock.b().returns(2)
             mock.c().returns(3)
@@ -36,7 +36,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testOneStrictClosureWithOneMockAndUnorderedExpectations() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a().returns(1)
             mock.b().returns(2)
             mock.c().returns(3)
@@ -54,14 +54,14 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testOneStrictClosureWithOneMockAndFailed() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a()
             mock.b()
             mock.c()
         }
 
         def expected = "Unexpected method call 'c()'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'a()': expected 1, actual 1\n" +
                        "    'b()': expected 1, actual 0\n" +
                        "    'c()': expected 1, actual 0"
@@ -76,7 +76,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureWithTimesExpectations() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a().returns(1).times(2)
             mock.a().returns(2).times(1..3)
             mock.b().returns(3).stub()
@@ -92,7 +92,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureShouldReset() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a()
             mock.b().stub()
         }
@@ -101,12 +101,12 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             mock.b()
         }
 
-        strict {
+        ordered {
             mock.c()
             mock.d()
         }
         def expected = "Unexpected method call 'b()'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'c()': expected 1, actual 0\n" +
                        "    'd()': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
@@ -119,12 +119,12 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureShouldVerify() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a()
             mock.b()
         }
         def expected = "Expectation not matched on verify:\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'a()': expected 1, actual 1\n" +
                        "    'b()': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
@@ -137,7 +137,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testOneStrictClosureWithMultiMocks() {
         def m1 = mock(), m2 = mock(), m3 = mock()
-        strict {
+        ordered {
             m1.a().returns(1)
             m2.b().returns(2)
             m3.b().returns(3)
@@ -155,7 +155,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         def m1 = mock(), m2 = mock(), m3 = mock()
         m1.a().returns(5)
         m1.b().returns(6)
-        strict {
+        ordered {
             m1.a().returns(1)
             m2.b().returns(2)
             m3.b().returns(3)
@@ -177,14 +177,14 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testOneStrictClosureWithMultiMocksAndFailed() {
         def m1 = mock(), m2 = mock(), m3 = mock()
-        strict {
+        ordered {
             m1.a()
             m2.b()
             m3.b()
             m1.c()
         }
         def expected = "Unexpected method call 'b()' on 'Mock for Object (3)'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'a()' on 'Mock for Object (1)': expected 1, actual 1\n" +
                        "    'b()' on 'Mock for Object (2)': expected 1, actual 0\n" +
                        "    'b()' on 'Mock for Object (3)': expected 1, actual 0\n" +
@@ -201,12 +201,12 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     void testTwoStrictClosuresWithOneMock() {
         def mock = mock()
         def setUp = { ->
-            strict {
+            ordered {
                 mock.a().returns(1)
                 mock.b().returns(2)
                 mock.c().returns(3)
             }
-            strict {
+            ordered {
                 mock.a().returns(4)
                 mock.c().returns(5)
                 mock.d().returns(6)
@@ -235,19 +235,19 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testTwoStrictClosuresWithOneMockAndFailed() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a()
             mock.b()
         }
-        strict {
+        ordered {
             mock.a()
             mock.c()
         }
         def expected = "Unexpected method call 'c()'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'a()': expected 1, actual 1\n" +
                        "    'b()': expected 1, actual 0\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'a()': expected 1, actual 0\n" +
                        "    'c()': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
@@ -261,12 +261,12 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testTwoStrictClosuresWithOneMockAndTimesExpectations() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a().returns(1).times(2..3)
             mock.b().returns(2).times(2)
         }
         mock.b().returns(3).atLeast(2)
-        strict {
+        ordered {
             mock.b().returns(4)
             mock.c().returns(5).atMost(3)
         }
@@ -282,17 +282,17 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     void testThreeStrictClosuresWithOneMockAndUnorderedExpectations() {
         def mock = mock()
         mock.a().returns(0)
-        strict {
+        ordered {
             mock.a().returns(1)
             mock.b().returns(2)
         }
         mock.b().returns(3)
-        strict {
+        ordered {
             mock.a().returns(4)
             mock.c().returns(5)
             mock.d().returns(6)
         }
-        strict {
+        ordered {
             mock.b().returns(7)
             mock.d().returns(8)
         }
@@ -313,15 +313,15 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testMultiStrictClosuresWithMultiMocksAndOneForEach() {
         def m1 = mock(), m2 = mock(), m3 = mock()
-        strict {
+        ordered {
             m1.a().returns(1)
             m1.b().returns(2)
         }
-        strict {
+        ordered {
             m2.a().returns(3)
             m2.b().returns(4)
         }
-        strict {
+        ordered {
             m3.a().returns(5)
             m3.c().returns(6)
         }
@@ -337,12 +337,12 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testTwoStrictClosuresWithThreeMocks() {
         def m1 = mock(), m2 = mock(), m3 = mock()
-        strict {
+        ordered {
             m1.a().returns(1)
             m2.b().returns(2)
             m3.c().returns(3)
         }
-        strict {
+        ordered {
             m2.b().returns(4)
             m1.a().returns(5)
             m3.d().returns(6)
@@ -362,12 +362,12 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosuresWithPropertyMocking() {
         def m1 = mock(), m2 = mock()
-        strict {
+        ordered {
             m1.a.set(1)
             m2.a.set(2)
         }
         m1.b.set(3)
-        strict {
+        ordered {
             m2.a.set(4).atMost(2)
             m1.b.set(5)
             m1.c.returns(6)
@@ -385,13 +385,13 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosuresWithPropertyMockingAndFailed() {
         def m1 = mock(), m2 = mock()
-        strict {
+        ordered {
             m1.a.set(1)
             m2.a.set(2)
             m1.a.returns(0)
         }
         def expected = "Unexpected property getter call 'a' on 'Mock for Object (1)'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'a = 1' on 'Mock for Object (1)': expected 1, actual 1\n" +
                        "    'a = 2' on 'Mock for Object (2)': expected 1, actual 0\n" +
                        "    'a' on 'Mock for Object (1)': expected 1, actual 0"
@@ -406,12 +406,12 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureWithStaticMocking() {
         def mockLoader = mock(Loader), mockString = mock(String)
-        strict {
+        ordered {
             mockLoader.static.a().returns(1)
             mockLoader.static.b().returns(2)
             mockLoader.static.c().returns(3)
         }
-        strict {
+        ordered {
             mockString.static.a().returns(4)
             mockString.static.b().returns(5)
         }
@@ -426,13 +426,13 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureWithStaticMockingAndFailed() {
         def mockLoader = mock(Loader)
-        strict {
+        ordered {
             mockLoader.static.a()
             mockLoader.static.b()
             mockLoader.static.c()
         }
         def expected = "Unexpected static method call 'Loader.c()'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'Loader.a()': expected 1, actual 1\n" +
                        "    'Loader.b()': expected 1, actual 0\n" +
                        "    'Loader.c()': expected 1, actual 0"
@@ -447,11 +447,11 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureWithStaticPropertyMocking() {
         def mockLoader = mock(Loader), mockString = mock(String)
-        strict {
+        ordered {
             mockLoader.static.a.set(1)
             mockString.static.a.set(2)
         }
-        strict {
+        ordered {
             mockLoader.static.b.returns(3)
             mockString.static.b.returns(4)
         }
@@ -468,14 +468,14 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureWithStaticPropertyMockingAndFailed() {
         def mockLoader = mock(Loader)
-        strict {
+        ordered {
             mockLoader.static.a.set(1)
             mockLoader.static.b.set(2)
             mockLoader.static.c.set(3)
             mockLoader.static.a.returns(4)
         }
         def expected = "Unexpected static property getter call 'Loader.a'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'Loader.a = 1': expected 1, actual 1\n" +
                        "    'Loader.b = 2': expected 1, actual 1\n" +
                        "    'Loader.c = 3': expected 1, actual 0\n" +
@@ -491,11 +491,11 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     }
 
     void testStrictClosureWithConstructorMocking() {
-        strict {
+        ordered {
             mock(Loader, constructor(1))
             mock(String, constructor(2))
         }
-        strict {
+        ordered {
             mock(String, constructor(3))
             mock(Loader, constructor(4))
         }
@@ -508,13 +508,13 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     }
 
     void testStrictClosureWithConstructorMockingAndFailed() {
-        strict {
+        ordered {
             mock(Loader, constructor(1))
             mock(Loader, constructor(2))
             mock(Loader, constructor(3))
         }
         def expected = "Unexpected constructor call 'new Loader(3)'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'new Loader(1)': expected 1, actual 1\n" +
                        "    'new Loader(2)': expected 1, actual 0\n" +
                        "    'new Loader(3)': expected 1, actual 0"
@@ -528,7 +528,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     }
 
     void testStrictOrderingWithAllKindOfMocking() {
-        strict {
+        ordered {
             mock(Loader).static.init()
             mock(Loader, constructor()) {
                 load(1).returns(2)
@@ -548,7 +548,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     }
 
     void testStrictOrderingWithAllKindOfMockingAndFailed() {
-        strict {
+        ordered {
             mock(Loader).static.init()
             mock(Loader, constructor()) {
                 load(1).returns(2)
@@ -558,7 +558,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             mock(Loader).static.finalize()
         }
         def expected = "Unexpected static method call 'Loader.finalize()'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'Loader.init()': expected 1, actual 1\n" +
                        "    'new Loader()': expected 1, actual 1\n" +
                        "    'load(1)' on 'Mock for Loader (2)': expected 1, actual 1\n" +
@@ -579,7 +579,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureShouldValidate1() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a
         }
         def expected = "Missing property expectation for 'a' on 'Mock for Object'"
@@ -591,7 +591,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureShouldValidate2() {
         def mock = mock()
-        strict {
+        ordered {
             mock.static.a
         }
         def expected = "Missing property expectation for 'Object.a'"
@@ -603,7 +603,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureShouldValidate3() {
         def mock = mock()
-        strict {
+        ordered {
             mock.static
         }
         def expected = "Missing static expectation for Object"
@@ -615,7 +615,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureInsideExpectationClosure() {
         def mock = mock {
-            strict {
+            ordered {
                 a().returns(1)
                 b().returns(2)
                 c().returns(3)
@@ -632,7 +632,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testStrictClosureInsideStaticClosure() {
         mock(Loader).static {
-            strict {
+            ordered {
                 a().returns(1)
                 b().returns(2)
                 setUp().returns(3)
@@ -648,7 +648,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     void testStrictClosureInsideStaticClosureWhichIsInsideMockClosure() {
         mock(Loader) {
             'static' {
-                strict {
+                ordered {
                     a().returns(1)
                     b().returns(2)
                     setUp().returns(3)
@@ -665,7 +665,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     void testStrictClosureInsideWithClosure() {
         def mock = mock()
         with(mock) {
-            strict {
+            ordered {
                 a().returns(1)
                 setUp().returns(2)
             }
@@ -680,7 +680,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         def mock = mock(Loader)
         with(mock) {
             'static' {
-                strict {
+                ordered {
                     a().returns(1)
                     setUp().returns(2)
                 }
@@ -694,7 +694,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testClosureMatcherInsideStrictClosureWhichIsInsideExpectationClosure() {
         def mock = mock {
-            strict {
+            ordered {
                 a(match { it == 1 }).returns(2)
                 it.match(match { it == 3 }).returns(4)
             }
@@ -707,7 +707,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testClosureMatcherInsideStrictClosureWhichIsInsideStaticClosure() {
         mock(Loader).static {
-            strict {
+            ordered {
                 a(match { it == 1 }).returns(2)
                 it.match(match { it == 3 }).returns(4)
             }
@@ -720,11 +720,11 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testMultipleStrictClosuresInsideExpectationClosure() {
         def mock = mock {
-            strict {
+            ordered {
                 a().returns(1)
                 b().returns(2)
             }
-            strict {
+            ordered {
                 a().returns(3)
                 b().returns(4)
             }
@@ -739,11 +739,11 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testMultipleStrictClosuresInsideStaticClosure() {
         mock(Loader).static {
-            strict {
+            ordered {
                 a().returns(1)
                 b().returns(2)
             }
-            strict {
+            ordered {
                 a().returns(3)
                 b().returns(4)
             }
@@ -759,12 +759,12 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     void testMultipleStrictClosuresInsideStaticClosureWhichIsInsideExpectationClosure() {
         def mock = mock(Loader) {
             'static' {
-                strict {
+                ordered {
                     a().returns(1)
                     b().returns(2)
                 }
             }
-            strict {
+            ordered {
                 a().returns(3)
                 b().returns(4)
             }
@@ -778,16 +778,16 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     }
 
     void testCannotNestStrictClosures() {
-        strict {
+        ordered {
             shouldFail(IllegalStateException) {
-                strict {}
+                ordered {}
             }
         }
 
         mock {
-            strict {
+            ordered {
                 shouldFail(IllegalStateException) {
-                    strict {}
+                    ordered {}
                 }
             }
         }
@@ -796,13 +796,13 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     void testStrictClosureCannotBeInsidePlayClosure() {
         play {
             shouldFail(IllegalStateException) {
-                strict {}
+                ordered {}
             }
         }
     }
 
     void testPlayClosureCannotBeInsideStrictClosure() {
-        strict {
+        ordered {
             shouldFail(IllegalStateException) {
                 play {}
             }
@@ -811,7 +811,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testTimesShouldBeCheckedForStrictOrdering() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a().atLeast(2)
             shouldFail(IllegalStateException) {
                 mock.a().times(2)
@@ -821,7 +821,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testNonfixedTimesForStrictOrderingButNotTheSameMockShouldBeFine() {
         def m1 = mock(), m2 = mock()
-        strict {
+        ordered {
             m1.a().atLeast(2)
             m2.a().atMost(2)
         }
@@ -829,11 +829,11 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testNonfixedTimesInDifferentStrictClosuresShouldBeFine() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a().times(2)
             mock.a().times(1..2)
         }
-        strict {
+        ordered {
             mock.a()
             mock.a().atMostOnce()
         }
@@ -846,7 +846,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testNonfixedTimesNotHeelInStrictClosureShouldBeFine() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a().stub()
             mock.b()
             mock.a().atLeastOnce()
@@ -859,7 +859,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
     }
 
     void testTimesShouldBeCheckedForStrictOrderingWithStaticMocking() {
-        strict {
+        ordered {
             mock(Loader).static.a().stub()
             shouldFail(IllegalStateException) {
                 mock(Loader).static.a().times(1..2)
@@ -869,7 +869,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testNoDefaultBehaviorsIfExpectationsAreSetInStrictClosure() {
         def mock = mock {
-            strict {
+            ordered {
                 it.toString().returns('test')
                 it.hashCode().returns(1)
                 it.equals(match { true }).returns(false)
@@ -887,9 +887,9 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testLooseClosureInsideStrictClosure() {
         def mockLock = mock(), mockOther = mock()
-        strict {
+        ordered {
             mockLock.lock().returns(true)
-            loose {
+            unordered {
                 mockLock.a().returns(1)
                 mockOther.b().returns(2).times(1..2)
                 mockOther.c().returns(3).stub()
@@ -909,18 +909,18 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testLooseClosureInsideStrictClosureAndFailed() {
         def mockLock = mock(), mockOther = mock()
-        strict {
+        ordered {
             mockLock.lock().returns(true)
-            loose {
+            unordered {
                 mockOther.b().returns(2).times(2..3)
                 mockOther.c().returns(3).stub()
             }
             mockLock.unlock().returns(true)
         }
         def expected = "Unexpected method call 'unlock()' on 'Mock for Object (1)'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'lock()' on 'Mock for Object (1)': expected 1, actual 1\n" +
-                       "    loose:\n" +
+                       "    unordered:\n" +
                        "      'b()' on 'Mock for Object (2)': expected 2..3, actual 1\n" +
                        "      'c()' on 'Mock for Object (2)': expected any times, actual 3\n" +
                        "    'unlock()' on 'Mock for Object (1)': expected 1, actual 0"
@@ -939,9 +939,9 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testLooseClosureInsideStrictClosureShouldValidate() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a()
-            loose {
+            unordered {
                 mock.b()
                 mock.c
             }
@@ -956,17 +956,17 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testLooseClosureInsideStrictClosureShouldVerify() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a()
-            loose {
+            unordered {
                 mock.b()
                 mock.c()
             }
         }
         def expected = "Expectation not matched on verify:\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'a()': expected 1, actual 1\n" +
-                       "    loose:\n" +
+                       "    unordered:\n" +
                        "      'b()': expected 1, actual 0\n" +
                        "      'c()': expected 1, actual 1"
         def message = shouldFail(AssertionFailedError) {
@@ -980,9 +980,9 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testNonfixedTimesAfterLooseClosureShouldBeFine() {
         def mock = mock()
-        strict {
+        ordered {
             mock.a().returns(1).atLeast(1)
-            loose {
+            unordered {
                 mock.a().returns(2)
                 mock.b().returns(3).stub()
                 mock.a().returns(4).times(1..2)
@@ -1000,8 +1000,8 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testNonfixedTimesShouldBeCheckedInsideLooseClosure() {
         def mock = mock()
-        strict {
-            loose {
+        ordered {
+            unordered {
                 mock.a().times(1..2)
                 shouldFail {
                     mock.a()
@@ -1012,8 +1012,8 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testNoDefaultBehaviorsIfExpectationsAreSetInLooseClosure() {
         def mock = mock()
-        strict {
-            loose {
+        ordered {
+            unordered {
                 mock.toString().returns('test')
                 mock.hashCode().returns(2)
                 mock.equals(match { true }).returns(false)
@@ -1031,25 +1031,25 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testLooseClosureCanOnlyBeInsideStrictClosure() {
         shouldFail(IllegalStateException) {
-            loose {}
+            unordered {}
         }
     }
 
     void testLooseClosuresCannotBeNested() {
-        strict {
-            loose {
+        ordered {
+            unordered {
                 shouldFail(IllegalStateException) {
-                    loose {}
+                    unordered {}
                 }
             }
         }
     }
 
     void testStrictClosureCannotBeInsideLooseClosure() {
-        strict {
-            loose {
+        ordered {
+            unordered {
                 shouldFail(IllegalStateException) {
-                    strict {}
+                    ordered {}
                 }
             }
         }
@@ -1057,9 +1057,9 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testLooseClosureInsideExpectationClosure() {
         def mock = mock {
-            strict {
+            ordered {
                 a().returns(1)
-                loose {
+                unordered {
                     b().returns(2)
                     c().returns(3)
                 }
@@ -1076,9 +1076,9 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testLooseClosureInsideStaticClosure() {
         mock(Loader).static {
-            strict {
+            ordered {
                 a().returns(1)
-                loose {
+                unordered {
                     b().returns(2)
                     c().returns(3)
                 }
@@ -1095,10 +1095,10 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testErrorMessageWithMultipleMocksAndMultipleStrictClosures() {
         def m1 = mock(), m2 = mock(), m3 = mock()
-        strict {
+        ordered {
             m1.a().times(2)
             m1.a().times(1..2)
-            loose {
+            unordered {
                 m2.b()
                 m3.c()
                 m2.b().times(2..3)
@@ -1106,8 +1106,8 @@ class FunctionalStrictOrderTest extends GMockTestCase {
             m3.c().atMost(2)
         }
         m1.a()
-        strict { loose {}; loose {} }
-        strict {
+        ordered { unordered {}; unordered {} }
+        ordered {
             m1.a()
             m2.b()
             m1.a().times(2)
@@ -1116,13 +1116,13 @@ class FunctionalStrictOrderTest extends GMockTestCase {
         m1.a().atLeast(2)
 
         def expected = "Unexpected method call 'b()' on 'Mock for Object (2)'\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'a()' on 'Mock for Object (1)': expected 3..4, actual 0\n" +
-                       "    loose:\n" +
+                       "    unordered:\n" +
                        "      'b()' on 'Mock for Object (2)': expected 3..4, actual 0\n" +
                        "      'c()' on 'Mock for Object (3)': expected 1, actual 0\n" +
                        "    'c()' on 'Mock for Object (3)': expected at most 2, actual 0\n" +
-                       "  strict:\n" +
+                       "  ordered:\n" +
                        "    'a()' on 'Mock for Object (1)': expected 1, actual 0\n" +
                        "    'b()' on 'Mock for Object (2)': expected 1, actual 0\n" +
                        "    'a()' on 'Mock for Object (1)': expected 2, actual 0\n" +
@@ -1139,9 +1139,9 @@ class FunctionalStrictOrderTest extends GMockTestCase {
 
     void testMultipleReturnsAndRaisesOnOneExpectation() {
         def mock = mock {
-            strict {
+            ordered {
                 fun().returns(1).raises(RuntimeException).returns(2).times(2)
-                loose {
+                unordered {
                     foo().returns(1).returns(2)
                 }
             }

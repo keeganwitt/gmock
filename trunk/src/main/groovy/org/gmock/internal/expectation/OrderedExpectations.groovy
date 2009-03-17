@@ -191,7 +191,7 @@ class LooseGroup extends ExpectationCollection {
 
     def appendToCallState(callState) {
         if (!empty) {
-            def unorderedCallState = new UnorderedCallState(callState, "loose")
+            def unorderedCallState = new UnorderedCallState(callState)
             expectations.each { unorderedCallState.append(it) }
         }
     }

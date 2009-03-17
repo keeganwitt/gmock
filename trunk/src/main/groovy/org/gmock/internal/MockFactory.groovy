@@ -29,9 +29,7 @@ import java.lang.reflect.Modifier
 import org.objenesis.ObjenesisHelper
 import org.gmock.internal.util.WeakIdentityHashMap
 
-
 class MockFactory {
-
 
     def controller
     def defaultNames = [:]

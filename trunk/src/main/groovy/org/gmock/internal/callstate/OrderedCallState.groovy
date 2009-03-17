@@ -18,7 +18,7 @@ package org.gmock.internal.callstate
 class OrderedCallState extends CallState {
 
     OrderedCallState(callState) {
-        super(callState.multipleMocks, callState.showTitle, "strict")
+        super(callState.multipleMocks, callState.showTitle, "ordered")
         callState.append(this)
     }
 
