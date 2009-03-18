@@ -216,7 +216,7 @@ play {
 
 == Order matching ==
 
-We the method calls order is important you can use the `ordered` closure. Calls order expectation can apply across multiple mocks.
+When the method calls order is important you can use the `ordered` closure. Calls order expectation can apply across multiple mocks.
 
 Here is an example of an hypothetic cached cat database.
 
@@ -230,8 +230,21 @@ ordered {
   cache.put("select * from cat", ["cat1", "cat2"])
   database.close()
 }
-
 }}}
+
+There is scenario where you don't want to specify ordering within an `ordered` closure. In those cases you should nest the `unordered` closure like this:
+
+{{{
+def mockLock = mock()
+ordered {
+  mockLock.lock()
+  unordered {
+    // ...
+  }
+  mockLock.unlock()
+}
+}}}
+
 
 = Syntax Shortcuts =
 
