@@ -214,6 +214,25 @@ play {
 }
 }}}
 
+== Order matching ==
+
+We the method calls order is important you can use the `ordered` closure. Calls order expectation can apply across multiple mocks.
+
+Here is an example of an hypothetic cached cat database.
+
+{{{
+def database = mock()
+def cache = mock()
+ordered {
+  database.open()
+  cache.get("select * from cat").returns(null)
+  database.query("select * from cat").returns(["cat1", "cat2"])
+  cache.put("select * from cat", ["cat1", "cat2"])
+  database.close()
+}
+
+}}}
+
 = Syntax Shortcuts =
 
 Gmock provides a few syntax shortcut useful in various situation.
