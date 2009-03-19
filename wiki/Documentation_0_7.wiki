@@ -122,6 +122,10 @@ Support for exceptions and method stubs are similar to standard method calls. Ex
   * `loader.name.set("invalid").raises(new RuntimeException())`
   * `mockLoader.name.returns('a name').stub()`
 
+Property expectations are transparently translated to their method equivalent and vice versa. 
+So you can write `mockUrl.text.returns("some text")` in you expectation and have `mock.getText()` in your code.
+
+
 
 == Mock static call ==
 
