@@ -1,0 +1,18 @@
+usePlugin('groovy')
+
+sourceCompatibility = 1.5
+targetCompatibility = 1.5
+group = 'org.gmock'
+version = '0.7.0-SNAPSHOT'
+
+srcDirNames = []
+groovySrcDirNames = ['main/java', 'main/groovy']
+
+dependencies {
+    addMavenRepo()
+    groovy "org.codehaus.groovy:groovy-all:1.6.0"
+    compile "junit:junit:4.5"
+    compile "cglib:cglib:2.2"
+    compile "org.objenesis:objenesis:1.1"
+    testCompile "org.hamcrest:hamcrest-library:1.1"
+}

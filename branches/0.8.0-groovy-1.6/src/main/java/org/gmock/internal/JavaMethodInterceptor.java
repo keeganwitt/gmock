@@ -23,13 +23,13 @@ import java.lang.reflect.Method;
 
 public class JavaMethodInterceptor implements MethodInterceptor {
 
-    private MockController gmc;
+    private InternalMockController gmc;
 
     private MetaClass mpmc;
 
     private Object mockName;
 
-    public JavaMethodInterceptor(MockController gmc, MetaClass mpmc, Object mockName) {
+    public JavaMethodInterceptor(InternalMockController gmc, MetaClass mpmc, Object mockName) {
         this.gmc = gmc;
         this.mpmc = mpmc;
         this.mockName = mockName;

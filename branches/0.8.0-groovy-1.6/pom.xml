@@ -36,10 +36,11 @@
             <plugin>
                 <groupId>org.codehaus.groovy.maven</groupId>
                 <artifactId>gmaven-plugin</artifactId>
-                <version>1.0-rc-4</version>
+                <version>1.0-rc-5</version>
                 <executions>
                     <execution>
                         <goals>
+							<goal>generateStubs</goal>
                             <goal>compile</goal>
                             <goal>testCompile</goal>
                         </goals>
@@ -110,10 +111,15 @@
             <artifactId>junit</artifactId>
             <version>4.0</version>
         </dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy.maven.runtime</groupId>
+			<artifactId>gmaven-runtime-1.6</artifactId>
+			<version>1.0-rc-5</version>
+		</dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>1.5.6</version>
+            <version>1.6.0</version>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>

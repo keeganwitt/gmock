@@ -16,7 +16,6 @@
 package org.gmock.internal
 
 import junit.framework.Assert
-import org.gmock.internal.MockController
 import org.gmock.internal.MockDelegate
 import org.gmock.internal.MockFactory
 import org.gmock.internal.callstate.CallState
@@ -25,7 +24,7 @@ import org.gmock.internal.expectation.OrderedExpectations
 import org.gmock.internal.expectation.UnorderedExpectations
 import org.gmock.internal.recorder.ConstructorRecorder
 
-class InternalMockController implements MockController {
+class InternalMockController {
 
     def mockFactory
 
@@ -212,27 +211,27 @@ class InternalMockController implements MockController {
         return callState
     }
 
-    def doInternal(Closure invokeOriginal, Closure work) {
+    Object doInternal(invokeOriginal, work) {
         if (!internal) {
             return doInternal(work)
         } else {
-            return invokeOriginal()
+            return invokeOriginal.call()
         }
     }
 
-    def doInternal(Closure work) {
+    Object doInternal(work) {
         doWork(work, true)
     }
 
-    def doExternal(Closure work) {
+    Object doExternal(work) {
         doWork(work, false)
     }
 
-    private doWork(Closure work, boolean mode) {
+    private doWork(work, boolean mode) {
         def backup = internal
         internal = mode
         try {
-            return work()
+            return work.call()
         } finally {
             internal = backup
         }

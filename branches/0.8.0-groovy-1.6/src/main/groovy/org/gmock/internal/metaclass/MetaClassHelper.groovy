@@ -17,7 +17,7 @@ package org.gmock.internal.metaclass
 
 class MetaClassHelper {
 
-    static findExpectation(expectations, signature, message, arguments, controller) {
+    static Object findExpectation(expectations, signature, message, arguments, controller) {
         def expectation = controller.orderedExpectations.findMatching(signature) ?: expectations.findMatching(signature)
         if (expectation){
             return expectation.answer(arguments)
@@ -31,25 +31,6 @@ class MetaClassHelper {
             controller.unorderedExpectations.add(expectation, expectations)
         } else {
             controller.orderedExpectations.add(expectation)
-        }
-    }
-
-    static setMetaClassTo(object, Class clazz, MetaClass mc, controller) {
-        if (GroovyObject.isInstance(object)) {
-            object.metaClass = mc
-        } else {
-            def dpmc = DispatcherProxyMetaClass.getInstance(clazz)
-            dpmc.controller = controller
-            dpmc.setMetaClassForInstance(object, mc)
-        }
-    }
-
-    static getMetaClassFrom(object) {
-        def metaClass = object.metaClass
-        if (metaClass instanceof DispatcherProxyMetaClass) {
-            return metaClass.getMetaClassForInstance(object)
-        } else {
-            return metaClass
         }
     }
 
