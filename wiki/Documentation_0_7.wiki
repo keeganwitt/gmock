@@ -141,7 +141,50 @@ play {
 
 == Partial mock ==
 
-...
+Partial mock let you mock single method out of an object. Having to mock out method is usually considered as a bad design but we believe it to be different in a dynamic environment where you will get method automatically injected for you.
+
+Calling `mock(object)` on a concrete object will return a mock version of it. You will be able to setup expectation on that object whilst being able to use the concrete implementation. Your test will look like this:
+
+{{{
+def controller = new SomeController()
+def mockController = mock(controller)
+mockController.params.returns = [id: 3]
+def mockRequest = mock()
+mockController.request.returns(mockRequest)
+}}}
+
+Or you could use the shortcut version of it:
+{{{
+def controller = new SomeController()
+mock(controller).params.returns = [id: 3]
+def mockRequest = mock()
+mock(controller).request.returns(mockRequest)
+}}}
+
+
+This could be incredibly  useful in the Grails environment, let's pick a simple tag lib:
+{{{
+class FakeTagLib {
+   def hello = { attrs ->
+        out << "hello"
+    }
+}
+}}}
+
+We can mock the `out` property that way:
+{{{
+def tagLib = new FakeTagLib()
+def mockTabLib = mock(tagLib)
+def mockOut = mock()
+
+mockTabLib.out.returns(mockOut)
+mockOut << "hello"
+
+play {
+    tagLib.hello()
+}
+}}}
+
 
 
 
