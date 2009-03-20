@@ -296,6 +296,18 @@ ordered {
 }
 }}}
 
+== Regex methods matching ==
+
+When setting up expectation you can define the method in the form of a regex. This would pick any method matching the regex. Here is how it work:
+
+{{{
+def mock = mock()
+mock./set.*/(1).returns(2)
+play {
+  assertEquals 2, mock.setSomething(1)
+}
+}}}
+
 
 = Syntax Shortcuts =
 
