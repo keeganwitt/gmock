@@ -1,0 +1,17 @@
+#summary One-sentence summary of this page.
+
+= Release Todo List =
+
+*When releasing gmock:*
+ * Create an updated documentation page 
+ * Remove the snapshot in pom
+ * Tag the release
+ * Increment the current version and snapshot it
+ * Install the artifact in the gmock.org repository
+ * Make the artifacts available on google code
+ * Update gmock.org documentation
+ * Change gmock.org version number
+ * Update the download page
+ * Update the roadmap
+ * Deploy gmock.org
+ * Announce it
