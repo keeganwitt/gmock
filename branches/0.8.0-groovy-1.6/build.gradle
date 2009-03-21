@@ -3,7 +3,7 @@ usePlugin('groovy')
 sourceCompatibility = 1.5
 targetCompatibility = 1.5
 group = 'org.gmock'
-version = '0.7.0-SNAPSHOT'
+version = '0.8.0'
 
 srcDirNames = []
 groovySrcDirNames = ['main/java', 'main/groovy']
@@ -16,3 +16,13 @@ dependencies {
     compile "org.objenesis:objenesis:1.1"
     testCompile "org.hamcrest:hamcrest-library:1.1"
 }
+
+defaultTasks 'test'
+
+init.doFirst {
+    if (!build.taskGraph.hasTask(':release')) {
+        version += '-SNAPSHOT'
+    }
+}
+
+createTask('release', dependsOn: 'dists')
