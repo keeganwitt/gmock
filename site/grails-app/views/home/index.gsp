@@ -46,8 +46,10 @@
             <li>Static method mocking: <tt>mockMath.static.random().returns(0.5)</tt></li>
             <li>Property mocking: <tt>mockLoader.name.returns("loader")</tt></li>
             <li>Constructor mocking: <tt>def mockFile = mock(File, constructor('/a/path/file.txt'))</tt></li>
+            <li>Partial mocking: mocking out methods on a concrete object</li>
             <li>Times expectation: <tt>mockLoader.load("fruit").returns("apple").atLeastOnce()</tt></li>
             <li>Custom matcher: <tt>mockLoader.load(match{ it.startsWith("fru") })</tt></li>
+            <li>Strict ordering:  <tt>ordered {  ... }</tt></li>
             <li>Optional support for <a href="http://code.google.com/p/hamcrest/">Hamcrest matcher:</a>
                 <tt>mockLoader.put("test", is(not(lessThan(5))))</tt>
             </li>
