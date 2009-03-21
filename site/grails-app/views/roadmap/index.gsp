@@ -18,18 +18,26 @@
             <li>Nice,Strict mock</li>
         </ul>
 
+        <h2>Version 0.9.0</h2>
+        <ul>
+            <li>Closure mocking <g:issue number="54"/></li>
+            <li>Support for chain method call <g:issue number="77"/></li>
+        </ul>
+
         <h2>Version 0.8.0</h2>
         <ul>
-            <li>Closure mocking</li>
+            <li>Support for Groovy 1.6.0 <g:issue number="74"/></li>
+            <li>Ast transform @WithGmock <g:issue number="71"/></li>
         </ul>
 
-        <h2>Version 0.7.0</h2>
+        <h2 class="done here">Version 0.7.0</h2>
         <ul>
-            <li>Strict ordering <g:issue number="50"/></li>
-            <li>Mock out single method on concrete object <g:issue number="52"/></li>
+            <li>Strict ordering <g:issue number="50" done="true"/></li>
+            <li>Mock out single method on concrete object <g:issue number="52" done="true"/></li>
+            <li>Regex method matching <g:issue number="70" done="true"/></li>
         </ul>
 
-        <h2 class="done here">Version 0.6.0</h2>
+        <h2 class="done">Version 0.6.0</h2>
         <ul>
             <li>Static property mocking <g:issue number="23" done="true"/></li>
             <li>Setup expectation in mock closure <g:issue number="35" done="true"/></li>

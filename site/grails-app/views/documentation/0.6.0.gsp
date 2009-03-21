@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <title>Gmock: Documentation 0.5.0</title>
+    <title>Gmock: Documentation 0.6.0</title>
     <meta name="layout" content="main"/>
 </head>
 
