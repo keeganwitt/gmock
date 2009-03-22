@@ -1,0 +1,22 @@
+#How to build Gmock with Gradle
+
+First of all, Gradle 0.5.2 is needed.
+
+You can use the following commands:
+
+  * `gradle clean`
+    will remove the 'build' directory
+  * `gradle test`
+    will run the tests
+  * `gradle`
+    is the same as above
+  * `gradle libs`
+    will create the jar file (without jarjarified)
+  * `gradle jarjarify`
+    will jarjarified the jar file
+  * `gradle integrationTest`
+    will run the tests with the jarjarified jar file
+  * `gradle dists`
+    will package the jar file and all other additional files (e.g. source codes) (not finished)
+  * `gradle release`
+    is the same as above, but without '-SNAPSHOT' in the version
