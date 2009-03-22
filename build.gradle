@@ -1,23 +1,39 @@
 usePlugin('groovy')
 
-sourceCompatibility = 1.5
-targetCompatibility = 1.5
 group = 'org.gmock'
 version = '0.8.0'
+
+sourceCompatibility = 1.5
+targetCompatibility = 1.5
 
 srcDirNames = []
 groovySrcDirNames = ['main/java', 'main/groovy']
 
 dependencies {
+    addConfiguration 'jarjar'
+    addConfiguration 'jarjarify'
+
     addMavenRepo()
-    groovy "org.codehaus.groovy:groovy-all:1.6.0"
-    compile "junit:junit:4.5"
-    compile "cglib:cglib:2.2"
-    compile "org.objenesis:objenesis:1.1"
-    testCompile "org.hamcrest:hamcrest-library:1.1"
+    addMavenStyleRepo('JBossRepo', 'http://repository.jboss.org/maven2/')
+
+    groovy 'org.codehaus.groovy:groovy-all:1.6.0'
+    compile 'junit:junit:4.5'
+    testCompile 'org.hamcrest:hamcrest-library:1.1'
+
+    jarjar 'com.google.code:jarjar:1.0'
+    jarjarify 'cglib:cglib:2.2',
+              'org.objenesis:objenesis:1.1'
+
+    linkConfWithTask 'testRuntime', 'integrationTest'
 }
 
 defaultTasks 'test'
+
+[compile, test].each { task ->
+    task.doFirst {
+        it.unmanagedClasspath = dependencies.resolve('jarjarify').clone()
+    }
+}
 
 init.doFirst {
     if (!build.taskGraph.hasTask(':release')) {
@@ -25,4 +41,47 @@ init.doFirst {
     }
 }
 
+archive_jar.doFirst {
+    ant.delete(file: archive_jar.archivePath)
+}
+
 createTask('release', dependsOn: 'dists')
+
+createTask('jarjarify', dependsOn: 'libs') {
+    archivePath = archive_jar.archivePath
+    tmpArchivePath = "${archivePath}.tmp"
+    jarjarClasspath = dependencies.resolve('jarjar').first()
+    jarjarifyClasspath = dependencies.resolve('jarjarify')
+    ant {
+        move(file: archivePath, tofile: tmpArchivePath)
+        taskdef(name: 'jarjar', classname: 'com.tonicsystems.jarjar.JarJarTask', classpath: jarjarClasspath)
+        jarjar(jarfile: archivePath) {
+            zipfileset(src: tmpArchivePath)
+            jarjarifyClasspath.each {
+                zipfileset(src: it)
+            }
+            rule(pattern: "net.sf.cglib.**", result: "org.gmock.internal.cglib.@1")
+            rule(pattern: "org.objenesis.**", result: "org.gmock.internal.objenesis.@1")
+            rule(pattern: "org.objectweb.asm.**", result: "org.gmock.internal.asm.@1")
+        }
+        delete(file: tmpArchivePath)
+    }
+}
+
+createTask('integrationTest', dependsOn: 'jarjarify', type: Test).doFirst {
+    it.configure {
+        options.fork = true
+        options.forkOptions.forkMode = ForkMode.ONCE
+        options.forkOptions.dir = projectDir
+        include("**/*Tests.class", "**/*Test.class")
+        exclude("**/Abstract*.class")
+        testClassesDir = test.testClassesDir
+        testResultsDir = "$buildDir/integration-test-results" as File
+        testReportDir = "$buildDir/$reportsDirName/integration-tests" as File
+        unmanagedClasspath = [archive_jar.archivePath]
+        dependencyManager = dependencies
+    }
+}.skipProperties << 'skip.test'
+
+uploadLibs.dependsOn 'integrationTest'
+dists.dependsOn 'integrationTest'
