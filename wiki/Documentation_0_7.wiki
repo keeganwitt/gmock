@@ -149,7 +149,7 @@ Calling `mock(object)` on a concrete object will return a mock version of it. Yo
 {{{
 def controller = new SomeController()
 def mockController = mock(controller)
-mockController.params.returns = [id: 3]
+mockController.params.returns([id: 3])
 def mockRequest = mock()
 mockController.request.returns(mockRequest)
 }}}
@@ -157,7 +157,7 @@ mockController.request.returns(mockRequest)
 Or you could use the shortcut version of it:
 {{{
 def controller = new SomeController()
-mock(controller).params.returns = [id: 3]
+mock(controller).params.returns([id: 3])
 def mockRequest = mock()
 mock(controller).request.returns(mockRequest)
 }}}
