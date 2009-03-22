@@ -5,18 +5,22 @@ First of all, Gradle 0.5.2 is needed.
 You can use the following commands:
 
   * `gradle clean`
-    will remove the 'build' directory
+    remove the 'build' directory
   * `gradle test`
-    will run the tests
+    run the tests
   * `gradle`
-    is the same as above
+    the same as above
   * `gradle libs`
-    will create the jar file (without jarjarified)
+    create the jar file (without jarjarified)
   * `gradle jarjarify`
-    will jarjarified the jar file
+    jarjarify the jar file
   * `gradle integrationTest`
-    will run the tests with the jarjarified jar file
+    run the tests with the jarjarified jar file
+  * `gradle install`
+    install the artifact to the local Maven repository
   * `gradle dists`
-    will package the jar file and all other additional files (e.g. source codes) (not finished)
-  * `gradle release`
-    is the same as above, but without '-SNAPSHOT' in the version
+    package the jar file and all other additional files (e.g. source codes) (not finished)
+  * `gradle -Drelease [any task]`
+    run the task, but without '-SNAPSHOT' in the version
+  * `gradle -Dskip.test [any task]`
+    run the task, but skip all tests, including the integration tests
