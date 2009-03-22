@@ -1,4 +1,4 @@
-#How to build Gmock with Gradle
+#summary How to build Gmock with Gradle
 
 First of all, Gradle 0.5.2 is needed.
 
