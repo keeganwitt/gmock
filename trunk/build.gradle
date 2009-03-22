@@ -1,13 +1,18 @@
 usePlugin('groovy')
+usePlugin('maven')
 
 group = 'org.gmock'
 version = '0.8.0'
+archivesBaseName = 'gmock'
 
 sourceCompatibility = 1.5
 targetCompatibility = 1.5
 
 srcDirNames = []
 groovySrcDirNames = ['main/java', 'main/groovy']
+
+groovyVersion = '1.6.0'
+junitVersion = '4.5'
 
 dependencies {
     addConfiguration 'jarjar'
@@ -16,8 +21,8 @@ dependencies {
     addMavenRepo()
     addMavenStyleRepo('JBossRepo', 'http://repository.jboss.org/maven2/')
 
-    groovy 'org.codehaus.groovy:groovy-all:1.6.0'
-    compile 'junit:junit:4.5'
+    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
+    compile "junit:junit:$junitVersion"
     testCompile 'org.hamcrest:hamcrest-library:1.1'
 
     jarjar 'com.google.code:jarjar:1.0'
@@ -25,6 +30,14 @@ dependencies {
               'org.objenesis:objenesis:1.1'
 
     linkConfWithTask 'testRuntime', 'integrationTest'
+}
+
+if (System.getProperty('release') == null) {
+    version += '-SNAPSHOT'
+}
+
+install {
+    uploadResolvers.get('maven-installer').artifactPomContainer = new CustomArtifactPomContainer(project: project, pomDir: uploadLibsPomDir)
 }
 
 defaultTasks 'test'
@@ -35,29 +48,21 @@ defaultTasks 'test'
     }
 }
 
-init.doFirst {
-    if (!build.taskGraph.hasTask(':release')) {
-        version += '-SNAPSHOT'
-    }
-}
-
 archive_jar.doFirst {
-    ant.delete(file: archive_jar.archivePath)
+    ant.delete(file: it.archivePath)
 }
 
-createTask('release', dependsOn: 'dists')
+getTasksDependingOn(libs).each { it.dependsOn 'integrationTest' }
 
 createTask('jarjarify', dependsOn: 'libs') {
     archivePath = archive_jar.archivePath
     tmpArchivePath = "${archivePath}.tmp"
-    jarjarClasspath = dependencies.resolve('jarjar').first()
-    jarjarifyClasspath = dependencies.resolve('jarjarify')
     ant {
         move(file: archivePath, tofile: tmpArchivePath)
-        taskdef(name: 'jarjar', classname: 'com.tonicsystems.jarjar.JarJarTask', classpath: jarjarClasspath)
+        taskdef(name: 'jarjar', classname: 'com.tonicsystems.jarjar.JarJarTask', classpath: dependencies.antpath('jarjar'))
         jarjar(jarfile: archivePath) {
             zipfileset(src: tmpArchivePath)
-            jarjarifyClasspath.each {
+            dependencies.resolve('jarjarify').each {
                 zipfileset(src: it)
             }
             rule(pattern: "net.sf.cglib.**", result: "org.gmock.internal.cglib.@1")
@@ -68,7 +73,7 @@ createTask('jarjarify', dependsOn: 'libs') {
     }
 }
 
-createTask('integrationTest', dependsOn: 'jarjarify', type: Test).doFirst {
+createTask('integrationTest', dependsOn: 'jarjarify', type: Test) {
     it.configure {
         options.fork = true
         options.forkOptions.forkMode = ForkMode.ONCE
@@ -83,5 +88,29 @@ createTask('integrationTest', dependsOn: 'jarjarify', type: Test).doFirst {
     }
 }.skipProperties << 'skip.test'
 
-uploadLibs.dependsOn 'integrationTest'
-dists.dependsOn 'integrationTest'
+
+
+def getTasksDependingOn(theTask) {
+    tasks.findAll { name, task -> theTask in task.taskDependencies.getDependencies(task) }.values()
+}
+
+class CustomArtifactPomContainer implements org.gradle.api.internal.dependencies.maven.deploy.ArtifactPomContainer {
+
+    def artifactFile
+    def project
+    def pomDir
+
+    void addArtifact(org.apache.ivy.core.module.descriptor.Artifact artifact, File src) { artifactFile = src }
+
+    Map createDeployableUnits(List dependencies) {
+        def pomFile = new File(pomDir, 'pom.xml')
+        project.ant {
+            filter(token: 'gmockVersion', value: project.version)
+            filter(token: 'groovyVersion', value: project.groovyVersion)
+            filter(token: 'junitVersion', value: project.junitVersion)
+            copy(file: project.file('pom.xml'), tofile: pomFile, overwrite: 'true', filtering: 'true')
+        }
+        return [(pomFile): artifactFile]
+    }
+
+}
