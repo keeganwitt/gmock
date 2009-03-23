@@ -37,22 +37,43 @@ if (System.getProperty('release') == null) {
 }
 
 install {
-    uploadResolvers.get('maven-installer').artifactPomContainer = new CustomArtifactPomContainer(project: project, pomDir: uploadLibsPomDir)
+    uploadResolvers.get('maven-installer').artifactPomContainer = [
+        addArtifact: { org.apache.ivy.core.module.descriptor.Artifact artifact, File src -> artifactFile = src },
+        createDeployableUnits: { List dependencies -> [(pomFile): artifactFile] }
+    ] as org.gradle.api.internal.dependencies.maven.deploy.ArtifactPomContainer
 }
 
-defaultTasks 'test'
-
-[compile, test].each { task ->
-    task.doFirst {
-        it.unmanagedClasspath = dependencies.resolve('jarjarify').clone()
+dists {
+    zip(classifier: 'all') {
+        fileSet(dir: rootDir) {
+            include('src/**', 'apache-license-2.0.txt', 'samples/*/pom.xml', 'samples/*/src/**')
+        }
+        files(archive_jar.archivePath)
     }
+}
+
+defaultTasks ':test'
+
+[compile, test]*.doFirst {
+    it.unmanagedClasspath = dependencies.resolve('jarjarify').clone()
 }
 
 archive_jar.doFirst {
     ant.delete(file: it.archivePath)
 }
 
-getTasksDependingOn(libs).each { it.dependsOn 'integrationTest' }
+getTasksDependingOn(libs)*.dependsOn 'integrationTest'
+install.dependsOn 'generatePom'
+
+createTask('generatePom') {
+    pomFile = file("$buildDir/pom.xml")
+    ant {
+        filter(token: 'gmockVersion', value: version)
+        filter(token: 'groovyVersion', value: groovyVersion)
+        filter(token: 'junitVersion', value: junitVersion)
+        copy(file: file('pom.xml'), tofile: pomFile, overwrite: 'true', filtering: 'true')
+    }
+}
 
 createTask('jarjarify', dependsOn: 'libs') {
     archivePath = archive_jar.archivePath
@@ -73,44 +94,22 @@ createTask('jarjarify', dependsOn: 'libs') {
     }
 }
 
-createTask('integrationTest', dependsOn: 'jarjarify', type: Test) {
-    it.configure {
-        options.fork = true
-        options.forkOptions.forkMode = ForkMode.ONCE
-        options.forkOptions.dir = projectDir
-        include("**/*Tests.class", "**/*Test.class")
-        exclude("**/Abstract*.class")
-        testClassesDir = test.testClassesDir
-        testResultsDir = "$buildDir/integration-test-results" as File
-        testReportDir = "$buildDir/$reportsDirName/integration-tests" as File
-        unmanagedClasspath = [archive_jar.archivePath]
-        dependencyManager = dependencies
-    }
-}.skipProperties << 'skip.test'
+createTask('integrationTest', dependsOn: 'jarjarify', type: Test).configure {
+    options.fork = true
+    options.forkOptions.forkMode = ForkMode.ONCE
+    options.forkOptions.dir = projectDir
+    include("**/*Tests.class", "**/*Test.class")
+    exclude("**/Abstract*.class")
+    testClassesDir = test.testClassesDir
+    testResultsDir = "$buildDir/integration-test-results" as File
+    testReportDir = "$buildDir/$reportsDirName/integration-tests" as File
+    unmanagedClasspath = [archive_jar.archivePath]
+    dependencyManager = dependencies
+    skipProperties << 'skip.test'
+}
 
 
 
 def getTasksDependingOn(theTask) {
     tasks.findAll { name, task -> theTask in task.taskDependencies.getDependencies(task) }.values()
-}
-
-class CustomArtifactPomContainer implements org.gradle.api.internal.dependencies.maven.deploy.ArtifactPomContainer {
-
-    def artifactFile
-    def project
-    def pomDir
-
-    void addArtifact(org.apache.ivy.core.module.descriptor.Artifact artifact, File src) { artifactFile = src }
-
-    Map createDeployableUnits(List dependencies) {
-        def pomFile = new File(pomDir, 'pom.xml')
-        project.ant {
-            filter(token: 'gmockVersion', value: project.version)
-            filter(token: 'groovyVersion', value: project.groovyVersion)
-            filter(token: 'junitVersion', value: project.junitVersion)
-            copy(file: project.file('pom.xml'), tofile: pomFile, overwrite: 'true', filtering: 'true')
-        }
-        return [(pomFile): artifactFile]
-    }
-
 }
