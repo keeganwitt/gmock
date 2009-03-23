@@ -172,19 +172,6 @@ class FunctionnalConstructorsTest extends GMockTestCase {
         }
     }
 
-    void testOldStyleConstructorStillWork(){
-        Date now = new Date()
-        def mockLoader1 = mock(Loader, constructor: ["1", "2"])
-        def mockLoader2 = mock(Loader, constructor: [now])
-
-        play {
-            def epectedLoader2 = new Loader(now)
-            def epectedLoader1 = new Loader("1", "2")
-            assertSame epectedLoader1, mockLoader1
-            assertSame epectedLoader2, mockLoader2
-        }
-    }
-
     void testInvokeOriginalConstructor() {
         JavaLoader mock = mock(JavaLoader, invokeConstructor("loader"))
         mock.getName().returns("name")

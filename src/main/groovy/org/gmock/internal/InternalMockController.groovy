@@ -59,24 +59,8 @@ class InternalMockController {
         order == Order.LOOSE
     }
 
-    @Deprecated
-    def mock(Map constraints, Class clazz = Object, Closure expectationClosure = null) {
-        def mockArgs = [:]
-        mockArgs.clazz = clazz
-        mockArgs.constructorRecorder = new ConstructorRecorder(constraints.constructor)
-        if (expectationClosure){
-            mockArgs.expectationClosure = expectationClosure
-        }
-
-        return doMock(mockArgs)
-    }
-
     def mock(Class clazz = Object, Object ... args) {
         def mockArgs = mockFactory.parseMockArgument(clazz, args)
-        return doMock(mockArgs)
-    }
-
-    private doMock(mockArgs) {
         def mock
         doInternal {
             if (replay) {
