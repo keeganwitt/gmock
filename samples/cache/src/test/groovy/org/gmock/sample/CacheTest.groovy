@@ -51,8 +51,8 @@ class CacheTest extends GMockTestCase {
     }
 
     void testGetAndSwapOutDirtyItem() {
-        strict {
-            loose {
+        ordered {
+            unordered {
                 with(respository) {
                     get("key 1").returns(1)
                     get("key 3").returns(3)
