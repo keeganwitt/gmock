@@ -46,9 +46,9 @@ install {
 dists {
     zip(classifier: 'all') {
         fileSet(dir: rootDir) {
-            include('src/**', 'apache-license-2.0.txt', 'samples/*/pom.xml', 'samples/*/src/**')
+            include('src/**', 'docs/**', 'apache-license-2.0.txt', 'samples/*/pom.xml', 'samples/*/src/**')
         }
-        files(archive_jar.archivePath)
+        files(libs.archiveTasks*.archivePath as File[])
     }
 }
 
@@ -58,7 +58,7 @@ defaultTasks ':test'
     it.unmanagedClasspath = dependencies.resolve('jarjarify').clone()
 }
 
-archive_jar.doFirst {
+libs.archiveTasks*.doFirst {
     ant.delete(file: it.archivePath)
 }
 
@@ -103,7 +103,7 @@ createTask('integrationTest', dependsOn: 'jarjarify', type: Test).configure {
     testClassesDir = test.testClassesDir
     testResultsDir = "$buildDir/integration-test-results" as File
     testReportDir = "$buildDir/$reportsDirName/integration-tests" as File
-    unmanagedClasspath = [archive_jar.archivePath]
+    unmanagedClasspath = libs.archiveTasks*.archivePath
     dependencyManager = dependencies
     skipProperties << 'skip.test'
 }
