@@ -41,10 +41,6 @@ class PropertyRecorder extends BaseRecorder {
         }
     }
 
-    def sets(value) {
-        throw new DeprecationException("'sets' is deprecated. Use 'set' instead.");
-    }
-
     def set(value) {
         expectation.signature = setterClass.newInstance(mock, propertyName, value)
         expectation.result = ReturnNull.INSTANCE
