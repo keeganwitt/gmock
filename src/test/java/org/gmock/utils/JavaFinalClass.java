@@ -13,31 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.utils
+package org.gmock.utils;
 
-class FakeTagLib {
+public final class JavaFinalClass {
 
-    public String field = 'field'
+    public String field = "field";
 
-    def hello = { attrs ->
-        out << "hello"
+    public String getSomething() {
+        return "something";
     }
 
-    def linkHello = { attrs ->
-        link(attrs, "hello")
-    }
-
-    def saySomething(){
-        return "something"
-    }
-
-    def getSomething(){
-        return "something"
-    }
-
-    def setSomething(something){
-    }
-    def setSomethingElse(something){
+    public static String getName() {
+        return "name";
     }
 
 }

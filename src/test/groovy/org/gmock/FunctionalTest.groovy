@@ -18,6 +18,7 @@ package org.gmock
 import junit.framework.AssertionFailedError
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 import org.gmock.utils.JavaLoader
+import org.gmock.utils.FakeTagLib
 import static org.hamcrest.Matchers.*
 
 class FunctionalTest extends GMockTestCase {
@@ -917,6 +918,60 @@ class FunctionalTest extends GMockTestCase {
         }
         play {
             assertEquals 'yes', s.match {true}{true}
+        }
+    }
+
+    void testPOGOCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
+        def saySomething = { tagLib ->
+            tagLib.saySomething()
+        }
+        def tagLib = mock(FakeTagLib)
+        tagLib.saySomething().returns('test')
+        play {
+            assertEquals 'test', saySomething(tagLib)
+        }
+        tagLib.saySomething().returns('test')
+
+        tagLib = new FakeTagLib()
+        assertEquals 'something', saySomething(tagLib)
+    }
+
+    void testPOGOCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
+        def saySomething = { tagLib ->
+            tagLib.saySomething()
+        }
+        def tagLib = new FakeTagLib()
+        assertEquals 'something', saySomething(tagLib)
+
+        tagLib = mock(FakeTagLib)
+        tagLib.saySomething().returns('test')
+        play {
+            assertEquals 'test', saySomething(tagLib)
+        }
+    }
+
+    void testPOJOCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
+        def getLength = { str ->
+            str.length()
+        }
+        def str = mock(String)
+        str.length().returns(1)
+        play {
+            assertEquals 1, getLength(str)
+        }
+        str.length().returns(1)
+        assertEquals 3, getLength('abc')
+    }
+
+    void testPOJOCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
+        def getLength = { str ->
+            str.length()
+        }
+        def str = mock(String)
+        str.length().returns(1)
+        assertEquals 3, getLength('abc')
+        play {
+            assertEquals 1, getLength(str)
         }
     }
 

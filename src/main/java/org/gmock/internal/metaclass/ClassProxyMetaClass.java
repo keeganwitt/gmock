@@ -43,6 +43,8 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
     private boolean staticExpectationsEmpty;
     private InternalMockController controller;
 
+    private Class mockClass;
+
     private ClassProxyMetaClass(MetaClassRegistry metaClassRegistry, Class aClass, MetaClass adaptee, InternalMockController controller) throws IntrospectionException {
         super(metaClassRegistry, aClass, adaptee);
         this.controller = controller;
@@ -53,6 +55,10 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
         MetaClassRegistry registry = GroovySystem.getMetaClassRegistry();
         MetaClass adaptee = registry.getMetaClass(theClass);
         return new ClassProxyMetaClass(registry, theClass, adaptee, controller);
+    }
+
+    public Class getTheClass() {
+        return mockClass;
     }
 
     public void addConstructorExpectation(Expectation expectation) {
@@ -67,6 +73,8 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
 
     public void startProxy(){
         if (!empty()) {
+            mockClass = theClass;
+
             adaptee = registry.getMetaClass(theClass);
             registry.setMetaClass(theClass, this);
         }
@@ -75,6 +83,8 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
     public void stopProxy(){
         if (!empty()) {
             registry.setMetaClass(theClass, adaptee);
+
+            mockClass = null;
         }
     }
 
