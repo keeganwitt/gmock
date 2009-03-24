@@ -2,7 +2,6 @@ package org.gmock.sample;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Date;
 
 public class Cache implements Respository {
 

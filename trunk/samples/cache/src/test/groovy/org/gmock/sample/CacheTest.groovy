@@ -52,15 +52,15 @@ class CacheTest extends GMockTestCase {
 
     void testGetAndSwapOutDirtyItem() {
         ordered {
-            unordered {
-                with(respository) {
-                    get("key 1").returns(1)
-                    get("key 3").returns(3)
-                    get("key 4").returns(4)
-                }
+            with(respository) {
+                get("key 1").returns(1)
+                get("key 3").returns(3)
             }
-            strategy.getKeyToRemove().returns("key 2")
-            respository.put("key 2", 2)
+            unordered {
+                respository.get("key 4").returns(4)
+                strategy.getKeyToRemove().returns("key 2")
+                respository.put("key 2", 2)
+            }
         }
         strategy.onAccess(anything()).times(4)
         play {

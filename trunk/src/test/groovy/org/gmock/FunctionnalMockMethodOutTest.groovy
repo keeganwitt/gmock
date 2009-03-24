@@ -204,4 +204,54 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
         }
     }
 
+    void testPOGOCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
+        def saySomething = { tagLib ->
+            tagLib.saySomething()
+        }
+        def tagLib = new FakeTagLib()
+        mock(tagLib).saySomething().returns('test')
+        play {
+            assertEquals 'test', saySomething(tagLib)
+        }
+        mock(tagLib).saySomething().returns('test')
+        assertEquals 'something', saySomething(tagLib)
+    }
+
+    void testPOGOCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
+        def saySomething = { tagLib ->
+            tagLib.saySomething()
+        }
+        def tagLib = new FakeTagLib()
+        mock(tagLib).saySomething().returns('test')
+        assertEquals 'something', saySomething(tagLib)
+        play {
+            assertEquals 'test', saySomething(tagLib)
+        }
+    }
+
+    void testPOJOCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
+        def getLength = { str ->
+            str.length()
+        }
+        def str = 'abc'
+        mock(str).length().returns(1)
+        play {
+            assertEquals 1, getLength(str)
+        }
+        mock(str).length().returns(1)
+        assertEquals 3, getLength(str)
+    }
+
+    void testPOJOCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
+        def getLength = { str ->
+            str.length()
+        }
+        def str = 'abc'
+        mock(str).length().returns(1)
+        assertEquals 3, getLength(str)
+        play {
+            assertEquals 1, getLength(str)
+        }
+    }
+
 }

@@ -16,9 +16,7 @@
 package org.gmock
 
 import junit.framework.AssertionFailedError
-import org.gmock.utils.JavaCache
-import org.gmock.utils.JavaLoader
-import org.gmock.utils.Loader
+import org.gmock.utils.*
 import static org.hamcrest.Matchers.greaterThan
 import static org.hamcrest.Matchers.greaterThanOrEqualTo
 
@@ -205,5 +203,28 @@ class FunctionnalConstructorsTest extends GMockTestCase {
             assertEquals "loader", cache.getLoaderName()
         }
     }
+
+    void testCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
+        def createGroovyLoader = { ->
+            new GroovyLoader()
+        }
+        mock(GroovyLoader, constructor()).load('a').returns('b')
+        play {
+            assertEquals 'b', createGroovyLoader().load('a')
+        }
+        mock(GroovyLoader, constructor()).load('a').returns('b')
+        assertEquals 'a', createGroovyLoader().load('a')
+    }
+
+//    void testCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
+//        def createGroovyLoader = { ->
+//            new GroovyLoader()
+//        }
+//        mock(GroovyLoader, constructor()).load('a').returns('b')
+//        assertEquals 'a', createGroovyLoader().load('a')
+//        play {
+//            assertEquals 'b', createGroovyLoader().load('a')
+//        }
+//    }
 
 }
