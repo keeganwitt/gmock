@@ -11,13 +11,14 @@ targetCompatibility = 1.5
 srcDirNames = []
 groovySrcDirNames = ['main/java', 'main/groovy']
 
-groovyVersion = '1.6.0'
+groovyVersion = '1.6.1-SNAPSHOT'
 junitVersion = '4.5'
 
 dependencies {
     addConfiguration 'jarjar'
     addConfiguration 'jarjarify'
 
+    addFlatDirResolver('Lib', file('lib'))
     addMavenRepo()
     addMavenStyleRepo('JBossRepo', 'http://repository.jboss.org/maven2/')
 
