@@ -84,7 +84,9 @@ createTask('jarjarify', dependsOn: 'libs') {
         jarjar(jarfile: archivePath) {
             zipfileset(src: tmpArchivePath)
             dependencies.resolve('jarjarify').each {
-                zipfileset(src: it)
+                zipfileset(src: it) {
+                    include(name: '**/*.class')
+                }
             }
             rule(pattern: "net.sf.cglib.**", result: "org.gmock.internal.cglib.@1")
             rule(pattern: "org.objenesis.**", result: "org.gmock.internal.objenesis.@1")
