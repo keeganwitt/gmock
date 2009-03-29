@@ -1,3 +1,18 @@
+/*
+ * Copyright 2008-2009 Julien Gagnet, Johnny Jian
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gmock.internal.ast
 
 import org.codehaus.groovy.ast.stmt.BlockStatement
@@ -9,87 +24,63 @@ import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.gmock.GMock
 import org.gmock.GMockController
 import org.codehaus.groovy.ast.*
+import static org.codehaus.groovy.ast.ClassHelper.*
+import static org.codehaus.groovy.ast.ClassNode.EMPTY_ARRAY
 import org.codehaus.groovy.ast.expr.*
-import static org.objectweb.asm.Opcodes.ACC_PRIVATE
-import static org.objectweb.asm.Opcodes.ACC_PROTECTED
+import static org.codehaus.groovy.ast.expr.MethodCallExpression.NO_ARGUMENTS
+import static org.objectweb.asm.Opcodes.*
 
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 public class WithGMockTransformation implements ASTTransformation {
 
-    public void visit(ASTNode[] nodes, SourceUnit sourceUnit) {
+    private static final ClassNode GMOCK_CONTROLLER_TYPE = new ClassNode(GMockController)
+    private static final ClassNode GMOCK_TYPE = new ClassNode(GMock)
+    private static final ClassNode OBJECT_ARRAY_TYPE = OBJECT_TYPE.makeArray()
 
-        AnnotatedNode parent = (AnnotatedNode) nodes[1];
+    public void visit(ASTNode[] nodes, SourceUnit sourceUnit) {
+        AnnotatedNode parent = (AnnotatedNode) nodes[1]
 
         if (!(parent instanceof ClassNode)) {
-            throw new RuntimeException("@WithGMock need to be applied on a class level.");
+            throw new RuntimeException("@WithGMock need to be applied on a class level.")
         }
-        ClassNode cNode = (ClassNode) parent;
+        ClassNode cNode = (ClassNode) parent
 
         if (cNode.isInterface()) {
-            throw new RuntimeException('@WithGMock cannot be applied on an interface.');
+            throw new RuntimeException('@WithGMock cannot be applied on an interface.')
         }
 
-        Expression newGmockController = new ConstructorCallExpression(new ClassNode(GMockController), MethodCallExpression.NO_ARGUMENTS);
-        cNode.addField("\$gmockController", ACC_PRIVATE, new ClassNode(GMockController), newGmockController);
+        Expression newGmockController = new ConstructorCallExpression(GMOCK_CONTROLLER_TYPE, NO_ARGUMENTS)
+        cNode.addField('$gmockController', ACC_PRIVATE, GMOCK_CONTROLLER_TYPE, newGmockController)
 
-        def mockArgs = ["args": new ClassNode(Object).makeArray()]
-        delegateToController(cNode, "mock", mockArgs)
+        delegateToController(cNode, "mock", [args: OBJECT_ARRAY_TYPE])
+        delegateToController(cNode, "play", [closure: CLOSURE_TYPE])
+        delegateToController(cNode, "with", [mock: OBJECT_TYPE, closure: CLOSURE_TYPE])
+        delegateToController(cNode, "ordered", [closure: CLOSURE_TYPE])
+        delegateToController(cNode, "unordered", [closure: CLOSURE_TYPE])
 
-        def playArgs = ["closure": new ClassNode(Closure)]
-        delegateToController(cNode, "play", playArgs)
-
-        def withArgs = ["mock": new ClassNode(Object), "closure": new ClassNode(Closure)]
-        delegateToController(cNode, "with", withArgs)
-
-        def orderedArgs = ["closure": new ClassNode(Closure)]
-        delegateToController(cNode, "ordered", orderedArgs)
-
-        def unorderedArgs = ["closure": new ClassNode(Closure)]
-        delegateToController(cNode, "unordered", unorderedArgs)
-
-        def matchArgs = ["closure": new ClassNode(Closure)]
-        delegateToGmock(cNode, "match", matchArgs)
-
-        def constructorArgs = ["args": new ClassNode(Object).makeArray()]
-        delegateToGmock(cNode, "constructor", constructorArgs)
-
-        def invokeConstructorArgs = ["args": new ClassNode(Object).makeArray()]
-        delegateToGmock(cNode, "invokeConstructor", invokeConstructorArgs)
-
-        def nameArgs = ["name": new ClassNode(String)]
-        delegateToGmock(cNode, "name", nameArgs)
-
+        delegateToGmock(cNode, "match", [closure: CLOSURE_TYPE])
+        delegateToGmock(cNode, "constructor", [args: OBJECT_ARRAY_TYPE])
+        delegateToGmock(cNode, "invokeConstructor", [args: OBJECT_ARRAY_TYPE])
+        delegateToGmock(cNode, "name", [name: STRING_TYPE])
     }
 
     private delegateToGmock(ClassNode cNode, String methodName, Map args) {
-        final BlockStatement body = new BlockStatement();
-
-        def arguments = args.keySet().collect { new VariableExpression(it) }
-        def mockExpression = new StaticMethodCallExpression(
-                new ClassNode(GMock),
-                methodName,
-                new ArgumentListExpression(arguments as VariableExpression[]))
-        body.addStatement(new ExpressionStatement(mockExpression))
-
-        def params = args.entrySet().collect { new Parameter(it.value, it.key)}
-        cNode.addMethod(new MethodNode(methodName, ACC_PROTECTED, ClassHelper.OBJECT_TYPE, params as Parameter[], ClassNode.EMPTY_ARRAY, body))
+        addMethod(cNode, methodName, args, StaticMethodCallExpression, GMOCK_TYPE)
     }
 
     private delegateToController(ClassNode cNode, String methodName, Map args) {
-        final BlockStatement body = new BlockStatement();
+        addMethod(cNode, methodName, args, MethodCallExpression, new VariableExpression('$gmockController'))
+    }
 
-        def arguments = args.keySet().collect { new VariableExpression(it) }
+    private addMethod(ClassNode cNode, String methodName, Map args, Class expressionClass, Object object) {
+        final BlockStatement body = new BlockStatement()
 
-        def mockExpression = new MethodCallExpression(
-                new VariableExpression("\$gmockController"),
-                new ConstantExpression(methodName),
-                new ArgumentListExpression(arguments as VariableExpression[])
-        )
-
+        def arguments = args.keySet().collect { new VariableExpression(it) } as VariableExpression[]
+        def mockExpression = expressionClass.newInstance(object, methodName, new ArgumentListExpression(arguments))
         body.addStatement(new ExpressionStatement(mockExpression))
 
-        def params = args.entrySet().collect { new Parameter(it.value, it.key)}
-        cNode.addMethod(new MethodNode(methodName, ACC_PROTECTED, ClassHelper.OBJECT_TYPE, params as Parameter[], ClassNode.EMPTY_ARRAY, body))
+        def params = args.entrySet().collect { new Parameter(it.value, it.key) } as Parameter[]
+        cNode.addMethod(new MethodNode(methodName, ACC_PROTECTED, OBJECT_TYPE, params, EMPTY_ARRAY, body))
     }
 
 }
