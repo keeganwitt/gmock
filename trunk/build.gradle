@@ -55,7 +55,7 @@ dists {
 defaultTasks ':test'
 
 [compile, test]*.doFirst {
-    it.unmanagedClasspath = dependencies.resolve('jarjarify').clone()
+    it.unmanagedClasspath = dependencies.jarjarify.files.toList()
 }
 
 libs.archiveTasks*.doFirst {
@@ -83,7 +83,7 @@ createTask('jarjarify', dependsOn: 'libs') {
         taskdef(name: 'jarjar', classname: 'com.tonicsystems.jarjar.JarJarTask', classpath: dependencies.antpath('jarjar'))
         jarjar(jarfile: archivePath) {
             zipfileset(src: tmpArchivePath)
-            dependencies.resolve('jarjarify').each {
+            dependencies.jarjarify.each {
                 zipfileset(src: it) {
                     include(name: '**/*.class')
                 }

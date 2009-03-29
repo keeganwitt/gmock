@@ -1,6 +1,5 @@
 package org.gmock;
 
-
 import org.codehaus.groovy.transform.GroovyASTTransformationClass;
 
 import java.lang.annotation.Target;
@@ -9,7 +8,7 @@ import java.lang.annotation.Retention
 import java.lang.annotation.ElementType;
 
 @Retention(RetentionPolicy.SOURCE)
-@Target([ElementType.METHOD])
+@Target([ElementType.TYPE])
 @GroovyASTTransformationClass(["org.gmock.internal.ast.WithGMockTransformation"])
 public @interface WithGMock {
 

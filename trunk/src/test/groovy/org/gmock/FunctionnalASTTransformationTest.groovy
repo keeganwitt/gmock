@@ -1,12 +1,12 @@
 package org.gmock
 
-import junit.framework.TestCase
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.gmock.WithGMock
-import org.gmock.utils.JavaLoader
 import org.gmock.utils.JavaCache
+import org.gmock.utils.JavaLoader
 
 @WithGMock
-class FunctionnalASTTransformationTest extends TestCase {
+class FunctionnalASTTransformationTest extends GroovyTestCase {
 
     void testBasic() {
         def loader = mock()
@@ -89,5 +89,47 @@ class FunctionnalASTTransformationTest extends TestCase {
         }
     }
 
+    private void shouldFailWithGMock(Closure closure) {
+        try {
+            closure()
+        } catch (MultipleCompilationErrorsException e) {
+            def errors = e.errorCollector.errors
+            if (errors.size() == 1 && errors[0].cause.message.startsWith('@WithGMock')) {
+                return // success
+            }
+        } catch (e) {}
+        fail("Should fail to compile the code because of applying @WithGMock on a wrong target.")
+    }
+
+    void testAnnotationCannotBeAppliedOnProperties() {
+        shouldFailWithGMock {
+            Eval.me '''
+class A {
+    @org.gmock.WithGMock
+    def aProperty
+}
+'''
+        }
+    }
+
+    void testAnnotationCannotBeAppliedOnMethods() {
+        shouldFailWithGMock {
+            Eval.me '''
+class A {
+    @org.gmock.WithGMock
+    def aMethod() {}
+}
+'''
+        }
+    }
+
+    void testAnnotationCannotBeAppliedOnInterfaces() {
+        shouldFailWithGMock {
+            Eval.me '''
+@org.gmock.WithGMock
+interface I {}
+'''
+        }
+    }
 
 }
