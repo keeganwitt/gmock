@@ -147,4 +147,20 @@ interface I {}
         }
     }
 
+    void testDoNotAddMethodsIfTheyAreAlreadyExists() {
+        Eval.me '''
+@org.gmock.WithGMock
+class A {
+    def name(String s) { "name" }
+    def with(object, Closure closure) { "with" }
+    def test() {
+        assert "name" == name("test")
+        assert "with" == with(null, {})
+        assert constructor() instanceof org.gmock.internal.recorder.ConstructorRecorder
+    }
+}
+new A().test()
+'''
+    }
+
 }

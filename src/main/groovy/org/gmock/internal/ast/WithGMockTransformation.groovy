@@ -73,15 +73,16 @@ public class WithGMockTransformation implements ASTTransformation {
     }
 
     private addMethod(ClassNode cNode, String methodName, Map args, Class expressionClass, Object object) {
-        final BlockStatement body = new BlockStatement()
-
-        def arguments = args.keySet().collect { new VariableExpression(it) } as VariableExpression[]
-        def mockExpression = expressionClass.newInstance(object, methodName, new ArgumentListExpression(arguments))
-        body.addStatement(new ExpressionStatement(mockExpression))
-
         def params = args.entrySet().collect { new Parameter(it.value, it.key) } as Parameter[]
-        cNode.addMethod(new MethodNode(methodName, ACC_PROTECTED, OBJECT_TYPE, params, EMPTY_ARRAY, body))
-        // TODO: check if the method is already exists
+        if (!cNode.getMethod(methodName, params)) { // add the method only if it is not exists 
+            def arguments = args.keySet().collect { new VariableExpression(it) } as VariableExpression[]
+            def mockExpression = expressionClass.newInstance(object, methodName, new ArgumentListExpression(arguments))
+
+            final BlockStatement body = new BlockStatement()
+            body.addStatement(new ExpressionStatement(mockExpression))
+
+            cNode.addMethod(new MethodNode(methodName, ACC_PROTECTED, OBJECT_TYPE, params, EMPTY_ARRAY, body))
+        }
     }
 
 }
