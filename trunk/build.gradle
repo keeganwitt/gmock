@@ -29,12 +29,18 @@ dependencies {
     jarjarify 'cglib:cglib:2.2',
               'org.objenesis:objenesis:1.1'
 
+    linkConfWithTask 'testCompile', 'integrationTestCompile'
     linkConfWithTask 'testRuntime', 'integrationTest'
 }
 
 if (System.getProperty('release') == null) {
     version += '-SNAPSHOT'
 }
+
+archivePaths = libs.archiveTasks*.archivePath
+integrationTestClassesDir = file("$buildDir/integration-test-classes")
+integrationTestResultsDir = file("$buildDir/integration-test-results")
+integrationTestReportDir = file("$buildDir/$reportsDirName/integration-tests")
 
 install {
     uploadResolvers.get('maven-installer').artifactPomContainer = [
@@ -48,11 +54,9 @@ dists {
         fileSet(dir: rootDir) {
             include('src/**', 'docs/**', 'apache-license-2.0.txt', 'samples/*/pom.xml', 'samples/*/src/**')
         }
-        files(libs.archiveTasks*.archivePath as File[])
+        files(archivePaths as File[])
     }
 }
-
-defaultTasks ':test'
 
 [compile, test]*.doFirst {
     it.unmanagedClasspath = dependencies.jarjarify.files.toList()
@@ -96,19 +100,33 @@ createTask('jarjarify', dependsOn: 'libs') {
     }
 }
 
-createTask('integrationTest', dependsOn: 'jarjarify', type: Test).configure {
+createTask('integrationTestCompile', dependsOn: 'jarjarify', type: GroovyCompile).configure {
+    srcDirs = testSrcDirs
+    groovySourceDirs = groovyTestSrcDirs
+    groovyClasspath = dependencies.resolve('groovy')
+    destinationDir = integrationTestClassesDir
+    sourceCompatibility = project.sourceCompatibility
+    targetCompatibility = project.targetCompatibility
+    unmanagedClasspath = archivePaths
+    dependencyManager = dependencies
+    skipProperties << 'skip.test'
+}
+
+createTask('integrationTest', dependsOn: 'integrationTestCompile', type: Test).configure {
     options.fork = true
     options.forkOptions.forkMode = ForkMode.ONCE
     options.forkOptions.dir = projectDir
     include("**/*Tests.class", "**/*Test.class")
     exclude("**/Abstract*.class")
-    testClassesDir = test.testClassesDir
-    testResultsDir = "$buildDir/integration-test-results" as File
-    testReportDir = "$buildDir/$reportsDirName/integration-tests" as File
-    unmanagedClasspath = libs.archiveTasks*.archivePath
+    testClassesDir = integrationTestClassesDir
+    testResultsDir = integrationTestResultsDir
+    testReportDir = integrationTestReportDir
+    unmanagedClasspath = archivePaths
     dependencyManager = dependencies
     skipProperties << 'skip.test'
 }
+
+defaultTasks ':test'
 
 
 

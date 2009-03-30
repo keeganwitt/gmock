@@ -81,6 +81,7 @@ public class WithGMockTransformation implements ASTTransformation {
 
         def params = args.entrySet().collect { new Parameter(it.value, it.key) } as Parameter[]
         cNode.addMethod(new MethodNode(methodName, ACC_PROTECTED, OBJECT_TYPE, params, EMPTY_ARRAY, body))
+        // TODO: check if the method is already exists
     }
 
 }
