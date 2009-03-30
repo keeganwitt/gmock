@@ -19,6 +19,9 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.gmock.WithGMock
 import org.gmock.utils.JavaCache
 import org.gmock.utils.JavaLoader
+import org.testng.annotations.Test
+import org.testng.TestListenerAdapter
+import org.testng.TestNG
 
 @WithGMock
 class FunctionnalASTTransformationTest extends GroovyTestCase {
@@ -161,6 +164,100 @@ class A {
 }
 new A().test()
 '''
+    }
+
+    void testTestNGWithGMock() {
+        new TestNG().with {
+            outputDirectory = 'build/reports/testng-tests'
+            testClasses = TestNGWithGMock as Class[]
+            it.run()
+            assertFalse hasFailure()
+        }
+    }
+
+}
+
+@WithGMock
+class TestNGWithGMock {
+
+    @Test void basic() {
+        def loader = mock()
+        loader.load("key").returns("value")
+
+        String mockString = mock(String)
+        mockString.contains("ham").returns(true)
+
+        play {
+            assert "value" == loader.load("key")
+            assert mockString.contains("ham")
+        }
+    }
+
+    @Test void withMock() {
+        def loader = mock()
+        with(loader) {
+            loader.load("key").returns("value")
+        }
+        play {
+            assert "value" == loader.load("key")
+        }
+    }
+
+    @Test void ordering() {
+        def mock = mock()
+        ordered {
+            mock.a().returns(1)
+            unordered {
+                mock.b().returns(2)
+                mock.c().returns(3)
+            }
+            mock.d().returns(4)
+        }
+        play {
+            assert 1 == mock.a()
+            assert 3 == mock.c()
+            assert 2 == mock.b()
+            assert 4 == mock.d()
+        }
+
+    }
+
+    @Test void matching() {
+        def mockLoader = mock()
+        mockLoader.load(match { it.startsWith("k")}).returns("value")
+
+        play {
+            assert "value" == mockLoader.load("key")
+        }
+    }
+
+    @Test void constructor() {
+        JavaLoader mock = mock(JavaLoader, constructor("my loader"))
+        mock.getName().returns("name")
+
+        play {
+            JavaLoader loader = new JavaLoader("my loader")
+            assert "name" == loader.getName()
+        }
+    }
+
+    @Test void invokeConstructor() {
+        JavaLoader mock = mock(JavaLoader, invokeConstructor("loader"))
+        mock.getName().returns("name")
+
+        def cache = new JavaCache(mock)
+
+        play {
+            assert "name" == mock.getName()
+            assert "loader" == cache.getLoaderName()
+        }
+    }
+
+    @Test void name() {
+        def mockDate = mock(Date, name('my mock date'))
+        play {
+            assert "my mock date" == mockDate.toString()
+        }
     }
 
 }
