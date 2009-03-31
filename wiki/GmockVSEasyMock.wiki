@@ -59,7 +59,7 @@ expect(two.add("two")).andReturn(true);
 
 control.replay();
 
-someCodeThatInteractsWithMocks();
+someCodeThatInteractsWithMocks(one, two);
 
 control.verify();
 }}}
@@ -76,5 +76,34 @@ ordered {
 
 play {
   someCodeThatInteractsWithMocks(one, two)
+}
+}}}
+
+
+= Times Verification and Argument Matchers =
+
+=== EasyMock ===
+{{{
+List mock = createMock(List.class);
+
+mock.clear();
+expectLastCall().times(3);
+
+expect(mock.add(anyObject())).andReturn(true).atLeastOnce();
+
+someCodeThatInteractsWithMock(mock);
+
+replay(mock);
+}}}
+
+=== Gmock ===
+{{{
+def mock = mock(List)
+
+mock.clear().times(3)
+mock.add(anything()).returns(true).atLeastOnce()
+
+play {
+  someCodeThatInteractsWithMock(mock)
 }
 }}}
