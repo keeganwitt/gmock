@@ -1,4 +1,4 @@
-#summary Gmock VS EasyMock
+﻿#summary Gmock VS EasyMock
 
 
 = Basic Usages =
@@ -91,9 +91,11 @@ expectLastCall().times(3);
 
 expect(mock.add(anyObject())).andReturn(true).atLeastOnce();
 
+replay(mock);
+
 someCodeThatInteractsWithMock(mock);
 
-replay(mock);
+verify(mock);
 }}}
 
 === Gmock ===
