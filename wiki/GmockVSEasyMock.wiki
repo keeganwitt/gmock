@@ -26,18 +26,18 @@ mock.get(1).returns('two').stub()
 mock.clear()
 
 play {
-    someCodeThatInteractsWithMock(mock)
+  someCodeThatInteractsWithMock(mock)
 }
 }}}
 Or even shorter:
 {{{
 def mock = mock(List) {
-    get(0).returns('one')
-    get(1).returns('two').stub()
-    clear()
+  get(0).returns('one')
+  get(1).returns('two').stub()
+  clear()
 }
 
 play {
-    someCodeThatInteractsWithMock(mock)
+  someCodeThatInteractsWithMock(mock)
 }
 }}}
