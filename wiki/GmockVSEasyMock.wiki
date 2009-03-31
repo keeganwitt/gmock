@@ -10,6 +10,7 @@ List mock = createMock(List.class);
 expect(mock.get(0)).andReturn("one");
 expect(mock.get(1)).andStubReturn("two");
 mock.clear();
+expectLastCall().andThrow(new RuntimeException());
 
 replay(mock);
 
@@ -24,7 +25,7 @@ def mock = mock(List)
 
 mock.get(0).returns('one')
 mock.get(1).returns('two').stub()
-mock.clear()
+mock.clear().throws(RuntimeException)
 
 play {
   someCodeThatInteractsWithMock(mock)
@@ -35,7 +36,7 @@ Or even shorter:
 def mock = mock(List) {
   get(0).returns('one')
   get(1).returns('two').stub()
-  clear()
+  clear().throws(RuntimeException)
 }
 
 play {
