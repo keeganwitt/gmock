@@ -1,4 +1,5 @@
 #summary Gmock VS EasyMock
+#labels Featured
 
 
 = Basic Usages =
