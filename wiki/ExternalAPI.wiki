@@ -1,4 +1,5 @@
 #summary Gmock external API
+#labels Deprecated
 
 = External API =
 
