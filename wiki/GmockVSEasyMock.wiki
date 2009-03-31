@@ -1,5 +1,6 @@
 #summary Gmock VS EasyMock
 
+
 = Basic Usages =
 
 === EasyMock ===
@@ -39,5 +40,40 @@ def mock = mock(List) {
 
 play {
   someCodeThatInteractsWithMock(mock)
+}
+}}}
+
+
+= Order Checking =
+
+=== EasyMock ===
+{{{
+Control control = createStrictControl();
+
+List one = control.createMock(List.class);
+List two = control.createMock(List.class);
+
+expect(one.add("one")).andReturn(true);
+expect(two.add("two")).andReturn(true);
+
+control.replay();
+
+someCodeThatInteractsWithMocks();
+
+control.verify();
+}}}
+
+=== Gmock ===
+{{{
+def one = mock(List)
+def two = mock(List)
+
+ordered {
+  one.add("one").returns(true)
+  two.add("two").returns(true)
+}
+
+play {
+  someCodeThatInteractsWithMocks(one, two)
 }
 }}}
