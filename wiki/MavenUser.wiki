@@ -1,0 +1,1 @@
+#summary How to use Gmock with Maven
