@@ -109,3 +109,46 @@ play {
   someCodeThatInteractsWithMock(mock)
 }
 }}}
+
+
+= Custom Argument Matchers =
+
+=== EasyMock ===
+It is inconvenient to create a custom argument matcher in EasyMock.
+
+First, you have to implement IArgumentMatcher:
+{{{
+import org.easymock.IArgumentMatcher;
+public class ThrowableEquals implements IArgumentMatcher {
+  private Throwable expected;
+  public ThrowableEquals(Throwable expected) {
+    this.expected = expected;
+  }
+  public boolean matches(Object actual) {
+    String actualMessage = ((Throwable) actual).getMessage();
+    return expected.getClass().equals(actual.getClass())
+        && expected.getMessage().equals(actualMessage);
+  }
+  public void appendTo(StringBuffer buffer) { ... }
+}
+}}}
+
+Then, define a static method to report the matcher:
+{{{
+public static <T extends Throwable> T eqException(T in) {
+  reportMatcher(new ThrowableEquals(in));
+  return null;
+}
+}}}
+
+Finally, you can use the matcher:
+{{{
+IllegalStateException e = new IllegalStateException("Operation not allowed.")
+expect(mock.logThrowable(eqException(e))).andReturn(true);
+}}}
+
+=== Gmock ===
+In Gmock, all you need is just defining a closure:
+{{{
+mock.logThrowable(match { it?.class == IllegalStateException && it.message == "Operation not allowed." }).returns(true)
+}}}
