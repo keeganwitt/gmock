@@ -25,7 +25,7 @@ def mock = mock(List)
 
 mock.get(0).returns('one')
 mock.get(1).returns('two').stub()
-mock.clear().throws(RuntimeException)
+mock.clear().raises(RuntimeException)
 
 play {
   someCodeThatInteractsWithMock(mock)
@@ -36,7 +36,7 @@ Or even shorter:
 def mock = mock(List) {
   get(0).returns('one')
   get(1).returns('two').stub()
-  clear().throws(RuntimeException)
+  clear().raises(RuntimeException)
 }
 
 play {
