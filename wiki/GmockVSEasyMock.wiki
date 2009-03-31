@@ -1,1 +1,43 @@
 #summary Gmock VS EasyMock
+
+= Basic Usages =
+
+=== EasyMock ===
+{{{
+List mock = createMock(List.class);
+
+expect(mock.get(0)).andReturn("one");
+expect(mock.get(1)).andStubReturn("two");
+mock.clear();
+
+replay(mock);
+
+someCodeThatInteractsWithMock(mock);
+
+verify(mock);
+}}}
+
+=== Gmock ===
+{{{
+def mock = mock(List)
+
+mock.get(0).returns('one')
+mock.get(1).returns('two').stub()
+mock.clear()
+
+play {
+    someCodeThatInteractsWithMock(mock)
+}
+}}}
+Or even shorter:
+{{{
+def mock = mock(List) {
+    get(0).returns('one')
+    get(1).returns('two').stub()
+    clear()
+}
+
+play {
+    someCodeThatInteractsWithMock(mock)
+}
+}}}
