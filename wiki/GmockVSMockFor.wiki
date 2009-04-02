@@ -7,16 +7,16 @@
 // A Stub's expectation is sequence independent
 def stub = new StubFor(HashMap)
 stub.demand.get { i ->
-    assert 1 == i
-    'one'
+  assert 1 == i
+  'one'
 }
 stub.demand.get { i ->
-    assert 2 == i
-    'two'
+  assert 2 == i
+  'two'
 }
 stub.use {
-    def mockMap = new HashMap() // this object has to be created in the use closure
-    someCodeThatInteractsWithMock(mockMap)
+  def mockMap = new HashMap() // this object has to be created in the use closure
+  someCodeThatInteractsWithMock(mockMap)
 }
 stub.expect.verify() // use of verify() is left to the user
 }}}
@@ -24,10 +24,55 @@ stub.expect.verify() // use of verify() is left to the user
 
 === Gmock ===
 {{{
-def mockMap = mock(HashMap)
+def mockMap = mock(Map)
 mock.get(1).returns('one')
 mock.get(2).returns('two')
 play {
   someCodeThatInteractsWithMock(mockMap)
+}
+}}}
+
+
+= Order Checking =
+
+=== MockFor ===
+{{{
+// A Mock's expectation is always sequence dependent
+def mock = new MockFor(HashMap)
+mock.demand.put { key, value ->
+  assert 'one' == key
+  assert 1 == value
+}
+mock.demand.put { key, value ->
+  assert 'two' == key
+  assert 2 == value
+}
+mock.use {
+  def mockMap = new HashMap()
+  someCodeThatInteractsWithMock(mockMap)
+}
+}}}
+
+=== Gmock ===
+{{{
+def mockMap = mock(Map)
+ordered {
+  mockMap.put('one', 1)
+  mockMap.put('two', 2)
+}
+play {
+  someCodeThatInteractsWithMock(mockMap)
+}
+}}}
+And Gmock also support order checking of multiple mocks, while MockFor doesn't.
+{{{
+def one = mock(Map)
+def two = mock(Map)
+ordered {
+  one.put('one', 1)
+  two.put('two', 2)
+}
+play {
+  someCodeThatInteractsWithMocks(one, two)
 }
 }}}
