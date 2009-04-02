@@ -1,5 +1,6 @@
 #summary Gmock VS MockFor & StubFor
 
+
 = Basic Usages =
 
 === MockFor ===
@@ -10,9 +11,8 @@ stub.demand.get { i ->
   assert 1 == i
   'one'
 }
-stub.demand.get { i ->
-  assert 2 == i
-  'two'
+stub.demand.clear { ->
+  throw new RuntimeException()
 }
 stub.use {
   def mockMap = new HashMap() // this object has to be created in the use closure
@@ -21,12 +21,11 @@ stub.use {
 stub.expect.verify() // use of verify() is left to the user
 }}}
 
-
 === Gmock ===
 {{{
 def mockMap = mock(Map)
-mock.get(1).returns('one')
-mock.get(2).returns('two')
+mockMap.get(1).returns('one')
+mockMap.clear().raises(RuntimeException)
 play {
   someCodeThatInteractsWithMock(mockMap)
 }
@@ -76,3 +75,4 @@ play {
   someCodeThatInteractsWithMocks(one, two)
 }
 }}}
+
