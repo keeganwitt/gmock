@@ -1,1 +1,33 @@
-#summary Gmock VS MockFor
+#summary Gmock VS MockFor & StubFor
+
+= Basic Usages =
+
+=== MockFor ===
+{{{
+// A Stub's expectation is sequence independent
+def stub = new StubFor(HashMap)
+stub.demand.get { i ->
+    assert 1 == i
+    'one'
+}
+stub.demand.get { i ->
+    assert 2 == i
+    'two'
+}
+stub.use {
+    def mockMap = new HashMap() // this object has to be created in the use closure
+    someCodeThatInteractsWithMock(mockMap)
+}
+stub.expect.verify() // use of verify() is left to the user
+}}}
+
+
+=== Gmock ===
+{{{
+def mockMap = mock(HashMap)
+mock.get(1).returns('one')
+mock.get(2).returns('two')
+play {
+  someCodeThatInteractsWithMock(mockMap)
+}
+}}}
