@@ -6,9 +6,9 @@
 === MockFor ===
 {{{
 // A Stub's expectation is sequence independent
-def stub = new StubFor(HashMap)
-stub.demand.get { i ->
-  assert 1 == i
+def stub = new StubFor(HashMap) // you have to mock a class instead of an interface
+stub.demand.get { key ->
+  assert 1 == key
   'one'
 }
 stub.demand.clear { ->
@@ -63,7 +63,7 @@ play {
   someCodeThatInteractsWithMock(mockMap)
 }
 }}}
-And Gmock also support order checking of multiple mocks, while MockFor doesn't.
+Gmock also support order checking of multiple mocks, while MockFor doesn't.
 {{{
 def one = mock(Map)
 def two = mock(Map)
@@ -105,6 +105,30 @@ def mockMap = mock(Map) {
   get(1).returns(2).stub()
 }
 play {
-  someCodeThatInteractsWithMock(mock)
+  someCodeThatInteractsWithMock(mockMap)
+}
+}}}
+
+
+= Property Mocking =
+
+=== MockFor ===
+{{{
+def mock = new MockFor(HashMap)
+mock.demand.setSomething { value -> assert 'value' == value }
+mock.demand.getSomething { -> 'something' }
+mock.use {
+  def mockMap = new HashMap()
+  someCodeThatInteractsWithMock(mockMap)
+}
+}}}
+
+=== Gmock ===
+{{{
+def mockMap = mock(Map)
+mockMap.something.set('value')
+mockMap.something.returns('something')
+play {
+  someCodeThatInteractsWithMock(mockMap)
 }
 }}}
