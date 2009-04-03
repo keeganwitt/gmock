@@ -132,3 +132,68 @@ play {
   someCodeThatInteractsWithMock(mockMap)
 }
 }}}
+
+
+= Static Method Mocking =
+
+=== MockFor ===
+There are no differences between static method mocking and instance method mocking in MockFor.
+{{{
+def mock = new MockFor(HashMap)
+mock.demand.get(1..2) { -> 'static' }
+mock.use {
+  assert 'static' == HashMap.get()
+  assert 'static' == new HashMap().get()
+}
+}}}
+
+=== Gmock ===
+{{{
+def mockMap = mock(HashMap)
+mockMap.static.get().returns('static')
+play {
+  assert 'static' == HashMap.get()
+  // this will not pass:
+  // assert 'static' == new HashMap().get()
+}
+}}}
+Or even shorter:
+{{{
+mock(HashMap).static.get().returns('static')
+play {
+  assert 'static' == HashMap.get()
+}
+}}}
+
+
+= Constructor Mocking =
+
+=== MockFor ===
+There is no constructor mocking in MockFor. You have to use ExpandoMetaClass instead.
+{{{
+HashMap.metaClass.constructor = { String s ->
+  assert 'one' == s
+  new HashMap()
+}
+mock = new MockFor(HashMap)
+mock.demand.get { key -> 'two' }
+mock.demand.put { key, value -> assert 'three' == value }
+mock.use {
+  def mockMap = new HashMap('one')
+  assert 'two' == mockMap.get(2)
+  mockMap.put(3, 'three')
+}
+}}}
+
+=== Gmock ===
+{{{
+mock(HashMap, constructor('one')) {
+  get(anything()).returns('two')
+  put(anything(), 'three')
+}
+play {
+  def mockMap = new HashMap('one')
+  assert 'two' == mockMap.get(2)
+  mockMap.put(3, 'three')
+}
+}}}
