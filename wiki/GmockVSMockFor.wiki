@@ -1,4 +1,5 @@
 #summary Gmock VS MockFor & StubFor
+#labels Featured
 
 
 = Basic Usages =
