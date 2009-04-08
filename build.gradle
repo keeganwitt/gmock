@@ -11,7 +11,7 @@ targetCompatibility = 1.5
 srcDirNames = []
 groovySrcDirNames = ['main/java', 'main/groovy']
 
-groovyVersion = '1.6.0'
+groovyVersion = '1.6.1'
 junitVersion = '4.5'
 
 dependencies {
@@ -134,3 +134,10 @@ defaultTasks ':test'
 def getTasksDependingOn(theTask) {
     tasks.findAll { name, task -> theTask in task.taskDependencies.getDependencies(task) }.values()
 }
+
+
+//tasks.each { name, task ->
+//    if (name.toLowerCase().contains('test')) {
+//        task.enabled = false
+//    }
+//}
