@@ -69,6 +69,7 @@ libs.archiveTasks*.doFirst {
 
 getTasksDependingOn(libs)*.dependsOn 'integrationTest'
 install.dependsOn 'generatePom'
+dists.dependsOn ':samples:cache:test', ':samples:collaborator:test'
 
 createTask('generatePom') {
     pomFile = file("$buildDir/pom.xml")
