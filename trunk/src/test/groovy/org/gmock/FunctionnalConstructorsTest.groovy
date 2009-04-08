@@ -216,15 +216,15 @@ class FunctionnalConstructorsTest extends GMockTestCase {
         assertEquals 'a', createGroovyLoader().load('a')
     }
 
-//    void testCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
-//        def createGroovyLoader = { ->
-//            new GroovyLoader()
-//        }
-//        mock(GroovyLoader, constructor()).load('a').returns('b')
-//        assertEquals 'a', createGroovyLoader().load('a')
-//        play {
-//            assertEquals 'b', createGroovyLoader().load('a')
-//        }
-//    }
+    void testCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
+        def createGroovyLoader = { ->
+            new GroovyLoader()
+        }
+        mock(GroovyLoader, constructor()).load('a').returns('b')
+        assertEquals 'a', createGroovyLoader().load('a')
+        play {
+            assertEquals 'b', createGroovyLoader().load('a')
+        }
+    }
 
 }

@@ -751,42 +751,42 @@ class FunctionnalPropertyTest extends GMockTestCase {
         assertEquals 'something', getSomething(tagLib)
     }
 
-//    void testPOJOPropertyCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
-//        def getSomething = { tagLib ->
-//            tagLib.something
-//        }
-//        def tagLib = new JavaFinalClass()
-//        assertEquals 'something', getSomething(tagLib)
-//
-//        tagLib = mock(JavaFinalClass)
-//        tagLib.something.returns('test')
-//        play {
-//            assertEquals 'test', getSomething(tagLib)
-//        }
-//    }
+    void testPOJOPropertyCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
+        def getSomething = { tagLib ->
+            tagLib.something
+        }
+        def tagLib = new JavaFinalClass()
+        assertEquals 'something', getSomething(tagLib)
 
-//    void testStaticPropertyCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
-//        def getName = { ->
-//            JavaFinalClass.name
-//        }
-//        mock(JavaFinalClass).static.name.returns('test')
-//        play {
-//            assertEquals 'test', getName()
-//        }
-//        mock(JavaFinalClass).static.name.returns('test')
-//        assertEquals 'name', getName()
-//    }
+        tagLib = mock(JavaFinalClass)
+        tagLib.something.returns('test')
+        play {
+            assertEquals 'test', getSomething(tagLib)
+        }
+    }
 
-//    void testStaticPropertyCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
-//        def getName = { ->
-//            JavaFinalClass.name
-//        }
-//        assertEquals 'name', getName()
-//        mock(JavaFinalClass).static.name.returns('test')
-//        play {
-//            assertEquals 'test', getName()
-//        }
-//    }
+    void testStaticPropertyCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
+        def getName = { ->
+            JavaFinalClass.name
+        }
+        mock(JavaFinalClass).static.name.returns('test')
+        play {
+            assertEquals 'test', getName()
+        }
+        mock(JavaFinalClass).static.name.returns('test')
+        assertEquals 'name', getName()
+    }
+
+    void testStaticPropertyCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
+        def getName = { ->
+            JavaFinalClass.name
+        }
+        assertEquals 'name', getName()
+        mock(JavaFinalClass).static.name.returns('test')
+        play {
+            assertEquals 'test', getName()
+        }
+    }
 
     void testPOGOFieldCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
         def getField = { tagLib ->
@@ -830,18 +830,18 @@ class FunctionnalPropertyTest extends GMockTestCase {
         assertEquals 'field', getField(tagLib)
     }
 
-//    void testPOJOFieldCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
-//        def getField = { tagLib ->
-//            tagLib.field
-//        }
-//        def tagLib = new JavaFinalClass()
-//        assertEquals 'field', getField(tagLib)
-//
-//        tagLib = mock(JavaFinalClass)
-//        tagLib.field.returns('test')
-//        play {
-//            assertEquals 'test', getField(tagLib)
-//        }
-//    }
+    void testPOJOFieldCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
+        def getField = { tagLib ->
+            tagLib.field
+        }
+        def tagLib = new JavaFinalClass()
+        assertEquals 'field', getField(tagLib)
+
+        tagLib = mock(JavaFinalClass)
+        tagLib.field.returns('test')
+        play {
+            assertEquals 'test', getField(tagLib)
+        }
+    }
 
 }
