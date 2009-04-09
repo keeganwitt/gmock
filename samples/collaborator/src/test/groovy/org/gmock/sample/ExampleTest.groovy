@@ -13,12 +13,11 @@ class ExampleTest {
     @BeforeMethod void setup() {
         mock = mock(Collaborator)
         classUnderTest = new ClassUnderTest()
-//        classUnderTest.addListener(mock)
+        classUnderTest.addListener(mock)
     }
 
     @Test void removeNonExistingDocument() {
         play {
-            classUnderTest.addListener(mock) // TODO: move to setup()
             classUnderTest.removeDocument("Does not exist")
         }
     }
@@ -26,7 +25,6 @@ class ExampleTest {
     @Test void addDocument() {
         mock.documentAdded("New Document")
         play {
-            classUnderTest.addListener(mock) // TODO: move to setup()
             classUnderTest.addDocument("New Document", new byte[0])
         }
     }
@@ -35,7 +33,6 @@ class ExampleTest {
         mock.documentAdded("Document")
         mock.documentChanged("Document").times(3)
         play {
-            classUnderTest.addListener(mock) // TODO: move to setup()
             4.times {
                 classUnderTest.addDocument("Document", new byte[0])
             }
@@ -51,7 +48,6 @@ class ExampleTest {
         mock.documentRemoved("Document")
 
         play {
-            classUnderTest.addListener(mock) // TODO: move to setup()
             classUnderTest.addDocument("Document", new byte[0])
             assert classUnderTest.removeDocument("Document")
         }
@@ -65,7 +61,6 @@ class ExampleTest {
         // document removal is *not* expected
 
         play {
-            classUnderTest.addListener(mock) // TODO: move to setup()
             classUnderTest.addDocument("Document", new byte[0])
             assert !classUnderTest.removeDocument("Document")
         }
@@ -80,7 +75,6 @@ class ExampleTest {
             documentRemoved("Document 2")
         }
         play {
-            classUnderTest.addListener(mock) // TODO: move to setup()
             classUnderTest.addDocument("Document 1", new byte[0])
             classUnderTest.addDocument("Document 2", new byte[0])
             assert classUnderTest.removeDocuments("Document 1", "Document 2")
@@ -94,7 +88,6 @@ class ExampleTest {
             voteForRemovals(["Document 1", "Document 2"] as String[]).returns(-42)
         }
         play {
-            classUnderTest.addListener(mock) // TODO: move to setup()
             classUnderTest.addDocument("Document 1", new byte[0])
             classUnderTest.addDocument("Document 2", new byte[0])
             assert !classUnderTest.removeDocuments("Document 1", "Document 2")
