@@ -40,8 +40,8 @@ final List one = mock(List.class, "one");
 final List two = mock(List.class, "two");
 
 checking(new Expectations() {{
-    oneOf (one).add("one"); inSequence(sequence); will(returnValue(true));
-    oneOf (two).add("two"); inSequence(sequence); will(returnValue(true));
+  oneOf (one).add("one"); inSequence(sequence); will(returnValue(true));
+  oneOf (two).add("two"); inSequence(sequence); will(returnValue(true));
 }});
 
 someCodeThatInteractsWithMocks(one, two);
@@ -70,8 +70,8 @@ play {
 final List mock = mock(List.class);
 
 checking(new Expectations() {{
-    exactly(3).of (mock).clear();
-    atLeast(1).of (mock).add(with(anything())); will(returnValue(true));
+  exactly(3).of (mock).clear();
+  atLeast(1).of (mock).add(with(anything())); will(returnValue(true));
 }});
 
 someCodeThatInteractsWithMock(mock);
