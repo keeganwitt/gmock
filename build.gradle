@@ -137,7 +137,7 @@ createTask('integrationTest', dependsOn: 'integrationTestCompile', type: Test).c
     skipProperties << 'skip.test'
 }
 
-createTask('generateDoc', dependsOn: ['integrationTest', dir("$buildDirName/$docsDirName")]) {
+createTask('generateDoc', dependsOn: dir("$buildDirName/$docsDirName")) {
     ant {
         copy(todir: docsDir, overwrite: 'true') {
             fileset(dir: docsTemplateDir, excludes: "**/*template*")
