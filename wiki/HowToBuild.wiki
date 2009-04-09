@@ -18,8 +18,10 @@ You can use the following commands:
     run the tests with the jarjarified jar file
   * `gradle install`
     install the artifact to the local Maven repository
+  * `gradle generateDoc`
+    generate documentation from the wiki page, the result will be in 'build/docs' directory
   * `gradle dists`
-    package the jar file and all other additional files (e.g. source codes)
+    package the jar file and all other additional files (e.g. source codes), the result will be in 'build/distributions' directory
   * `gradle -Drelease [any task]`
     run the task, but without '-SNAPSHOT' in the version
   * `gradle -Dskip.test [any task]`
