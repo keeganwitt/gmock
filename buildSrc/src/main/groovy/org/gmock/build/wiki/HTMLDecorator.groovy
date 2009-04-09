@@ -9,7 +9,7 @@ class HTMLDecorator {
     }
 
     def head = { i, content ->
-        "<h$i><a name=\"${replaceSpaces(content)}\"/>${content.trim()}</h$i>"
+        "<h$i><a name=\"${replaceSpaces(content)}\">${content.trim()}</a></h$i>"
     }
 
     def listBlock = { content ->
@@ -52,6 +52,12 @@ class HTMLDecorator {
         literal: codeWithClass.curry('lit'),
         punctuation: codeWithClass.curry('pun'),
         plain: codeWithClass.curry('pln')
+    ]
+
+    def catalog = [
+        list: { "<dl>$it</dl>" },
+        subList: { "<dd>$it</dd>" },
+        listItem: { "<dt><a href=\"#${replaceSpaces(it)}\">${it.trim()}</a></dt>" }
     ]
 
     private static replaceSpaces(String text) {

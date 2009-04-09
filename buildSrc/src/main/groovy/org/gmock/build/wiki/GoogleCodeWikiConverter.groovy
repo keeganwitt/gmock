@@ -5,11 +5,16 @@ class GoogleCodeWikiConverter {
     def converter
     def decorator
     def codeConverter
+    def catalog
 
-    GoogleCodeWikiConverter(converter = new WikiConverter(), decorator = new HTMLDecorator(), codeConverter = new GroovyCodeConverter()) {
+    GoogleCodeWikiConverter(converter = new WikiConverter(),
+                            decorator = new HTMLDecorator(),
+                            codeConverter = new GroovyCodeConverter(),
+                            catalog = new CatalogHolder()) {
         this.converter = converter
         this.decorator = decorator
         this.codeConverter = codeConverter
+        this.catalog = catalog
     }
 
     String convert(String wiki) {
@@ -25,7 +30,7 @@ class GoogleCodeWikiConverter {
             // meta data
             [regex: /^#((?:\S+) (?:.+))$\n?/, handler: metaDataHandler, converter: noChangeConverter],
             // head
-            *((1..6).collect { [regex: "^={$it}([^=]+)={$it}", handler: decorator.head.curry(it), converter: plainConverter] }),
+            *((1..6).collect { [regex: "^={$it}([^=]+)={$it}", handler: headHandler.curry(it), converter: plainConverter] }),
             // list
             [regex: /((?:^ +\*.*$\n?)+)/, handler: decorator.listBlock, converter: listConverter],
             // code block
@@ -66,6 +71,11 @@ class GoogleCodeWikiConverter {
         def matcher = content =~ /^(\S+) (.+)$/
         converter.addMetaData(matcher[0][1], matcher[0][2])
         return ''
+    }
+
+    def headHandler = { level, title ->
+        catalog.add(level, title)
+        decorator.head(level, title)
     }
 
     def urlLinkHandler = { content ->
