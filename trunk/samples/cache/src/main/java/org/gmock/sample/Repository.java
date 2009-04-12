@@ -1,6 +1,6 @@
 package org.gmock.sample;
 
-public interface Respository {
+public interface Repository {
 
     public Object get(String key) throws NotFoundException;
 

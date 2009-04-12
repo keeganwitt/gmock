@@ -4,7 +4,15 @@ class RandomStrategy implements Strategy {
 
     List history = []
 
-    void onAccess(String key) {
+    void onGet(String key) {
+        onAccess(key)
+    }
+
+    void onPut(String key) {
+        onAccess(key)
+    }
+
+    private onAccess(String key) {
         history << key
     }
 
