@@ -4,15 +4,23 @@ import org.gmock.GMockTestCase
 
 class LRUStrategyTest extends GMockTestCase {
 
-    void testOnAccess() {
+    private testOnAccess(String operation) {
         mock(LinkedList, constructor()) {
             remove("key")
-            leftShift("key")
+            it << "key"
         }
         play {
             def ls = new LRUStrategy()
-            ls.onAccess "key"
+            ls."on$operation" "key"
         }
+    }
+
+    void testOnPut() {
+        testOnAccess("Put")
+    }
+
+    void testOnGet() {
+        testOnAccess("Get")
     }
 
     void testGetKeyToRemove() {

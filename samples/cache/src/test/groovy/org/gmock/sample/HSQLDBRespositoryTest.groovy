@@ -15,17 +15,17 @@ class HSQLDBRespositoryTest extends GMockTestCase {
     }
 
     void testGet() {
-        sql.firstRow("select value from respository where key = ?", ["johnny"]).returns([value: "jian"])
+        sql.firstRow("select value from repository where key = ?", ["johnny"]).returns([value: "jian"])
         play {
-            def hr = new HSQLDBRespository()
+            def hr = new HSQLDBRepository()
             assertEquals "jian", hr.get("johnny")
         }
     }
 
     void testGetButNotFound() {
-        sql.firstRow("select value from respository where key = ?", ["johnny"]).returns(null)
+        sql.firstRow("select value from repository where key = ?", ["johnny"]).returns(null)
         play {
-            def hr = new HSQLDBRespository()
+            def hr = new HSQLDBRepository()
             shouldFail(NotFoundException) {
                 hr.get("johnny")
             }
@@ -33,9 +33,9 @@ class HSQLDBRespositoryTest extends GMockTestCase {
     }
 
     void testGetButFailed() {
-        sql.firstRow("select value from respository where key = ?", ["johnny"]).raises(SQLException)
+        sql.firstRow("select value from repository where key = ?", ["johnny"]).raises(SQLException)
         play {
-            def hr = new HSQLDBRespository()
+            def hr = new HSQLDBRepository()
             shouldFail(NotFoundException) {
                 hr.get("johnny")
             }
@@ -43,19 +43,19 @@ class HSQLDBRespositoryTest extends GMockTestCase {
     }
 
     void testPutWhileKeyFound() {
-        sql.firstRow("select value from respository where key = ?", ["johnny"]).returns([value: "jian"])
-        sql.execute("update respository set value = ? where key = ?", ["new", "johnny"])
+        sql.firstRow("select value from repository where key = ?", ["johnny"]).returns([value: "jian"])
+        sql.execute("update repository set value = ? where key = ?", ["new", "johnny"])
         play {
-            def hr = new HSQLDBRespository()
+            def hr = new HSQLDBRepository()
             hr.put("johnny", "new")
         }
     }
 
     void testPutWhileKeyNotFound() {
-        sql.firstRow("select value from respository where key = ?", ["johnny"]).returns(null)
-        sql.execute("insert into respository(key, value) values (?, ?)", ["johnny", "new"])
+        sql.firstRow("select value from repository where key = ?", ["johnny"]).returns(null)
+        sql.execute("insert into repository(key, value) values (?, ?)", ["johnny", "new"])
         play {
-            def hr = new HSQLDBRespository()
+            def hr = new HSQLDBRepository()
             hr.put("johnny", "new")
         }
     }

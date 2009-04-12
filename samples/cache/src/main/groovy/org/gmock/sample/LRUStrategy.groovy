@@ -4,7 +4,15 @@ class LRUStrategy implements Strategy {
 
     List history = new LinkedList()
 
-    void onAccess(String key) {
+    void onGet(String key) {
+        onAccess(key)
+    }
+
+    void onPut(String key) {
+        onAccess(key)
+    }
+
+    private onAccess(String key) {
         history.remove key
         history << key
     }
