@@ -50,6 +50,14 @@ p, pre {
     text-decoration: none;
 }
 
+.source p a:link, .source p a:visited, .source p a:hover {
+    text-decoration: underline;
+}
+
+.contents a:hover {
+    text-decoration: underline;
+}
+
 a:link, a:visited {
     color: #000;
     text-decoration: none;
@@ -123,6 +131,18 @@ pre.prettyprint {
     background-color: #eff0f1;
 }
 
+.contents {
+    padding: 0px 10px;
+}
+
+.contents dt {
+    font-weight: normal;
+}
+
+.contents dl {
+    margin: 0px;
+}
+
 .footer .container {
     margin-top: 15px;
     margin-bottom: 10px;
@@ -173,3 +193,4 @@ pre.prettyprint {
 .pun { color: #666600; }
 .com { color: #880000; }
 .lit { color: #006666; }
+.atn { color: #660066; }
