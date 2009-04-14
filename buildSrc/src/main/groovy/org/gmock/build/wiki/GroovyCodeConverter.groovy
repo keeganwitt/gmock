@@ -29,6 +29,8 @@ class GroovyCodeConverter {
             [regex: /(\b[A-Z]\w*\b)/, handler: decorator.code.type, converter: plainConverter],
             // literal
             [regex: /(\d+\.\d*|\d*\.\d+|\d+)/, handler: decorator.code.literal, converter: plainConverter],
+            // annotation
+            [regex: /(@[A-Z]\w*)/, handler: decorator.code.annotation, converter: plainConverter],
             // punctuation
             [regex: /([^\w\s'"\/\.]+|\.)/, handler: decorator.code.punctuation, converter: plainConverter],
             // plain

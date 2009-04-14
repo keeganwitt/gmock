@@ -39,6 +39,10 @@ class GroovyCodeConverterTest extends GroovyTestCase {
                      gcc.convert('1 1.2 1. .2')
     }
 
+    void testConvertAnnotation() {
+        assertEquals '<span class="atn">@WithGMock</span>', gcc.convert('@WithGMock')
+    }
+
     void testConvertPunctuation() {
         assertEquals '<span class="pun">{}</span> <span class="pun">()</span> <span class="pun">.</span> <span class="pun">+</span>',
                      gcc.convert('{} () . +')
