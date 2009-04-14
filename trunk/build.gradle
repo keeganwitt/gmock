@@ -42,7 +42,7 @@ archivePaths = libs.archiveTasks*.archivePath
 integrationTestClassesDir = file("$buildDir/integration-test-classes")
 integrationTestResultsDir = file("$buildDir/integration-test-results")
 integrationTestReportDir = file("$buildDir/$reportsDirName/integration-tests")
-docsTemplateDir = file('docs')
+docsTemplateDir = file(docsDirName)
 templateFile = file("$docsTemplateDir/template.gsp")
 docFile = file("$docsDir/index.html")
 

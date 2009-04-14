@@ -50,6 +50,14 @@ p, pre {
     text-decoration: none;
 }
 
+.source p a:link, .source p a:visited, .source p a:hover {
+    text-decoration: underline;
+}
+
+.contents a:hover {
+    text-decoration: underline;
+}
+
 a:link, a:visited {
     color: #000;
     text-decoration: none;
@@ -121,6 +129,18 @@ pre.prettyprint {
     padding: 10px;
     border: #d7dbe3 solid 1px;
     background-color: #eff0f1;
+}
+
+.contents {
+    padding: 0px 10px;
+}
+
+.contents dt {
+    font-weight: normal;
+}
+
+.contents dl {
+    margin: 0px;
 }
 
 .footer .container {
