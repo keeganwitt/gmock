@@ -50,6 +50,7 @@ class HTMLDecorator {
         keyword: codeWithClass.curry('kwd'),
         type: codeWithClass.curry('typ'),
         literal: codeWithClass.curry('lit'),
+        annotation: codeWithClass.curry('atn'),
         punctuation: codeWithClass.curry('pun'),
         plain: codeWithClass.curry('pln')
     ]

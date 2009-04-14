@@ -144,8 +144,7 @@ createTask('generateDoc', dependsOn: dir("$buildDirName/$docsDirName")) {
         }
     }
 
-//    wiki = "http://gmock.googlecode.com/svn/wiki/Documentation_${version[0]}_${version[2]}.wiki".toURL().text
-    def wiki = "http://gmock.googlecode.com/svn/wiki/Documentation_0_7.wiki".toURL().text
+    def wiki = "http://gmock.googlecode.com/svn/wiki/Documentation_${version[0]}_${version[2]}.wiki".toURL().text
     def converter = new org.gmock.build.wiki.GoogleCodeWikiConverter()
     def binding = [content: converter.convert(wiki), catalog: converter.catalog, version: version]
     def engine = new groovy.text.SimpleTemplateEngine()
