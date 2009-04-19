@@ -38,7 +38,7 @@ environments {
     }
 }
 
-gmock.version = "0.7.0"
+gmock.version = "0.8.0"
 grails.war.destFile = "gmock.war"
 
 
