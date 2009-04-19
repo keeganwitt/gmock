@@ -4,9 +4,8 @@
 
 *When releasing gmock:*
  * Create an updated documentation page 
- * Remove the snapshot in pom
  * Tag the release
- * Increment the current version and snapshot it
+ * Increment the current version
  * Install the artifact in the gmock.org repository
  * Make the artifacts available on google code
  * Update gmock.org documentation
@@ -14,4 +13,5 @@
  * Update the download page
  * Update the roadmap
  * Deploy gmock.org
+ * Update google code site
  * Announce it
