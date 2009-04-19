@@ -17,6 +17,7 @@ junitVersion = '4.5'
 dependencies {
     addConfiguration 'jarjar'
     addConfiguration 'jarjarify'
+    addConfiguration 'deployerJars'
 
     addMavenRepo()
     addMavenStyleRepo('JBossRepo', 'http://repository.jboss.org/maven2/')
@@ -29,6 +30,7 @@ dependencies {
     jarjar 'com.google.code:jarjar:1.0'
     jarjarify 'cglib:cglib:2.2',
               'org.objenesis:objenesis:1.1'
+    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
 
     linkConfWithTask 'testCompile', 'integrationTestCompile'
     linkConfWithTask 'testRuntime', 'integrationTest'
@@ -52,6 +54,15 @@ install {
         addArtifact: { org.apache.ivy.core.module.descriptor.Artifact artifact, File src -> artifactFile = src },
         createDeployableUnits: { List dependencies -> [(pomFile): artifactFile] }
     ] as org.gradle.api.internal.dependencies.maven.deploy.ArtifactPomContainer
+}
+
+uploadLibs {
+    uploadResolvers.addMavenDeployer('maven-deployer') {
+        repository(url: "scp://gmock.org/home/rsync/gmock/releases"){
+           authentication(userName: "rsync")
+        }
+        addProtocolProviderJars(dependencies.resolve('deployerJars'))
+    }
 }
 
 dists {
