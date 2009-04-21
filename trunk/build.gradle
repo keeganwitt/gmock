@@ -49,11 +49,13 @@ templateFile = file("$docsTemplateDir/template.gsp")
 docFile = file("$docsDir/index.html")
 
 
+templateArtifactPomContainer = [
+    addArtifact: { org.apache.ivy.core.module.descriptor.Artifact artifact, File src -> artifactFile = src },
+    createDeployableUnits: { List dependencies -> [(pomFile): artifactFile] }
+] as org.gradle.api.internal.dependencies.maven.deploy.ArtifactPomContainer
+
 install {
-    uploadResolvers.get('maven-installer').artifactPomContainer = [
-        addArtifact: { org.apache.ivy.core.module.descriptor.Artifact artifact, File src -> artifactFile = src },
-        createDeployableUnits: { List dependencies -> [(pomFile): artifactFile] }
-    ] as org.gradle.api.internal.dependencies.maven.deploy.ArtifactPomContainer
+    uploadResolvers.get('maven-installer').artifactPomContainer = templateArtifactPomContainer
 }
 
 uploadLibs {
@@ -62,6 +64,7 @@ uploadLibs {
            authentication(userName: "rsync")
         }
         addProtocolProviderJars(dependencies.resolve('deployerJars'))
+        artifactPomContainer = templateArtifactPomContainer
     }
 }
 
@@ -86,7 +89,7 @@ libs.archiveTasks*.doFirst {
 }
 
 getTasksDependingOn(libs)*.dependsOn 'integrationTest'
-install.dependsOn 'generatePom'
+[install, uploadLibs]*.dependsOn 'generatePom'
 dists.archiveTasks*.dependsOn ':samples:cache:test',
                               ':samples:collaborator:test',
                               'generateDoc'
