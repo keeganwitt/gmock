@@ -25,7 +25,8 @@ dependencies {
     groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
     compile "junit:junit:$junitVersion"
     testCompile 'org.hamcrest:hamcrest-library:1.1',
-                'org.testng:testng:5.8:jdk15'
+                'org.testng:testng:5.8:jdk15',
+                'org.apache.tomcat:servlet-api:6.0.18'
 
     jarjar 'com.google.code:jarjar:1.0'
     jarjarify 'cglib:cglib:2.2',
