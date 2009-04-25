@@ -20,6 +20,11 @@ import org.gmock.internal.callstate.UnorderedCallState
 class UnorderedExpectations {
 
     Map expectations = new LinkedHashMap()
+    def controller
+
+    UnorderedExpectations(controller) {
+        this.controller = controller
+    }
 
     def reset() {
         expectations = new LinkedHashMap()

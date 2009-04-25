@@ -17,7 +17,6 @@ package org.gmock.internal.expectation
 
 import org.gmock.internal.result.ReturnNull
 import org.gmock.internal.times.StrictTimes
-import org.gmock.internal.signature.MethodSignature
 
 class Expectation {
 
@@ -80,5 +79,8 @@ class Expectation {
         signature.match(this.signature) ? this : null
     }
 
+    def getController() {
+        expectations.controller
+    }
 
 }

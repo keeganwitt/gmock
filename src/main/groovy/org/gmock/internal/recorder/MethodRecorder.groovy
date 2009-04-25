@@ -29,6 +29,12 @@ class MethodRecorder extends BaseRecorder {
         return new MethodDuplicateRecorder(expectation)
     }
 
+    def chains() {
+        def mock = expectation.controller.mock()
+        expectation.result = new ReturnValue(mock)
+        return mock
+    }
+
     def raises(Throwable exception) {
         expectation.result = new ThrowException(exception)
         return new MethodDuplicateRecorder(expectation)
