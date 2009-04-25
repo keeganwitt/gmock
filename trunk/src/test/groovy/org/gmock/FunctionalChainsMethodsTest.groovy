@@ -15,18 +15,13 @@
  */
 package org.gmock
 
-import javax.servlet.http.HttpServletRequest
-import junit.framework.AssertionFailedError
+class FunctionalChainsMethodsTest extends GMockTestCase {
 
-class BugTest extends GMockTestCase {
-
-    void testHttpServletRequest() {
-        HttpServletRequest request = mock(HttpServletRequest)
-        def mock = mock()
-        mock.foo(request)
-
-        shouldFail(AssertionFailedError) {
-            play {}
+    void testBasic() {
+        def google = mock('http://www.google.com')
+        google.toURL().chains().text.returns('google')
+        play {
+            assertEquals 'google', 'http://www.google.com'.toURL().text
         }
     }
 

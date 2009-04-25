@@ -22,7 +22,6 @@ import org.gmock.internal.callstate.CallState
 import org.gmock.internal.expectation.ClassExpectations
 import org.gmock.internal.expectation.OrderedExpectations
 import org.gmock.internal.expectation.UnorderedExpectations
-import org.gmock.internal.recorder.ConstructorRecorder
 
 class InternalMockController {
 
@@ -32,7 +31,7 @@ class InternalMockController {
     def concreteMocks = []
     def classExpectations = new ClassExpectations(this)
     def orderedExpectations = new OrderedExpectations(this)
-    def unorderedExpectations = new UnorderedExpectations()
+    def unorderedExpectations = new UnorderedExpectations(this)
 
     boolean replay = false
     Order order = Order.NONE
