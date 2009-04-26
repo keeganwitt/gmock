@@ -167,6 +167,13 @@ createTask('generateDoc', dependsOn: dir("$buildDirName/$docsDirName")) {
     docFile.withPrintWriter { template.writeTo(it) }
 }
 
+createTask('copyDependencies', dependsOn: 'init') {
+  dependencies.testRuntime.resolve().each { depFile ->
+    ant.copy(file: depFile, todir: 'lib')
+  }
+}
+
+
 defaultTasks ':test'
 
 
