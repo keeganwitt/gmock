@@ -53,6 +53,11 @@ class PropertyRecorder extends BaseRecorder {
         return new PropertyGetterRecorder(this)
     }
 
+    def chains() {
+        expectation.signature = getterClass.newInstance(mock, propertyName)
+        return super.chains()
+    }
+
     protected doRaises(Object[] params) {
         expectation.signature = getterClass.newInstance(mock, propertyName)
         expectation.result = ThrowException.newInstance(params)
@@ -88,6 +93,10 @@ class PropertySetterRecorder extends PropertyRecorder {
     def returns(value) {
         expectation = expectation.duplicate()
         return super.returns(value)
+    }
+
+    def chains() {
+        throw new MissingMethodException('chains', this.class, [])
     }
 
     protected doRaises(Object[] params) {

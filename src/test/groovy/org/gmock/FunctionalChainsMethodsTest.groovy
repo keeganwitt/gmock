@@ -25,4 +25,48 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         }
     }
 
+    void testNoChainsMethodAfterAnyResultSetOnMethodMocking() {
+        def mock = mock()
+        shouldFailWithMissingChainsMethod {
+            mock.dump().returns('test').chains().trim()
+        }
+        shouldFailWithMissingChainsMethod {
+            mock.dump().raises(RuntimeException).chains().trim()
+        }
+    }
+
+    void testProperty() {
+        def mock = mock()
+        mock.text.chains().trim().returns('test')
+        play {
+            assertEquals 'test', mock.text.trim()
+        }
+    }
+
+    void testNoChainsMethodAfterAnyResultSetOnPropertyMocking() {
+        def mock = mock()
+        shouldFailWithMissingChainsMethod {
+            mock.text.set('test').chains().trim()
+        }
+        shouldFailWithMissingChainsMethod {
+            mock.text.returns('test').chains().trim()
+        }
+        shouldFailWithMissingChainsMethod {
+            mock.text.raises(RuntimeException).chains().trim()
+        }
+    }
+
+    private shouldFailWithMissingChainsMethod(Closure closure) {
+        try {
+            closure()
+        } catch (MissingMethodException e) {
+            if (e.method == 'chains') return
+        }
+        fail('Should fail with missing chains() method.')
+    }
+
+    // TODO: failure test
+    // TODO: test for static methods
+    // TODO: test in java
+
 }
