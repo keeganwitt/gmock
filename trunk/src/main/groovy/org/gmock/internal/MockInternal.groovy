@@ -67,12 +67,11 @@ class MockInternal {
 
     private addMethodDefaultBehavior(methodName, arguments, result) {
         def signature = new MethodSignature(mockProxyMetaClass, methodName, arguments)
-        if (!expectations.findSignature(signature) && !controller.orderedExpectations.findSignature(signature)) {
+        if (!findSignature(signature)) {
             def expectation = new Expectation(signature: signature, result: result, times: AnyTimes.INSTANCE, hidden: true)
             expectations.add(expectation)
         }
     }
-
 
     Object invokeMockMethod(String methodName, Object[] arguments) {
         def signature = new MethodSignature(mockProxyMetaClass, methodName, arguments)
@@ -90,6 +89,7 @@ class MockInternal {
             }
         }
     }
+
     private invokeStaticExpectationClosure(Closure staticExpectationClosure) {
         def recorder = new StaticMethodRecoder(mockProxyMetaClass.theClass, mockProxyMetaClass.classExpectations)
         staticExpectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
@@ -130,7 +130,7 @@ class MockInternal {
     }
 
     def findSignature(signature) {
-        return expectations.findSignature(signature)
+        return controller.orderedExpectations.findSignature(signature) ?: expectations.findSignature(signature)
     }
 
 }
