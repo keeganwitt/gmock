@@ -204,4 +204,15 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
         }
     }
 
+    void testWithOrderedClosure() {
+        def tagLib = new FakeTagLib()
+        def mockTabLib = mock(tagLib)
+        ordered {
+            mockTabLib.link([some: "attr"], "hello").returns("<a>link</a>")
+        }
+        play {
+            tagLib.linkHello([some: "attr"])
+        }
+    }
+
 }
