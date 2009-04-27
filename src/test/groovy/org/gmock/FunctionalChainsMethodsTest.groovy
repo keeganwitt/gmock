@@ -15,6 +15,9 @@
  */
 package org.gmock
 
+import junit.framework.AssertionFailedError
+import org.gmock.utils.Loader
+
 class FunctionalChainsMethodsTest extends GMockTestCase {
 
     void testBasic() {
@@ -65,8 +68,64 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         fail('Should fail with missing chains() method.')
     }
 
-    // TODO: failure test
-    // TODO: test for static methods
+    void testChainsMethodNotCalled() {
+        def mock = mock()
+        mock.text.chains().trim().returns('test')
+
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'text' on 'Mock for Object (1)': expected 1, actual 1\n" +
+                       "  'trim()' on 'Mock for Object (2)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play { mock.text }
+        }
+        assertEquals expected, message
+    }
+
+    void testChainsMethodCalledIncorrect() {
+        def mock = mock()
+        mock.text.chains().trim().returns('test')
+
+        def expected = "Unexpected method call 'toUpperCase()' on 'Mock for Object (2)'\n" +
+                       "  'text' on 'Mock for Object (1)': expected 1, actual 1\n" +
+                       "  'trim()' on 'Mock for Object (2)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play { mock.text.toUpperCase() }
+        }
+        assertEquals expected, message
+    }
+
+    void testMultipleChainsMethods() {
+        def mock = mock()
+        mock.text.chains().trim().chains().toLowerCase().returns('test')
+        play {
+            assertEquals 'test', mock.text.trim().toLowerCase()
+        }
+    }
+
+    void testChainsMethodForStaticMocking() {
+        mock(Loader).static {
+            one().chains().toString().returns('0')
+            name.chains().toUpperCase().returns('TEST')
+        }
+        play {
+            assertEquals '0', Loader.one().toString()
+            assertEquals 'TEST', Loader.name.toUpperCase()
+        }
+    }
+
+    void testChainsMethodInOrderedClosure() {
+        def test = mock()
+        def google = mock('http://www.google.com')
+        ordered {
+            test.text.chains().trim().returns('test')
+            google.toURL().chains().text.returns('goolge')
+        }
+        play {
+            assertEquals 'test', test.text.trim()
+            assertEquals 'goolge', 'http://www.google.com'.toURL().text
+        }
+    }
+
     // TODO: test in java
 
 }
