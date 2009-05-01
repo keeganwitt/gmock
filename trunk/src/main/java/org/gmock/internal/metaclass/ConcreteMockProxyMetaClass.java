@@ -32,14 +32,13 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
 
     private InternalMockController controller;
     private Object concreteObject;
-    private Object mockName;
     private MockInternal mock;
 
-    public ConcreteMockProxyMetaClass(Class clazz, InternalMockController controller, Object concreteObject, Object mockName) throws IntrospectionException {
+    public ConcreteMockProxyMetaClass(Class clazz, InternalMockController controller, Object concreteObject, MockInternal mock) throws IntrospectionException {
         super(GroovySystem.getMetaClassRegistry(), clazz, InvokerHelper.getMetaClass(concreteObject));
         this.controller = controller;
         this.concreteObject = concreteObject;
-        this.mockName = mockName;
+        this.mock = mock;
     }
 
     public Object invokeMethod(Object object, String methodName, Object[] arguments) {
@@ -54,9 +53,9 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
         }, new Callable() {
             public Object call() {
                 if (controller.getReplay()) {
-                    MethodSignature signature = new MethodSignature(ConcreteMockProxyMetaClass.this, methodName);
+                    MethodSignature signature = new MethodSignature(mock, methodName);
                     if (mock.findSignature(signature) != null) {
-                        return mock.invokeMockMethod(methodName, arguments);
+                        return mock.invokeMockMethod(receiver, methodName, arguments);
                     } else {
                         return controller.doExternal(new Callable() {
                             public Object call() {
@@ -65,7 +64,7 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
                         });
                     }
                 } else {
-                    return mock.invokeMockMethod(methodName, arguments);
+                    return mock.invokeMockMethod(receiver, methodName, arguments);
                 }
             }
         });
@@ -83,9 +82,9 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
         }, new Callable() {
             public Object call() {
                 if (controller.getReplay()) {
-                    PropertyGetSignature signature = new PropertyGetSignature(ConcreteMockProxyMetaClass.this, property);
+                    PropertyGetSignature signature = new PropertyGetSignature(mock, property);
                     if (mock.findSignature(signature) != null) {
-                        return mock.getMockProperty(property);
+                        return mock.getMockProperty(receiver, property);
                     } else {
                         return controller.doExternal(new Callable() {
                             public Object call() {
@@ -94,7 +93,7 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
                         });
                     }
                 } else {
-                    return mock.getMockProperty(property);
+                    return mock.getMockProperty(receiver, property);
                 }
             }
         });
@@ -113,9 +112,9 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
         }, new Callable() {
             public Object call() {
                 if (controller.getReplay()) {
-                    PropertySetSignature signature = new PropertySetSignature(ConcreteMockProxyMetaClass.this, property);
+                    PropertySetSignature signature = new PropertySetSignature(mock, property);
                     if (mock.findSignature(signature) != null) {
-                        mock.setMockProperty(property, value);
+                        mock.setMockProperty(receiver, property, value);
                     } else {
                         controller.doExternal(new Callable() {
                             public Object call() {
@@ -125,7 +124,7 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
                         });
                     }
                 } else {
-                    mock.setMockProperty(property, value);
+                    mock.setMockProperty(receiver, property, value);
                 }
                 return null;
             }
@@ -140,12 +139,8 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
         DefaultGroovyMethods.setMetaClass(concreteObject, adaptee);
     }
 
-    public Object getMockName() {
-        return mockName;
-    }
-
-    public void setMock(MockInternal mock) {
-        this.mock = mock;
+    public MockInternal getMock() {
+        return mock;
     }
 
 }

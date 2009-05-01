@@ -20,14 +20,8 @@ import org.codehaus.groovy.runtime.DefaultGroovyMethods
 
 class EqualsDefaultBehavior implements Result {
 
-    def mock
-
-    EqualsDefaultBehavior(mock) {
-        this.mock = mock
-    }
-
-    def answer(Object[] arguments) {
-        return DefaultGroovyMethods.is(mock, arguments[0])
+    def answer(Object receiver, String method, Object[] arguments) {
+        return DefaultGroovyMethods.is(receiver, arguments[0])
     }
 
 }

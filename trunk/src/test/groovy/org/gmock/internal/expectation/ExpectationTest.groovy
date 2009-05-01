@@ -83,11 +83,12 @@ class ExpectationTest extends GMockTestCase {
 
     void testDoReturn() {
         def mockReturn = mock()
-        mockReturn.answer([]).returns(99)
+        def mockObject = new Object()
+        mockReturn.answer(mockObject, 'test', []).returns(99)
         def expectation = new Expectation(result: mockReturn, called: 3)
 
         play {
-            assertEquals 99, expectation.answer([])
+            assertEquals 99, expectation.answer(mockObject, 'test', [])
             assertEquals 4, expectation.called
         }
     }

@@ -50,9 +50,9 @@ class Expectation {
         return times.stillRemain(called) && signature.match(methodSignature)
     }
 
-    def answer(arguments) {
+    def answer(mock, method, arguments) {
         ++called
-        return result.answer(arguments as Object[])
+        return result.answer(mock, method, arguments as Object[])
     }
 
     def isVerified() {

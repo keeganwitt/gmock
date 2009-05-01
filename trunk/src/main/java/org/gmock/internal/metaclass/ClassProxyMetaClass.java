@@ -23,8 +23,7 @@ import org.gmock.internal.Callable;
 import org.gmock.internal.InternalMockController;
 import org.gmock.internal.expectation.Expectation;
 import org.gmock.internal.expectation.ExpectationCollection;
-import static org.gmock.internal.metaclass.MetaClassHelper.addToExpectations;
-import static org.gmock.internal.metaclass.MetaClassHelper.findExpectation;
+import static org.gmock.internal.metaclass.MetaClassHelper.*;
 import org.gmock.internal.signature.ConstructorSignature;
 import org.gmock.internal.signature.StaticMethodSignature;
 import org.gmock.internal.signature.StaticPropertyGetSignature;
@@ -112,20 +111,20 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
         }, new Callable() {
             public Object call() {
                 ConstructorSignature signature = new ConstructorSignature(theClass, arguments);
-                return findExpectation(constructorExpectations, signature, "Unexpected constructor call", arguments, controller);
+                return findExpectation(constructorExpectations, signature, "Unexpected constructor call", theClass, null, arguments, controller);
             }
         });
     }
 
-    public Object invokeStaticMethod(final Object aClass, final String method, final Object[] arguments) {
+    public Object invokeStaticMethod(final Object clazz, final String method, final Object[] arguments) {
         return checkAndDo(staticExpectationsEmpty, new Callable() {
             public Object call() {
-                return adaptee.invokeStaticMethod(aClass, method, arguments);
+                return adaptee.invokeStaticMethod(clazz, method, arguments);
             }
         }, new Callable() {
             public Object call() {
-                StaticMethodSignature signature = new StaticMethodSignature(aClass, method, arguments);
-                return findExpectation(staticExpectations, signature, "Unexpected static method call", arguments, controller);
+                StaticMethodSignature signature = new StaticMethodSignature(clazz, method, arguments);
+                return findExpectation(staticExpectations, signature, "Unexpected static method call", clazz, method, arguments, controller);
             }
         });
     }
@@ -138,7 +137,7 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
         }, new Callable() {
             public Object call() {
                 StaticPropertyGetSignature signature = new StaticPropertyGetSignature(clazz, property);
-                return findExpectation(staticExpectations, signature, "Unexpected static property getter call", new Object[0], controller);
+                return findExpectation(staticExpectations, signature, "Unexpected static property getter call", clazz, getGetterMethodName(property), new Object[0], controller);
             }
         });
     }
@@ -152,7 +151,7 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
         }, new Callable() {
             public Object call() {
                 StaticPropertySetSignature signature = new StaticPropertySetSignature(clazz, property, value);
-                findExpectation(staticExpectations, signature, "Unexpected static property setter call", new Object[] {value}, controller);
+                findExpectation(staticExpectations, signature, "Unexpected static property setter call", clazz, getSetterMethodName(property), new Object[] {value}, controller);
                 return null;
             }
         });

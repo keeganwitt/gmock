@@ -17,6 +17,6 @@ package org.gmock.internal
 
 interface Result {
 
-    Object answer(Object[] arguments)
+    Object answer(Object receiver, String method, Object[] arguments)
 
 }

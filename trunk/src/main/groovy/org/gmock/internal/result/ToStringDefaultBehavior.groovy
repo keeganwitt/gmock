@@ -25,7 +25,7 @@ class ToStringDefaultBehavior implements Result {
         this.name = name
     }
 
-    def answer(Object[] arguments) {
+    def answer(Object receiver, String method, Object[] arguments) {
         name.toString()
     }
 

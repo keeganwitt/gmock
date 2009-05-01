@@ -21,22 +21,18 @@ import groovy.lang.ProxyMetaClass;
 import org.gmock.internal.Callable;
 import org.gmock.internal.InternalMockController;
 import org.gmock.internal.MockInternal;
-import org.gmock.internal.expectation.ClassExpectations;
 
 import java.beans.IntrospectionException;
 
 public class MockProxyMetaClass extends ProxyMetaClass {
 
     private MockInternal mock;
-    private ClassExpectations classExpectations;
     private InternalMockController controller;
-    private Object mockName;
 
-    MockProxyMetaClass(Class clazz, ClassExpectations classExpectations, InternalMockController controller, Object mockName) throws IntrospectionException {
+    MockProxyMetaClass(Class clazz, InternalMockController controller, MockInternal mock) throws IntrospectionException {
         super(GroovySystem.getMetaClassRegistry(), clazz, GroovySystem.getMetaClassRegistry().getMetaClass(clazz));
-        this.classExpectations = classExpectations;
         this.controller = controller;
-        this.mockName = mockName;
+        this.mock = mock;
     }
 
     public Object invokeMethod(Object object, String methodName, Object[] arguments) {
@@ -50,7 +46,7 @@ public class MockProxyMetaClass extends ProxyMetaClass {
             }
         }, new Callable() {
             public Object call() {
-                return mock.invokeMockMethod(methodName, arguments);
+                return mock.invokeMockMethod(receiver, methodName, arguments);
             }
         });
     }
@@ -66,7 +62,7 @@ public class MockProxyMetaClass extends ProxyMetaClass {
             }
         }, new Callable() {
             public Object call() {
-                return mock.getMockProperty(property);
+                return mock.getMockProperty(receiver, property);
             }
         });
     }
@@ -83,7 +79,7 @@ public class MockProxyMetaClass extends ProxyMetaClass {
             }
         }, new Callable() {
             public Object call() {
-                mock.setMockProperty(property, value);
+                mock.setMockProperty(receiver, property, value);
                 return null;
             }
         });
@@ -101,16 +97,8 @@ public class MockProxyMetaClass extends ProxyMetaClass {
         });
     }
 
-    public void setMock(MockInternal mock) {
-        this.mock = mock;
-    }
-
-    public ClassExpectations getClassExpectations() {
-        return classExpectations;
-    }
-
-    public Object getMockName() {
-        return mockName;
+    public MockInternal getMock() {
+        return mock;
     }
 
 }

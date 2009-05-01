@@ -29,7 +29,7 @@ class ThrowException implements Result {
         this.exception = exceptionClass.metaClass.invokeConstructor(params)
     }
 
-    def answer(Object[] arguments) {
+    def answer(Object receiver, String method, Object[] arguments) {
         throw exception
     }
 

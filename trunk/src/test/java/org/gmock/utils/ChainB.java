@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.result
+package org.gmock.utils;
 
-import org.gmock.internal.Result
+public interface ChainB {
 
-class HashCodeDefaultBehavior implements Result {
+    public ChainC getC();
 
-    def answer(Object receiver, String method, Object[] arguments) {
-        return System.identityHashCode(receiver)
-    }
+    public String methodB();
+
+    public ChainC methodB(int i);
 
 }

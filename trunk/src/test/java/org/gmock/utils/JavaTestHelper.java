@@ -29,4 +29,12 @@ public class JavaTestHelper {
         return obj.toString();
     }
 
+    public static String chainedCallsOn(ChainA a) {
+        return a.getB().getC().getText();
+    }
+
+    public static String chainedMethodsOn(ChainA a) {
+        return a.methodA(1).methodB(2).getText();
+    }
+
 }

@@ -17,6 +17,8 @@ package org.gmock
 
 import junit.framework.AssertionFailedError
 import org.gmock.utils.Loader
+import org.gmock.utils.ChainA
+import org.gmock.utils.JavaTestHelper
 
 class FunctionalChainsMethodsTest extends GMockTestCase {
 
@@ -126,6 +128,24 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         }
     }
 
-    // TODO: test in java
+    void testChainsMethodInJava() {
+        def a = mock(ChainA)
+        2.times { a.getB().chains().c.chains().text.returns('test') }
+        play {
+            assertEquals 'test', JavaTestHelper.chainedCallsOn(a)
+            assertEquals 'test', a.b.c.text
+        }
+    }
+
+    void testChainsMethodInJavaShouldChooseTheCorrectReturnType() {
+        def a = mock(ChainA)
+        2.times { a.methodA(1).chains().methodB(2).chains().text.returns('test') }
+        play {
+            assertEquals 'test', JavaTestHelper.chainedMethodsOn(a)
+            assertEquals 'test', a.methodA(1).methodB(2).text
+        }
+    }
+
+    // TODO: set times for the whole chain
 
 }
