@@ -17,10 +17,10 @@ package org.gmock.internal.metaclass
 
 class MetaClassHelper {
 
-    static Object findExpectation(expectations, signature, message, arguments, controller) {
+    static Object findExpectation(expectations, signature, message, mock, method, arguments, controller) {
         def expectation = controller.orderedExpectations.findMatching(signature) ?: expectations.findMatching(signature)
         if (expectation){
-            return expectation.answer(arguments)
+            return expectation.answer(mock, method, arguments)
         } else {
             controller.fail(message, signature)
         }
@@ -32,6 +32,18 @@ class MetaClassHelper {
         } else {
             controller.orderedExpectations.add(expectation)
         }
+    }
+
+    static String getGetterMethodName(String property) {
+        'get' + capitalize(property)
+    }
+
+    static String getSetterMethodName(String property) {
+        'set' + capitalize(property)
+    }
+
+    private static capitalize(String s) {
+        s[0].toUpperCase() + s.substring(1)
     }
 
 }

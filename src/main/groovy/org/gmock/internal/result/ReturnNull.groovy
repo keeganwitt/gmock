@@ -21,6 +21,6 @@ class ReturnNull implements Result {
 
     static final INSTANCE = new ReturnNull()
 
-    def answer(Object[] arguments) {}
+    def answer(Object receiver, String method, Object[] arguments) {}
 
 }

@@ -15,8 +15,8 @@
  */
 package org.gmock.internal.recorder
 
+import org.gmock.internal.result.ReturnMock
 import org.gmock.internal.times.*
-import org.gmock.internal.result.ReturnValue
 
 class BaseRecorder {
 
@@ -68,8 +68,9 @@ class BaseRecorder {
     }
 
     def chains() {
-        def mock = expectation.controller.mock()
-        expectation.result = new ReturnValue(mock)
+        def controller = expectation.controller
+        def mock = controller.mock()
+        expectation.result = new ReturnMock(controller, mock)
         return mock
     }
 

@@ -40,18 +40,22 @@ class MockFactory {
         this.mockCollection = mockCollection
     }
 
-    private static final ARG_CLASSES = [constructorRecorder: ConstructorRecorder,
+    private static final ARG_CLASSES = [
+            constructorRecorder: ConstructorRecorder,
             invokeConstructorRecorder: InvokeConstructorRecorder,
             mockNameRecorder: MockNameRecorder,
-            expectationClosure: Closure]
+            expectationClosure: Closure
+        ]
 
-    private static final CONCRETE_ARG_CLASSES = [mockNameRecorder: MockNameRecorder,
-            expectationClosure: Closure]
+    private static final CONCRETE_ARG_CLASSES = [
+            mockNameRecorder: MockNameRecorder,
+            expectationClosure: Closure
+        ]
 
     def createMock(mockArgs) {
         def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
-        def mpmc = new MockProxyMetaClass(mockArgs.clazz, controller.classExpectations, controller, mockName)
-        return createMockWithMetaClass(mockArgs, mpmc, mockName)
+        def mock = createMockInternal(mockArgs.clazz, mockName)
+        return createMockWithMockInternal(mock, mockArgs.invokeConstructorRecorder)
     }
 
     def createConcreteMock(mockArgs) {
@@ -60,22 +64,37 @@ class MockFactory {
             return concreteMocks.get(concreteInstance)
         } else {
             def mockName = getMockName(mockArgs.clazz, mockArgs.mockNameRecorder)
-            def cmpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, controller, mockArgs.concreteInstance, mockName)
-            def mock = createMockWithMetaClass(mockArgs, cmpmc, mockName)
+            def mock = createMockInternal(mockArgs.clazz, mockName)
+            def cmpmc = new ConcreteMockProxyMetaClass(mockArgs.clazz, controller, mockArgs.concreteInstance, mock)
             controller.concreteMocks << cmpmc
-            concreteMocks.put(concreteInstance, mock)
-            return mock
+
+            def mockInstance = createMockWithMetaClass(mockArgs.clazz, cmpmc, null, mockName)
+            concreteMocks.put(concreteInstance, mockInstance)
+            return mockInstance
         }
     }
 
-    private createMockWithMetaClass(mockArgs, metaClass, mockName) {
-        def mockInstance
-        if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
-            mockInstance = mockNonFinalClass(mockArgs.clazz, metaClass, mockArgs.invokeConstructorRecorder, mockName)
+    def createMockOfClass(Class clazz, mc) {
+        def mock = mc.mock
+        mock.clazz = clazz
+        return createMockWithMockInternal(mock, null)
+    }
+
+    private createMockWithMockInternal(mock, constructor) {
+        def mpmc = new MockProxyMetaClass(mock.clazz, controller, mock)
+        return createMockWithMetaClass(mock.clazz, mpmc, constructor, mock.mockName)
+    }
+
+    private createMockWithMetaClass(Class clazz, metaClass, constructor, mockName) {
+        if (!Modifier.isFinal(clazz.modifiers)) {
+            return mockNonFinalClass(clazz, metaClass, constructor, mockName)
         } else {
-            mockInstance = mockFinalClass(mockArgs.clazz, metaClass, mockArgs.invokeConstructorRecorder)
+            return mockFinalClass(clazz, metaClass, constructor)
         }
-        def mock = new MockInternal(controller, mockInstance, mockName, metaClass)
+    }
+
+    private createMockInternal(clazz, mockName) {
+        def mock = new MockInternal(controller, mockName, clazz, controller.classExpectations)
         mockCollection << mock
         return mock
     }
@@ -187,6 +206,5 @@ class MockFactory {
             return ObjenesisHelper.newInstance(clazz)
         }
     }
-
 
 }

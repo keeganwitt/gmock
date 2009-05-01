@@ -22,6 +22,7 @@ import org.gmock.internal.callstate.CallState
 import org.gmock.internal.expectation.ClassExpectations
 import org.gmock.internal.expectation.OrderedExpectations
 import org.gmock.internal.expectation.UnorderedExpectations
+import org.gmock.internal.metaclass.MockProxyMetaClass
 
 class InternalMockController {
 
@@ -59,27 +60,33 @@ class InternalMockController {
     }
 
     def mock(Class clazz = Object, Object ... args) {
-        def mockArgs = mockFactory.parseMockArgument(clazz, args)
-        def mock
+        def mockArgs = null, mockInstance = null
         doInternal {
             if (replay) {
                 throw new IllegalStateException("Cannot create mocks in play closure.")
             }
+
+            mockArgs = mockFactory.parseMockArgument(clazz, args)
             if (mockArgs.containsKey('concreteInstance')) {
-                mock = mockFactory.createConcreteMock(mockArgs)
+                mockInstance = mockFactory.createConcreteMock(mockArgs)
             } else {
-                mock = mockFactory.createMock(mockArgs)
+                mockInstance = mockFactory.createMock(mockArgs)
             }
+
             if (mockArgs.constructorRecorder) {
-                def expectation = mockArgs.constructorRecorder.generateExpectation(mockArgs.clazz, mock.mockInstance)
+                def expectation = mockArgs.constructorRecorder.generateExpectation(mockArgs.clazz, mockInstance)
                 classExpectations.addConstructorExpectation(mockArgs.clazz, expectation)
             }
         }
         if (mockArgs.expectationClosure) {
-            callClosureWithDelegate(mockArgs.expectationClosure, mock.mockInstance)
+            callClosureWithDelegate(mockArgs.expectationClosure, mockInstance)
         }
 
-        return mock.mockInstance
+        return mockInstance
+    }
+
+    def mockWithMetaClass(Class clazz, MetaClass mc) {
+        mockFactory.createMockOfClass(clazz, mc)
     }
 
     private callClosureWithDelegate(Closure closure, delegate) {
