@@ -171,6 +171,9 @@ createTask('copyDependencies', dependsOn: 'init') {
   dependencies.testRuntime.resolve().each { depFile ->
     ant.copy(file: depFile, todir: 'lib')
   }
+  dependencies.jarjarify.resolve().each { depFile ->
+    ant.copy(file: depFile, todir: 'lib')
+  }
 }
 
 
