@@ -18,11 +18,12 @@ package org.gmock.internal
 import junit.framework.Assert
 import org.gmock.internal.MockDelegate
 import org.gmock.internal.MockFactory
+import org.gmock.internal.MockInternal
 import org.gmock.internal.callstate.CallState
 import org.gmock.internal.expectation.ClassExpectations
 import org.gmock.internal.expectation.OrderedExpectations
 import org.gmock.internal.expectation.UnorderedExpectations
-import org.gmock.internal.metaclass.MockProxyMetaClass
+import org.gmock.internal.recorder.MockNameRecorder
 
 class InternalMockController {
 
@@ -85,8 +86,15 @@ class InternalMockController {
         return mockInstance
     }
 
-    def mockWithMetaClass(Class clazz, MetaClass mc) {
-        mockFactory.createMockOfClass(clazz, mc)
+    /**
+     * Used by the chains mocking
+     */
+    def createMockInternal() {
+        mockFactory.createMockInternal(Object, new MockNameRecorder(''))
+    }
+
+    def createMockOfClass(Class clazz, MockInternal mockInternal) {
+        mockFactory.createMockOfClass(clazz, mockInternal)
     }
 
     private callClosureWithDelegate(Closure closure, delegate) {

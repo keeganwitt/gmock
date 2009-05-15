@@ -75,8 +75,8 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         mock.text.chains().trim().returns('test')
 
         def expected = "Expectation not matched on verify:\n" +
-                       "  'text' on 'Mock for Object (1)': expected 1, actual 1\n" +
-                       "  'trim()' on 'Mock for Object (2)': expected 1, actual 0"
+                       "  'text' on 'Mock for Object': expected 1, actual 1\n" +
+                       "  'trim()' on '': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play { mock.text }
         }
@@ -87,9 +87,9 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         def mock = mock()
         mock.text.chains().trim().returns('test')
 
-        def expected = "Unexpected method call 'toUpperCase()' on 'Mock for Object (2)'\n" +
-                       "  'text' on 'Mock for Object (1)': expected 1, actual 1\n" +
-                       "  'trim()' on 'Mock for Object (2)': expected 1, actual 0"
+        def expected = "Unexpected method call 'toUpperCase()' on ''\n" +
+                       "  'text' on 'Mock for Object': expected 1, actual 1\n" +
+                       "  'trim()' on '': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play { mock.text.toUpperCase() }
         }
@@ -146,6 +146,7 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         }
     }
 
+    // TODO: refactor the chains() method for better error message
     // TODO: set times for the whole chain
 
 }

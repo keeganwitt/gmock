@@ -74,8 +74,7 @@ class MockFactory {
         }
     }
 
-    def createMockOfClass(Class clazz, mc) {
-        def mock = mc.mock
+    def createMockOfClass(Class clazz, MockInternal mock) {
         mock.clazz = clazz
         return createMockWithMockInternal(mock, null)
     }
@@ -93,7 +92,7 @@ class MockFactory {
         }
     }
 
-    private createMockInternal(clazz, mockName) {
+    def createMockInternal(clazz, mockName) {
         def mock = new MockInternal(controller, mockName, clazz, controller.classExpectations)
         mockCollection << mock
         return mock
