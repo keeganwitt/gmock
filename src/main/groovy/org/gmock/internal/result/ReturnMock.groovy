@@ -15,35 +15,32 @@
  */
 package org.gmock.internal.result
 
-import org.codehaus.groovy.runtime.InvokerHelper
+import org.gmock.internal.MockHelper
 import org.gmock.internal.Result
 import static org.codehaus.groovy.runtime.MetaClassHelper.convertToTypeArray
 
 class ReturnMock implements Result {
 
     def controller
-    def mock
-    MetaClass proxyMetaClass
+    def mockInternal
 
-    ReturnMock(controller, mock) {
+    ReturnMock(controller, mockInternal) {
         this.controller = controller
-        this.mock = mock
-        this.proxyMetaClass = InvokerHelper.getMetaClass(mock)
+        this.mockInternal = mockInternal
     }
 
     def answer(Object receiver, String method, Object[] arguments) {
-        def clazz = receiver.class
+        def clazz = MockHelper.getClassOfObject(receiver)
+        def mockClass = getMethodReturnType(clazz, method, arguments)
+        return controller.createMockOfClass(mockClass, mockInternal)
+    }
+
+    private getMethodReturnType(Class clazz, String method, Object[] arguments) {
         def argTypes = convertToTypeArray(arguments)
-        def mockClass
         try {
-            mockClass = clazz.getMethod(method, argTypes).returnType
+            clazz.getMethod(method, argTypes).returnType
         } catch (e) {
-            mockClass = clazz.metaClass.pickMethod(method, argTypes)?.returnType ?: Object
-        }
-        if (mockClass == Object) {
-            return mock
-        } else {
-            return controller.mockWithMetaClass(mockClass, proxyMetaClass)
+            clazz.metaClass.pickMethod(method, argTypes)?.returnType ?: Object
         }
     }
 
