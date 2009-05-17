@@ -18,50 +18,34 @@ package org.gmock.internal.recorder
 import org.gmock.internal.result.ReturnNull
 import org.gmock.internal.result.ReturnValue
 import org.gmock.internal.result.ThrowException
-import org.gmock.internal.signature.PropertyGetSignature
-import org.gmock.internal.signature.PropertySetSignature
-import org.gmock.internal.signature.PropertyUncompleteSignature
 
 class PropertyRecorder extends BaseRecorder {
 
-    def mock
-    def propertyName
-    Class setterClass
-    Class getterClass
-
-    PropertyRecorder(mock, propertyName, expectation, Class uncompleteClass = PropertyUncompleteSignature,
-                     Class setterClass = PropertySetSignature, Class getterClass = PropertyGetSignature) {
+    PropertyRecorder(expectation) {
         super(expectation)
-        this.mock = mock
-        this.propertyName = propertyName
-        this.setterClass = setterClass
-        this.getterClass = getterClass
-        if (uncompleteClass) {
-            expectation.signature = uncompleteClass.newInstance(mock, propertyName)
-        }
     }
 
     def set(value) {
-        expectation.signature = setterClass.newInstance(mock, propertyName, value)
+        expectation.signature = expectation.signature.getSetter(value)
         expectation.result = ReturnNull.INSTANCE
-        return new PropertySetterRecorder(this)
+        return new PropertySetterRecorder(expectation)
     }
 
     def returns(value) {
-        expectation.signature = getterClass.newInstance(mock, propertyName)
+        expectation.signature = expectation.signature.getGetter()
         expectation.result = new ReturnValue(value)
-        return new PropertyGetterRecorder(this)
+        return new PropertyGetterRecorder(expectation)
     }
 
     def chains() {
-        expectation.signature = getterClass.newInstance(mock, propertyName)
+        expectation.signature = expectation.signature.getGetter()
         return super.chains()
     }
 
     protected doRaises(Object[] params) {
-        expectation.signature = getterClass.newInstance(mock, propertyName)
+        expectation.signature = expectation.signature.getGetter()
         expectation.result = ThrowException.newInstance(params)
-        return new PropertyGetterRecorder(this)
+        return new PropertyGetterRecorder(expectation)
     }
 
     def raises(Throwable exception) {
@@ -74,15 +58,15 @@ class PropertyRecorder extends BaseRecorder {
 
     def times(times) {
         super.times(times)
-        return new PropertyTimesRecorder(this)
+        return new PropertyTimesRecorder(expectation)
     }
 
 }
 
 class PropertySetterRecorder extends PropertyRecorder {
 
-    PropertySetterRecorder(recorder) {
-        super(recorder.mock, recorder.propertyName, recorder.expectation, null, recorder.setterClass, recorder.getterClass)
+    PropertySetterRecorder(expectation) {
+        super(expectation)
     }
 
     def set(value) {
@@ -101,15 +85,15 @@ class PropertySetterRecorder extends PropertyRecorder {
 
     protected doRaises(Object[] params) {
         expectation.result = ThrowException.newInstance(params)
-        return new PropertyGetterRecorder(this)
+        return new PropertyGetterRecorder(expectation)
     }
 
 }
 
 class PropertyGetterRecorder extends PropertySetterRecorder {
 
-    PropertyGetterRecorder(recorder) {
-        super(recorder)
+    PropertyGetterRecorder(expectation) {
+        super(expectation)
     }
 
     protected doRaises(Object[] params) {
@@ -121,8 +105,8 @@ class PropertyGetterRecorder extends PropertySetterRecorder {
 
 class PropertyTimesRecorder extends PropertyGetterRecorder {
 
-    PropertyTimesRecorder(recorder) {
-        super(recorder)
+    PropertyTimesRecorder(expectation) {
+        super(expectation)
     }
 
     def times(times) {

@@ -18,10 +18,12 @@ package org.gmock.internal.signature
 class PropertyGetSignature extends BasePropertyGetSignature {
 
     def object
+    @Delegate PropertySignature propertySignature
 
     PropertyGetSignature(object, getterName) {
         super(getterName)
         this.object = object
+        propertySignature = new PropertySignature(object, getterName)
     }
 
     String toString(boolean showMockName = false) {

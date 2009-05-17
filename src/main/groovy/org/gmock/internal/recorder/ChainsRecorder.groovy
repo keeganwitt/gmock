@@ -17,6 +17,7 @@ package org.gmock.internal.recorder
 
 import org.gmock.internal.expectation.Expectation
 import org.gmock.internal.signature.MethodSignature
+import org.gmock.internal.signature.PropertySignature
 import static org.gmock.internal.metaclass.MetaClassHelper.addToExpectations
 
 class ChainsRecorder implements GroovyInterceptable {
@@ -38,9 +39,9 @@ class ChainsRecorder implements GroovyInterceptable {
     }
 
     Object getProperty(String property) {
-        def expectation = new Expectation()
+        def expectation = new Expectation(signature: new PropertySignature(mock, property))
         addToExpectations(expectation, expectations, controller)
-        return new PropertyRecorder(mock, property, expectation)
+        return new PropertyRecorder(expectation)
     }
 
     void setProperty(String property, Object value) {

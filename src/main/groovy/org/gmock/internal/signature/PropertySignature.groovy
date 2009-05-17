@@ -15,18 +15,25 @@
  */
 package org.gmock.internal.signature
 
-class StaticPropertyUncompleteSignature {
+class PropertySignature extends BasePropertySignature {
 
-    def clazz
-    def property
+    def object
 
-    StaticPropertyUncompleteSignature(clazz, property) {
-        this.clazz = clazz
-        this.property = property
+    PropertySignature(object, property) {
+        super(property)
+        this.object = object
     }
 
-    def validate() {
-        throw new IllegalStateException("Missing property expectation for '${clazz.simpleName}.$property'")
+    String getName() {
+        "'$property' on '$object.mockName'"
+    }
+
+    def getSetter(value) {
+        new PropertySetSignature(object, property, value)
+    }
+
+    def getGetter() {
+        new PropertyGetSignature(object, property)
     }
 
 }
