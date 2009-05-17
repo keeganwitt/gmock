@@ -146,6 +146,15 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         }
     }
 
+    void testChainsMockingSetPropertyInRecordState() {
+        def mock = mock()
+        def expected = "Cannot use property setter in record mode. Are you trying to mock a setter? Use 'b.set(1)' instead."
+        def message = shouldFail(MissingPropertyException) {
+            mock.a.chains().b = 1
+        }
+        assertEquals expected, message
+    }
+
     // TODO: refactor the chains() method for better error message
     // TODO: set times for the whole chain
 

@@ -18,10 +18,12 @@ package org.gmock.internal.signature
 class PropertySetSignature extends BasePropertySetSignature {
 
     def object
+    @Delegate PropertySignature propertySignature
 
     PropertySetSignature(object, setterName, arguments) {
         super(setterName, arguments)
         this.object = object
+        propertySignature = new PropertySignature(object, setterName)
     }
 
     PropertySetSignature(object, setterName) {

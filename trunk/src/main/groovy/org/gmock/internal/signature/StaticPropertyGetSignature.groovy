@@ -18,10 +18,12 @@ package org.gmock.internal.signature
 class StaticPropertyGetSignature extends BasePropertyGetSignature {
 
     Class clazz
+    @Delegate StaticPropertySignature propertySignature
 
     StaticPropertyGetSignature(clazz, getterName) {
         super(getterName)
         this.clazz = clazz
+        propertySignature = new StaticPropertySignature(clazz, getterName)
     }
 
     String toString(boolean showMockName = false) {

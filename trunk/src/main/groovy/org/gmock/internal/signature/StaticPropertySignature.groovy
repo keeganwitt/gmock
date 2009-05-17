@@ -13,16 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.recorder
+package org.gmock.internal.signature
 
-import org.gmock.internal.signature.StaticPropertyGetSignature
-import org.gmock.internal.signature.StaticPropertySetSignature
-import org.gmock.internal.signature.StaticPropertyUncompleteSignature
+class StaticPropertySignature extends BasePropertySignature {
 
-class StaticPropertyRecorder extends PropertyRecorder {
+    def clazz
 
-    StaticPropertyRecorder(clazz, property, expectation) {
-        super(clazz, property, expectation, StaticPropertyUncompleteSignature, StaticPropertySetSignature, StaticPropertyGetSignature)
+    StaticPropertySignature(clazz, property) {
+        super(property)
+        this.clazz = clazz
+    }
+
+    String getName() {
+        "'${clazz.simpleName}.$property'"
+    }
+
+    def getSetter(value) {
+        new StaticPropertySetSignature(clazz, property, value)
+    }
+
+    def getGetter() {
+        new StaticPropertyGetSignature(clazz, property)
     }
 
 }

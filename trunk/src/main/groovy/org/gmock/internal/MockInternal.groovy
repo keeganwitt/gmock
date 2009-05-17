@@ -15,20 +15,21 @@
  */
 package org.gmock.internal
 
-import org.gmock.internal.signature.MethodSignature
-import org.gmock.internal.result.ToStringDefaultBehavior
-import org.gmock.internal.result.HashCodeDefaultBehavior
-import org.gmock.internal.result.EqualsDefaultBehavior
-import org.gmock.internal.matcher.AlwaysMatchMatcher
-import org.gmock.internal.times.AnyTimes
-import org.gmock.internal.recorder.MethodRecorder
-import static org.gmock.internal.metaclass.MetaClassHelper.*
-import org.gmock.internal.recorder.StaticMethodRecoder
-import org.gmock.internal.signature.PropertyGetSignature
-import org.gmock.internal.recorder.PropertyRecorder
-import org.gmock.internal.signature.PropertySetSignature
 import org.gmock.internal.expectation.Expectation
 import org.gmock.internal.expectation.ExpectationCollection
+import org.gmock.internal.matcher.AlwaysMatchMatcher
+import org.gmock.internal.recorder.MethodRecorder
+import org.gmock.internal.recorder.PropertyRecorder
+import org.gmock.internal.recorder.StaticRecoder
+import org.gmock.internal.result.EqualsDefaultBehavior
+import org.gmock.internal.result.HashCodeDefaultBehavior
+import org.gmock.internal.result.ToStringDefaultBehavior
+import org.gmock.internal.signature.MethodSignature
+import org.gmock.internal.signature.PropertyGetSignature
+import org.gmock.internal.signature.PropertySetSignature
+import org.gmock.internal.signature.PropertySignature
+import org.gmock.internal.times.AnyTimes
+import static org.gmock.internal.metaclass.MetaClassHelper.*
 
 class MockInternal {
 
@@ -90,7 +91,7 @@ class MockInternal {
     }
 
     private invokeStaticExpectationClosure(Closure staticExpectationClosure) {
-        def recorder = new StaticMethodRecoder(clazz, classExpectations)
+        def recorder = new StaticRecoder(clazz, classExpectations)
         staticExpectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
         def backup = controller.mockDelegate
         try {
@@ -109,11 +110,11 @@ class MockInternal {
             return findExpectation(expectations, signature, "Unexpected property getter call", mockObject, getGetterMethodName(property), [], controller)
         } else {
             if (property == "static"){
-                return new StaticMethodRecoder(clazz, classExpectations)
+                return new StaticRecoder(clazz, classExpectations)
             } else {
-                def expectation = new Expectation()
+                def expectation = new Expectation(signature: new PropertySignature(this, property))
                 addToExpectations(expectation, expectations, controller)
-                return new PropertyRecorder(this, property, expectation)
+                return new PropertyRecorder(expectation)
             }
         }
     }

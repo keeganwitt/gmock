@@ -17,14 +17,15 @@ package org.gmock.internal.recorder
 
 import org.gmock.internal.expectation.Expectation
 import org.gmock.internal.signature.StaticMethodSignature
+import org.gmock.internal.signature.StaticPropertySignature
 
-class StaticMethodRecoder implements GroovyInterceptable {
+class StaticRecoder implements GroovyInterceptable {
 
     def classExpectations
     def aClass
     boolean missingExpectation = true
 
-    StaticMethodRecoder(aClass, classExpectations){
+    StaticRecoder(aClass, classExpectations){
         this.classExpectations = classExpectations
         this.aClass = aClass
         classExpectations.addStaticValidator { ->
@@ -42,10 +43,10 @@ class StaticMethodRecoder implements GroovyInterceptable {
     }
 
     Object getProperty(String property) {
-        def expectation = new Expectation()
+        def expectation = new Expectation(signature: new StaticPropertySignature(aClass, property))
         classExpectations.addStaticExpectation(aClass, expectation)
         missingExpectation = false
-        return new StaticPropertyRecorder(aClass, property, expectation)
+        return new PropertyRecorder(expectation)
     }
 
     void setProperty(String property, Object value) {
