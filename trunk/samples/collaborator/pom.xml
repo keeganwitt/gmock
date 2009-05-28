@@ -35,7 +35,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>1.6.1</version>
+            <version>@groovyVersion@</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.gmock</groupId>
             <artifactId>gmock</artifactId>
-            <version>0.8.0</version>
+            <version>@gmockVersion@</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

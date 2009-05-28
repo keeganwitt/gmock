@@ -1,28 +1,32 @@
-usePlugin('groovy')
+allprojects {
+    usePlugin('groovy')
+
+    group = 'org.gmock'
+
+    sourceCompatibility = 1.5
+    targetCompatibility = 1.5
+
+    dependencies {
+        addMavenRepo()
+        groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
+    }
+}
+
+
 usePlugin('maven')
 
-group = 'org.gmock'
-version = '0.9.0'
 archivesBaseName = 'gmock'
-
-sourceCompatibility = 1.5
-targetCompatibility = 1.5
 
 srcDirNames = []
 groovySrcDirNames = ['main/java', 'main/groovy']
-
-groovyVersion = '1.6.1'
-junitVersion = '4.5'
 
 dependencies {
     addConfiguration 'jarjar'
     addConfiguration 'jarjarify'
     addConfiguration 'deployerJars'
 
-    addMavenRepo()
     addMavenStyleRepo('JBossRepo', 'http://repository.jboss.org/maven2/')
 
-    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
     compile "junit:junit:$junitVersion"
     testCompile 'org.hamcrest:hamcrest-library:1.1',
                 'org.testng:testng:5.8:jdk15',
@@ -37,11 +41,13 @@ dependencies {
     linkConfWithTask 'testRuntime', 'integrationTest'
 }
 
+
 if (System.getProperty('release') == null) {
     version += '-SNAPSHOT'
 }
 
 archivePaths = libs.archiveTasks*.archivePath
+explodedDistsDir = file("$distsDir/exploded")
 integrationTestClassesDir = file("$buildDir/integration-test-classes")
 integrationTestResultsDir = file("$buildDir/integration-test-results")
 integrationTestReportDir = file("$buildDir/$reportsDirName/integration-tests")
@@ -71,13 +77,7 @@ uploadLibs {
 
 dists {
     zip(classifier: 'all') {
-        fileSet(dir: rootDir) {
-            include('src/**', 'apache-license-2.0.txt', 'samples/*/pom.xml', 'samples/*/src/**')
-        }
-        fileSet(dir: buildDir) {
-            include('docs/**')
-        }
-        files(archivePaths as File[])
+        fileSet dir: explodedDistsDir
     }
 }
 
@@ -91,17 +91,43 @@ libs.archiveTasks*.doFirst {
 
 getTasksDependingOn(libs)*.dependsOn 'integrationTest'
 [install, uploadLibs]*.dependsOn 'generatePom'
-dists.archiveTasks*.dependsOn ':samples:cache:test',
-                              ':samples:collaborator:test',
-                              'generateDoc'
+dists.archiveTasks*.dependsOn 'explodedDists'
+
+createTask('explodedDists', dependsOn: [':samples:cache:test', ':samples:collaborator:test', 'generateDoc']) {
+    ant {
+        delete dir: explodedDistsDir
+        archivePaths.each { copy file: it, todir: explodedDistsDir }
+        copy file: 'apache-license-2.0.txt', todir: explodedDistsDir
+        copy(todir: explodedDistsDir) {
+            fileset(dir: rootDir) {
+                include name: 'src/**'
+                include name: 'samples/*/src/**'
+            }
+        }
+        copy(todir: explodedDistsDir) {
+            fileset dir: rootDir, includes: 'samples/*/pom.xml'
+            filterset {
+                filter token: 'gmockVersion', value: version
+                filter token: 'groovyVersion', value: groovyVersion
+                filter token: 'junitVersion', value: junitVersion
+            }
+        }
+        copy(todir: explodedDistsDir) {
+            fileset dir: buildDir, includes: 'docs/**'
+        }
+    }
+}
 
 createTask('generatePom') {
     pomFile = file("$buildDir/pom.xml")
     ant {
-        filter(token: 'gmockVersion', value: version)
-        filter(token: 'groovyVersion', value: groovyVersion)
-        filter(token: 'junitVersion', value: junitVersion)
-        copy(file: file('pom.xml'), tofile: pomFile, overwrite: 'true', filtering: 'true')
+        copy(file: file('pom.xml'), tofile: pomFile, overwrite: 'true') {
+            filterset {
+                filter token: 'gmockVersion', value: version
+                filter token: 'groovyVersion', value: groovyVersion
+                filter token: 'junitVersion', value: junitVersion
+            }
+        }
     }
 }
 
