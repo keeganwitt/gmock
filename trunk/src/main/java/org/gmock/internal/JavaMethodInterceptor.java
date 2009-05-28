@@ -36,6 +36,10 @@ public class JavaMethodInterceptor implements MethodInterceptor {
     }
 
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+        if ("finalize".equals(method.getName()) && args.length == 0) {
+            return null;
+        }
+
         if (!gmc.getReplay() || gmc.getInternal()) {
             if ("toString".equals(method.getName()) && args.length == 0) {
                 return mockName.toString();
