@@ -30,4 +30,16 @@ class BugTest extends GMockTestCase {
         }
     }
 
+    void testIgnoreFinalize() {
+        def m = mock()
+        m.fun()
+        play {
+            m.fun()
+        }
+
+        m = mock()
+        System.gc()
+        play {}
+    }
+
 }
