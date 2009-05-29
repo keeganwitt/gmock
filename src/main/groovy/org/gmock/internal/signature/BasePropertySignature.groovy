@@ -27,6 +27,6 @@ abstract class BasePropertySignature {
         throw new IllegalStateException("Missing property expectation for $name")
     }
 
-    abstract String getName()
+    protected abstract String getName()
 
 }

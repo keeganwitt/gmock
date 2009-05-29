@@ -26,8 +26,12 @@ class StaticPropertyGetSignature extends BasePropertyGetSignature {
         propertySignature = new StaticPropertySignature(clazz, getterName)
     }
 
-    String toString(boolean showMockName = false) {
-        "'${clazz.simpleName}.$getterName'"
+    String toString() {
+        "${clazz.simpleName}.$getterName"
+    }
+
+    String toString(boolean showMockName, String postfix = '') {
+        "'${toString()}$postfix'"
     }
 
     boolean equals(Object signature) {

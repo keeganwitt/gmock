@@ -26,8 +26,12 @@ class StaticPropertySetSignature extends BasePropertySetSignature {
         propertySignature = new StaticPropertySignature(clazz, setterName)
     }
 
-    String toString(boolean showMockName = false) {
-        "'${clazz.simpleName}.$setterName = $arguments'"
+    String toString() {
+        "${clazz.simpleName}.$setterName = $arguments"
+    }
+
+    String toString(boolean showMockName) {
+        "'${toString()}'"
     }
 
     boolean equals(Object signature) {

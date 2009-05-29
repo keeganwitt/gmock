@@ -24,7 +24,7 @@ class StaticPropertySignature extends BasePropertySignature {
         this.clazz = clazz
     }
 
-    String getName() {
+    protected String getName() {
         "'${clazz.simpleName}.$property'"
     }
 

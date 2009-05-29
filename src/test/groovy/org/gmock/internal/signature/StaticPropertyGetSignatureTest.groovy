@@ -15,25 +15,23 @@
  */
 package org.gmock.internal.signature
 
-class PropertySignature extends BasePropertySignature {
+import org.gmock.utils.Loader
 
-    def object
+class StaticPropertyGetSignatureTest extends GroovyTestCase {
 
-    PropertySignature(object, property) {
-        super(property)
-        this.object = object
+    void testToString() {
+        def signature = new StaticPropertyGetSignature(Loader, 'property')
+        assertEquals 'Loader.property', signature.toString()
     }
 
-    protected String getName() {
-        "'$property' on '$object.mockName'"
+    void testToStringWithMockName() {
+        def signature = new StaticPropertyGetSignature(Loader, 'property')
+        assertEquals "'Loader.property'", signature.toString(true)
     }
 
-    def getSetter(value) {
-        new PropertySetSignature(object, property, value)
-    }
-
-    def getGetter() {
-        new PropertyGetSignature(object, property)
+    void testToStringWithMockNameAndPostfix() {
+        def signature = new StaticPropertyGetSignature(Loader, 'property')
+        assertEquals "'Loader.property.other'", signature.toString(true, '.other')
     }
 
 }
