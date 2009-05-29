@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal
+package org.gmock.internal.factory
 
 import java.lang.reflect.Modifier
 import net.sf.cglib.proxy.Callback
@@ -27,6 +27,7 @@ import org.gmock.internal.recorder.InvokeConstructorRecorder
 import org.gmock.internal.recorder.MockNameRecorder
 import org.gmock.internal.util.WeakIdentityHashMap
 import org.objenesis.ObjenesisHelper
+import org.gmock.internal.*
 
 class MockFactory {
 
@@ -92,8 +93,15 @@ class MockFactory {
         }
     }
 
-    def createMockInternal(clazz, mockName) {
+    private createMockInternal(clazz, mockName) {
         def mock = new MockInternal(controller, mockName, clazz, controller.classExpectations)
+        mockCollection << mock
+        return mock
+    }
+
+    def createChainsMockInternal(previousSignature) {
+        def signatureFactory = new ChainsSignatureFactory(previousSignature)
+        def mock = new MockInternal(controller, new MockNameRecorder(''), Object, controller.classExpectations, signatureFactory)
         mockCollection << mock
         return mock
     }
