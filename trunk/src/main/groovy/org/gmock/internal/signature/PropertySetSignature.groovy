@@ -31,8 +31,12 @@ class PropertySetSignature extends BasePropertySetSignature {
         this.object = object
     }
 
-    String toString(boolean showMockName = false) {
-        "'$setterName = $arguments'${object.mockName.toString(showMockName)}"
+    String toString() {
+        "$setterName = $arguments"
+    }
+
+    String toString(boolean showMockName) {
+        "'${toString()}'${object.mockName.toString(showMockName)}"
     }
 
     boolean equals(Object signature) {

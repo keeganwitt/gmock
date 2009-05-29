@@ -24,8 +24,12 @@ class StaticMethodSignature extends BaseMethodSignature {
         this.clazz = clazz
     }
 
-    String toString(boolean showMockName = false) {
-        "'${clazz.simpleName}.$methodName($arguments)'"
+    String toString() {
+        "${clazz.simpleName}.$methodName($arguments)"
+    }
+
+    String toString(boolean showMockName, String postfix = '') {
+        "'${toString()}$postfix'"
     }
 
     boolean equals(Object signature) {

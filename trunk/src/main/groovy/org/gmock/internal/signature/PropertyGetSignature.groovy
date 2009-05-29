@@ -26,8 +26,12 @@ class PropertyGetSignature extends BasePropertyGetSignature {
         propertySignature = new PropertySignature(object, getterName)
     }
 
-    String toString(boolean showMockName = false) {
-        "'$getterName'${object.mockName.toString(showMockName)}"
+    String toString() {
+        getterName
+    }
+
+    String toString(boolean showMockName, String postfix = '') {
+        "'${toString()}$postfix'${object.mockName.toString(showMockName)}"
     }
 
     boolean equals(Object signature) {
