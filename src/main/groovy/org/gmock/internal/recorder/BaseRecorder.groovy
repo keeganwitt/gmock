@@ -69,9 +69,10 @@ class BaseRecorder {
 
     def chains() {
         def controller = expectation.controller
-        def mockInternal = controller.createMockInternal()
+        def mockInternal = controller.createChainsMockInternal(expectation.signature)
         expectation.result = new ReturnMock(controller, mockInternal)
-        return new ChainsRecorder(controller, mockInternal, mockInternal.expectations)
+        expectation.hidden = true
+        return new ChainsRecorder(controller, mockInternal, mockInternal.expectations, expectation)
     }
 
 }

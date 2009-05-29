@@ -17,12 +17,12 @@ package org.gmock.internal
 
 import junit.framework.Assert
 import org.gmock.internal.MockDelegate
-import org.gmock.internal.MockFactory
 import org.gmock.internal.MockInternal
 import org.gmock.internal.callstate.CallState
 import org.gmock.internal.expectation.ClassExpectations
 import org.gmock.internal.expectation.OrderedExpectations
 import org.gmock.internal.expectation.UnorderedExpectations
+import org.gmock.internal.factory.MockFactory
 import org.gmock.internal.recorder.MockNameRecorder
 
 class InternalMockController {
@@ -30,6 +30,7 @@ class InternalMockController {
     def mockFactory
 
     def mockCollection = []
+    def mockCount = 0
     def concreteMocks = []
     def classExpectations = new ClassExpectations(this)
     def orderedExpectations = new OrderedExpectations(this)
@@ -83,14 +84,16 @@ class InternalMockController {
             callClosureWithDelegate(mockArgs.expectationClosure, mockInstance)
         }
 
+        ++mockCount
+
         return mockInstance
     }
 
     /**
      * Used by the chains mocking
      */
-    def createMockInternal() {
-        mockFactory.createMockInternal(Object, new MockNameRecorder(''))
+    def createChainsMockInternal(previousSignature) {
+        mockFactory.createChainsMockInternal(previousSignature)
     }
 
     def createMockOfClass(Class clazz, MockInternal mockInternal) {
@@ -195,12 +198,12 @@ class InternalMockController {
     def fail(message, signature = null) {
         def callState = callState(signature).toString()
         if (callState) { callState = "\n$callState" }
-        signature = signature ? ' ' + signature.toString(mockCollection.size() > 1) : ''
+        signature = signature ? ' ' + signature.toString(mockCount > 1) : ''
         Assert.fail("$message$signature$callState")
     }
 
     private callState(signature) {
-        def callState = new CallState(mockCollection.size() > 1, !orderedExpectations.empty)
+        def callState = new CallState(mockCount > 1, !orderedExpectations.empty)
         orderedExpectations.appendToCallState(callState)
         unorderedExpectations.appendToCallState(callState)
         if (signature) {

@@ -75,8 +75,7 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         mock.text.chains().trim().returns('test')
 
         def expected = "Expectation not matched on verify:\n" +
-                       "  'text' on 'Mock for Object': expected 1, actual 1\n" +
-                       "  'trim()' on '': expected 1, actual 0"
+                       "  'text.trim()': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play { mock.text }
         }
@@ -87,11 +86,86 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         def mock = mock()
         mock.text.chains().trim().returns('test')
 
-        def expected = "Unexpected method call 'toUpperCase()' on ''\n" +
-                       "  'text' on 'Mock for Object': expected 1, actual 1\n" +
-                       "  'trim()' on '': expected 1, actual 0"
+        def expected = "Unexpected method call 'text.toUpperCase()'\n" +
+                       "  'text.trim()': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play { mock.text.toUpperCase() }
+        }
+        assertEquals expected, message
+    }
+
+    void testMultipleChainsMethodNotCalled() {
+        def mock = mock()
+        mock.a.chains().b.chains().c.chains().d()
+
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'a.b.c.d()': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play { mock.a.b }
+        }
+        assertEquals expected, message
+    }
+
+    void testMultipleChainsMethodCalledIncorrect() {
+        def mock = mock()
+        mock.a().chains().b.chains().c().chains().d.returns(1)
+
+        def expected = "Unexpected property getter call 'a().x'\n" +
+                       "  'a().b.c().d': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play { mock.a().x.c().d }
+        }
+        assertEquals expected, message
+    }
+
+    void testMultipleMocksWithChainsMockingNotVerified() {
+        def m1 = mock(), m2 = mock()
+        m1.a.chains().b.returns(1)
+        m2.c().chains().d().chains().e()
+        m1.f()
+
+        def expected = "Expectation not matched on verify:\n" +
+                       "  'a.b' on 'Mock for Object (1)': expected 1, actual 0\n" +
+                       "  'c().d().e()' on 'Mock for Object (2)': expected 1, actual 1\n" +
+                       "  'f()' on 'Mock for Object (1)': expected 1, actual 1"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                m1.f()
+                m2.c().d().e()
+                m1.a
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testMultipleMocksWithChainsMockingUnexpected() {
+        def m1 = mock(), m2 = mock(), m3 = mock()
+        m1.a.chains().b.chains().c()
+        m2.d()
+        m3.e().chains().f.chains().g()
+
+        def expected = "Unexpected property getter call 'a.x' on 'Mock for Object (1)'\n" +
+                       "  'a.b.c()' on 'Mock for Object (1)': expected 1, actual 0\n" +
+                       "  'd()' on 'Mock for Object (2)': expected 1, actual 1\n" +
+                       "  'e().f.g()' on 'Mock for Object (3)': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                m2.d()
+                m1.a.x.c()
+            }
+        }
+        assertEquals expected, message
+    }
+
+    void testStaticMockingWithChainsMockingUnexpected() {
+        mock(Loader).static.a.chains().b.chains().c.returns(1)
+
+        def expected = "Unexpected property getter call 'Loader.a.x'\n" +
+                       "  'Loader.a.b.c': expected 1, actual 0"
+        def message = shouldFail(AssertionFailedError) {
+            play {
+                Loader.a.x.c
+            }
         }
         assertEquals expected, message
     }
@@ -155,7 +229,6 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         assertEquals expected, message
     }
 
-    // TODO: refactor the chains() method for better error message
     // TODO: set times for the whole chain
 
 }
