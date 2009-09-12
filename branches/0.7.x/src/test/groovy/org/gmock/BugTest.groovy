@@ -2,6 +2,7 @@ package org.gmock
 
 import javax.servlet.http.HttpServletRequest
 import junit.framework.AssertionFailedError
+import javax.sound.sampled.AudioSystem
 
 class BugTest extends GMockTestCase {
 
@@ -12,6 +13,13 @@ class BugTest extends GMockTestCase {
 
         shouldFail(AssertionFailedError) {
             play {}
+        }
+    }
+
+    void testPrivateConstructor() {
+        mock(AudioSystem).static.mixerInfo.returns(null)
+        play {
+            assertNull AudioSystem.getMixerInfo()
         }
     }
 

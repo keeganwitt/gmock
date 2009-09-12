@@ -71,14 +71,19 @@ class MockFactory {
 
     private createMockWithMetaClass(mockArgs, metaClass, mockName) {
         def mockInstance
-        if (!Modifier.isFinal(mockArgs.clazz.modifiers)) {
-            mockInstance = mockNonFinalClass(mockArgs.clazz, metaClass, mockArgs.invokeConstructorRecorder, mockName)
-        } else {
+        if (isFinalClass(mockArgs.clazz)) {
             mockInstance = mockFinalClass(mockArgs.clazz, metaClass, mockArgs.invokeConstructorRecorder)
+        } else {
+            mockInstance = mockNonFinalClass(mockArgs.clazz, metaClass, mockArgs.invokeConstructorRecorder, mockName)
         }
         def mock = new MockInternal(controller, mockInstance, mockName, metaClass)
         mockCollection << mock
         return mock
+    }
+
+    private boolean isFinalClass(Class clazz) {
+        return Modifier.isFinal(clazz.modifiers) ||
+                (clazz.declaredConstructors.size() > 0 && clazz.declaredConstructors.every { Modifier.isPrivate(it.modifiers) })
     }
 
     def parseMockArgument(clazz, args) {
