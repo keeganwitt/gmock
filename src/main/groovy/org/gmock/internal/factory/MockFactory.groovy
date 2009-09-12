@@ -86,11 +86,16 @@ class MockFactory {
     }
 
     private createMockWithMetaClass(Class clazz, metaClass, constructor, mockName) {
-        if (!Modifier.isFinal(clazz.modifiers)) {
-            return mockNonFinalClass(clazz, metaClass, constructor, mockName)
-        } else {
+        if (isFinalClass(clazz)) {
             return mockFinalClass(clazz, metaClass, constructor)
+        } else {
+            return mockNonFinalClass(clazz, metaClass, constructor, mockName)
         }
+    }
+
+    private boolean isFinalClass(Class clazz) {
+        return Modifier.isFinal(clazz.modifiers) ||
+                (clazz.declaredConstructors.size() > 0 && clazz.declaredConstructors.every { Modifier.isPrivate(it.modifiers) })
     }
 
     private createMockInternal(clazz, mockName) {
