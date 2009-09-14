@@ -15,7 +15,14 @@
  */
 package org.gmock.utils;
 
+import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
+
 public class JavaTestHelper {
+
+    public static final String SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+    
+    public static final String SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
 
     public static boolean equalsToEachOther(Object a, Object b) {
         return a.equals(b);
@@ -35,6 +42,10 @@ public class JavaTestHelper {
 
     public static String chainedMethodsOn(ChainA a) {
         return a.methodA(1).methodB(2).getText();
+    }
+
+    public static void setSAXReaderProperty(SAXReader reader) throws SAXException {
+        reader.setProperty(SCHEMA_LANGUAGE, SCHEMA_LANGUAGE_VALUE);
     }
 
 }

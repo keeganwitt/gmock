@@ -15,30 +15,19 @@
  */
 package org.gmock.internal;
 
-import groovy.lang.GroovyObject;
 import net.sf.cglib.proxy.CallbackFilter;
 
 import java.lang.reflect.Method;
 
-public class GroovyObjectMethodFilter implements CallbackFilter {
+public class JavaObjectMethodFilter implements CallbackFilter {
 
-    public static final GroovyObjectMethodFilter INSTANCE = new GroovyObjectMethodFilter();
+    public static final JavaObjectMethodFilter INSTANCE = new JavaObjectMethodFilter();
 
-    private GroovyObjectMethodFilter() {
+    private JavaObjectMethodFilter() {
     }
 
     public int accept(Method method) {
-        return hasMethod(GroovyObject.class, method) ? 1 : 0;
-    }
-
-    private boolean hasMethod(Class<?> clazz, Method method) {
-        try {
-            clazz.getMethod(method.getName(), method.getParameterTypes());
-            return true;
-        } catch (NoSuchMethodException e) {
-            return false;
-        }
-
+        return 0;
     }
 
 }

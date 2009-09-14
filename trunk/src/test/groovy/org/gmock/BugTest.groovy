@@ -16,8 +16,12 @@
 package org.gmock
 
 import javax.servlet.http.HttpServletRequest
-import junit.framework.AssertionFailedError
 import javax.sound.sampled.AudioSystem
+import junit.framework.AssertionFailedError
+import org.dom4j.io.SAXReader
+import org.gmock.utils.JavaTestHelper
+import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE
+import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE_VALUE
 
 class BugTest extends GMockTestCase {
 
@@ -47,6 +51,14 @@ class BugTest extends GMockTestCase {
         mock(AudioSystem).static.mixerInfo.returns(null)
         play {
             assertNull AudioSystem.getMixerInfo()
+        }
+    }
+
+    void testPOJOSetProperty() {
+        def m = mock(SAXReader)
+        m.setProperty(SCHEMA_LANGUAGE, SCHEMA_LANGUAGE_VALUE)
+        play {
+            JavaTestHelper.setSAXReaderProperty(m)
         }
     }
 

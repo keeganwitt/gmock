@@ -20,7 +20,9 @@ import net.sf.cglib.proxy.Callback
 import net.sf.cglib.proxy.Enhancer
 import net.sf.cglib.proxy.MethodInterceptor
 import org.gmock.GMockController
+import org.gmock.internal.factory.ChainsSignatureFactory
 import org.gmock.internal.metaclass.ConcreteMockProxyMetaClass
+import org.gmock.internal.metaclass.GeneratedMockProxyMetaClass
 import org.gmock.internal.metaclass.MockProxyMetaClass
 import org.gmock.internal.recorder.ConstructorRecorder
 import org.gmock.internal.recorder.InvokeConstructorRecorder
@@ -28,6 +30,7 @@ import org.gmock.internal.recorder.MockNameRecorder
 import org.gmock.internal.util.WeakIdentityHashMap
 import org.objenesis.ObjenesisHelper
 import org.gmock.internal.*
+import org.gmock.internal.metaclass.GeneratedClassProxyMetaClass
 
 class MockFactory {
 
@@ -188,19 +191,28 @@ class MockFactory {
     }
 
     private mockNonFinalClass(Class clazz, ProxyMetaClass mpmc, InvokeConstructorRecorder invokeConstructorRecorder, mockName) {
-        def groovyMethodInterceptor = new GroovyMethodInterceptor(mpmc)
-        def javaMethodInterceptor = new JavaMethodInterceptor(controller, mpmc, mockName)
+        def groovyClass = GroovyObject.isAssignableFrom(clazz)
 
         def superClass = clazz.isInterface() ? Object : clazz
-        def interfaces = clazz.isInterface() ? [clazz, GroovyObject] : [GroovyObject]
+        def interfaces = clazz.isInterface() ? [clazz] : null
+        def callbackFilter = groovyClass ? GroovyObjectMethodFilter.INSTANCE : JavaObjectMethodFilter.INSTANCE
+        def callbackTypes = groovyClass ? [MethodInterceptor] * 2 : [MethodInterceptor]
+        def callbacks = [new JavaMethodInterceptor(controller, mpmc, mockName)]
+        if (groovyClass) {
+            callbacks << new GroovyMethodInterceptor(mpmc)
+        }
 
-        def enhancer = new Enhancer(superclass: superClass, interfaces: interfaces,
-                callbackFilter: GroovyObjectMethodFilter.INSTANCE,
-                callbackTypes: [MethodInterceptor, MethodInterceptor])
+        def enhancer = new Enhancer(superclass: superClass, interfaces: interfaces, callbackFilter: callbackFilter,
+                callbackTypes: callbackTypes)
         def mockClass = enhancer.createClass()
 
         def mockInstance = newInstance(mockClass, invokeConstructorRecorder)
-        MockHelper.setCallbacksTo(mockInstance, [groovyMethodInterceptor, javaMethodInterceptor] as Callback[])
+        MockHelper.setCallbacksTo(mockInstance, callbacks as Callback[])
+
+        if (!groovyClass) {
+            GeneratedMockProxyMetaClass.startProxy(mockInstance, mpmc)
+            GeneratedClassProxyMetaClass.startProxy(mockClass, clazz)
+        }
 
         return mockInstance
     }
