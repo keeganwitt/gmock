@@ -683,8 +683,7 @@ class FunctionalTest extends GMockTestCase {
     }
 
     void testAssigningANonTypeVariableToATypeVariableGiveBadErrorMessage() {
-        def expected = /Cannot cast object 'Mock for Object' with class 'groovy\.lang\.GroovyObject.*' / +
-                       /to class 'java\.util\.Date'/
+        def expected = /Cannot cast object 'Mock for Object' with class '.*?' to class 'java\.util\.Date'/
         def message = shouldFail(GroovyCastException) {
             Date date = mock()
         }
@@ -692,8 +691,7 @@ class FunctionalTest extends GMockTestCase {
     }
 
     void testAssigningANonTypeVariableToATypeVariableGiveBadErrorMessageWithMockName() {
-        def expected = /Cannot cast object 'now' with class 'groovy\.lang\.GroovyObject.*' / +
-                       /to class 'java\.util\.Date'/
+        def expected = /Cannot cast object 'now' with class '.*?' to class 'java\.util\.Date'/
         def message = shouldFail(GroovyCastException) {
             Date date = mock(name("now"))
         }
