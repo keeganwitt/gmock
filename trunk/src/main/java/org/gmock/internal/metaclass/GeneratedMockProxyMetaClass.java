@@ -21,19 +21,15 @@ import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl;
 import java.beans.IntrospectionException;
 import java.util.List;
 
-public class GeneratedMockProxyMetaClass extends MetaClassImpl implements AdaptingMetaClass {
-
-    private MetaClass adaptee;
+public class GeneratedMockProxyMetaClass extends ProxyMetaClass {
 
     private GeneratedMockProxyMetaClass(MetaClassRegistry registry, Class clazz, MetaClass adaptee) throws IntrospectionException {
-        super(registry, clazz);
-        this.adaptee = adaptee;
+        super(registry, clazz, adaptee);
     }
 
     public static void startProxy(Object object, MetaClass adaptee) throws IntrospectionException {
         MetaClassRegistryImpl registry = (MetaClassRegistryImpl) GroovySystem.getMetaClassRegistry();
         MetaClass metaClass = new GeneratedMockProxyMetaClass(registry, object.getClass(), adaptee);
-        metaClass.initialize();
         registry.setMetaClass(object, metaClass);
     }
 
@@ -43,10 +39,6 @@ public class GeneratedMockProxyMetaClass extends MetaClassImpl implements Adapti
 
     public Object invokeMethod(Object object, String methodName, Object arguments) {
         return adaptee.invokeMethod(object, methodName, arguments);
-    }
-
-    public Object invokeStaticMethod(Object object, String methodName, Object[] arguments) {
-        return adaptee.invokeStaticMethod(object, methodName, arguments);
     }
 
     public Object invokeMethod(final Class sender, final Object receiver, final String methodName, final Object[] arguments, final boolean isCallToSuper, final boolean fromInsideClass) {
@@ -117,36 +109,16 @@ public class GeneratedMockProxyMetaClass extends MetaClassImpl implements Adapti
         return adaptee.getMetaProperty(name);
     }
 
-    public MetaMethod getStaticMetaMethod(String name, Object[] args) {
-        return adaptee.getStaticMetaMethod(name, args);
-    }
-
     public MetaMethod getMetaMethod(String name, Object[] args) {
         return adaptee.getMetaMethod(name, args);
-    }
-
-    public Object invokeConstructor(Object[] arguments) {
-        return adaptee.invokeConstructor(arguments);
     }
 
     public List getMetaMethods() {
         return adaptee.getMetaMethods();
     }
 
-    public int selectConstructorAndTransformArguments(int numberOfConstructors, Object[] arguments) {
-        return adaptee.selectConstructorAndTransformArguments(numberOfConstructors, arguments);
-    }
-
     public MetaMethod pickMethod(final String methodName, final Class[] arguments) {
         return adaptee.pickMethod(methodName, arguments);
-    }
-
-    public MetaClass getAdaptee() {
-        return adaptee;
-    }
-
-    public void setAdaptee(MetaClass metaClass) {
-        adaptee = metaClass;
     }
 
 }
