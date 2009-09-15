@@ -55,7 +55,7 @@ public class GeneratedClassProxyMetaClass extends MetaClassImpl implements Adapt
     }
 
     public MetaClass getAdaptee() {
-        return GroovySystem.getMetaClassRegistry().getMetaClass(adapteeClass);
+        return registry.getMetaClass(adapteeClass);
     }
 
     public void setAdaptee(MetaClass metaClass) {
