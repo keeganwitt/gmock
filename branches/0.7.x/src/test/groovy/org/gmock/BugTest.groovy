@@ -3,6 +3,7 @@ package org.gmock
 import javax.servlet.http.HttpServletRequest
 import junit.framework.AssertionFailedError
 import javax.sound.sampled.AudioSystem
+import org.gmock.utils.Meh
 
 class BugTest extends GMockTestCase {
 
@@ -20,6 +21,16 @@ class BugTest extends GMockTestCase {
         mock(AudioSystem).static.mixerInfo.returns(null)
         play {
             assertNull AudioSystem.getMixerInfo()
+        }
+    }
+
+    void testPartialMockingWithClosure() {
+        def meh = new Meh()
+        ordered {
+            mock(meh).doSomethingElse()
+        }
+        play {
+            meh.doSomething()
         }
     }
 

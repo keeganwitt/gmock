@@ -107,6 +107,14 @@ class ConcreteMockProxyMetaClass extends ProxyMetaClass {
         }
     }
 
+    MetaMethod pickMethod(String methodName, Class[] arguments) {
+        controller.doInternal {
+            adaptee.pickMethod(methodName, arguments)
+        } {
+            return new ProxyMetaMethod(this, methodName, arguments)
+        }
+    }
+
     def startProxy() {
         setMetaClassTo(concreteObject, theClass, this, controller)
     }
