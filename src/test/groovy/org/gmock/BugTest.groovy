@@ -19,7 +19,9 @@ import javax.servlet.http.HttpServletRequest
 import javax.sound.sampled.AudioSystem
 import junit.framework.AssertionFailedError
 import org.dom4j.io.SAXReader
+import org.gmock.GMockTestCase
 import org.gmock.utils.JavaTestHelper
+import org.gmock.utils.Meh
 import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE
 import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE_VALUE
 
@@ -59,6 +61,16 @@ class BugTest extends GMockTestCase {
         m.setProperty(SCHEMA_LANGUAGE, SCHEMA_LANGUAGE_VALUE)
         play {
             JavaTestHelper.setSAXReaderProperty(m)
+        }
+    }
+
+    void testPartialMockingWithClosure() {
+        def meh = new Meh()
+        ordered {
+            mock(meh).doSomethingElse()
+        }
+        play {
+            meh.doSomething()
         }
     }
 

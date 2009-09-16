@@ -16,6 +16,7 @@
 package org.gmock.internal.metaclass;
 
 import groovy.lang.GroovySystem;
+import groovy.lang.MetaMethod;
 import groovy.lang.ProxyMetaClass;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.InvokerHelper;
@@ -127,6 +128,18 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
                     mock.setMockProperty(receiver, property, value);
                 }
                 return null;
+            }
+        });
+    }
+
+    public MetaMethod pickMethod(final String methodName, final Class[] arguments) {
+        return (MetaMethod) controller.doInternal(new Callable() {
+            public Object call() {
+                return adaptee.pickMethod(methodName, arguments);
+            }
+        }, new Callable() {
+            public Object call() {
+                return new ProxyMetaMethod(ConcreteMockProxyMetaClass.this, methodName, arguments);
             }
         });
     }
