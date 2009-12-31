@@ -185,7 +185,7 @@ class InternalMockController {
         Order backup = this.order
         try {
             this.order = order
-            if (mockDelegate) {
+            if (mockDelegate != null) {
                 closure.resolveStrategy = Closure.DELEGATE_FIRST
                 closure.delegate = mockDelegate
             }
