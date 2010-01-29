@@ -27,7 +27,7 @@ import org.gmock.GMockTestCase
 
 class GMockWithGrabTest extends GMockTestCase {
     void testMock() {
-        def m = mock()
+        def m = mock() // mocks successfully
         m.fun()
         play {
             m.fun()
