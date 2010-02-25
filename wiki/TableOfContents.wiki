@@ -2,6 +2,7 @@
 
   * Usage
     * [Documentation_0_8 Documentation for Gmock 0.8]
+    * [GrailsUser Grails User]
     * [MavenUser Maven User]
     * [GmockWithGrab Gmock with @Grab]
   * Comparison
