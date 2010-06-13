@@ -61,12 +61,12 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
     }
 
     public void addConstructorExpectation(Expectation expectation) {
-        addToExpectations(expectation, constructorExpectations, controller);
+        controller.addToExpectations(expectation, constructorExpectations);
         constructorExpectationsEmpty = false;
     }
 
     public void addStaticExpectation(Expectation expectation) {
-        addToExpectations(expectation, staticExpectations, controller);
+        controller.addToExpectations(expectation, staticExpectations);
         staticExpectationsEmpty = false;
     }
 

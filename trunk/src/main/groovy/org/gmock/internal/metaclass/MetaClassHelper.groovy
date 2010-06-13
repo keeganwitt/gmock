@@ -18,7 +18,7 @@ package org.gmock.internal.metaclass
 class MetaClassHelper {
 
     static Object findExpectation(expectations, signature, message, mock, method, arguments, controller) {
-        def expectation = controller.orderedExpectations.findMatching(signature) ?: expectations.findMatching(signature)
+        def expectation = controller.orderingController.orderedExpectations.findMatching(signature) ?: expectations.findMatching(signature)
         if (expectation){
             return expectation.answer(mock, method, arguments)
         } else {
@@ -26,13 +26,6 @@ class MetaClassHelper {
         }
     }
 
-    static addToExpectations(expectation, expectations, controller) {
-        if (!controller.ordered) {
-            controller.unorderedExpectations.add(expectation, expectations)
-        } else {
-            controller.orderedExpectations.add(expectation)
-        }
-    }
 
     static String getGetterMethodName(String property) {
         'get' + capitalize(property)

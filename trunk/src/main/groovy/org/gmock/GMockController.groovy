@@ -19,26 +19,30 @@ import org.gmock.internal.InternalMockController
 
 class GMockController {
 
-    private internalMockController = new InternalMockController()
+  private InternalMockController internalMockController = new InternalMockController()
 
-    def mock(Object... args) {
-        internalMockController.mock(*args)
-    }
+  def mock(Object ... args) {
+    internalMockController.mock(* args)
+  }
 
-    def play(Closure closure) {
-        internalMockController.play(closure)
-    }
+  def play(Closure closure) {
+    internalMockController.play(closure)
+  }
 
-    def with(mock, Closure withClosure) {
-        internalMockController.with(mock, withClosure)
-    }
+  def with(mock, Closure withClosure) {
+    internalMockController.with(mock, withClosure)
+  }
 
-    def ordered(Closure orderedClosure) {
-        internalMockController.ordered(orderedClosure)
-    }
+  def ordered(Closure orderedClosure) {
+    internalMockController.ordered(orderedClosure)
+  }
 
-    def unordered(Closure unorderedClosure) {
-        internalMockController.unordered(unorderedClosure)
-    }
+  def unordered(Closure unorderedClosure) {
+    internalMockController.unordered(unorderedClosure)
+  }
+
+  def invoke(Closure expectation){
+    internalMockController.invoke(expectation)
+  }
 
 }

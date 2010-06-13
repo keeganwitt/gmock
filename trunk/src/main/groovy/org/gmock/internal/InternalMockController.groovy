@@ -27,17 +27,16 @@ import org.gmock.internal.recorder.MockNameRecorder
 
 class InternalMockController {
 
-    def mockFactory
+    MockFactory mockFactory
 
     def mockCollection = []
     def mockCount = 0
     def concreteMocks = []
     def classExpectations = new ClassExpectations(this)
-    def orderedExpectations = new OrderedExpectations(this)
-    def unorderedExpectations = new UnorderedExpectations(this)
+
+    OrderingController orderingController = new OrderingController(this)
 
     boolean replay = false
-    Order order = Order.NONE
     def mockDelegate = null
 
     // while running in internal mode, we should not mock any methods, instead, we should invoke the original implements
@@ -47,18 +46,6 @@ class InternalMockController {
 
     InternalMockController(){
         mockFactory = new MockFactory(this, mockCollection)
-    }
-
-    boolean isOrdered() {
-        order != Order.NONE
-    }
-
-    boolean isStrictOrdered() {
-        order == Order.STRICT
-    }
-
-    boolean isLooseOrdered() {
-        order == Order.LOOSE
     }
 
     def mock(Class clazz = Object, Object ... args) {
@@ -116,13 +103,13 @@ class InternalMockController {
             if (replay) {
                 throw new IllegalStateException("Cannot nest play closures.")
             }
-            if (ordered) {
+            if (orderingController.ordered) {
                 throw new IllegalStateException("Play closures cannot be inside ordered closure.")
             }
 
             mockCollection*.validate()
             classExpectations.validate()
-            orderedExpectations.validate()
+            orderingController.validate()
             mockCollection*.replay()
             concreteMocks*.startProxy()
             classExpectations.startProxy()
@@ -141,14 +128,13 @@ class InternalMockController {
             doInternal {
                 mockCollection*.verify()
                 classExpectations.verify()
-                orderedExpectations.verify()
+                orderingController.verify()
             }
         } finally {
             doInternal {
                 mockCollection*.reset()
                 classExpectations.reset()
-                orderedExpectations.reset()
-                unorderedExpectations.reset()
+                orderingController.reset()
             }
         }
     }
@@ -158,42 +144,17 @@ class InternalMockController {
     }
 
     def ordered(Closure orderedClosure) {
-        if (ordered) {
-            throw new IllegalStateException("Cannot nest ordered closures.")
-        }
-        if (replay) {
-            throw new IllegalStateException("Ordered closures cannot be inside play closure.")
-        }
-
-        orderedExpectations.newStrictGroup()
-        callClosureWithMockDelegate(orderedClosure, Order.STRICT)
+      orderingController.ordered(orderedClosure)
     }
 
     def unordered(Closure unorderedClosure) {
-        if (looseOrdered) {
-            throw new IllegalStateException("Cannot nest unordered closures.")
-        }
-        if (!strictOrdered) {
-            throw new IllegalStateException("Unordered closures can only be inside ordered closure.")
-        }
-
-        orderedExpectations.newLooseGroup()
-        callClosureWithMockDelegate(unorderedClosure, Order.LOOSE)
+      orderingController.unordered(unorderedClosure)
     }
 
-    private def callClosureWithMockDelegate(Closure closure, Order order) {
-        Order backup = this.order
-        try {
-            this.order = order
-            if (mockDelegate != null) {
-                closure.resolveStrategy = Closure.DELEGATE_FIRST
-                closure.delegate = mockDelegate
-            }
-            closure(mockDelegate)
-        } finally {
-            this.order = backup
-        }
-    }
+    def addToExpectations(expectation, expectations) {
+      orderingController.addToExpectations(expectation, expectations)
+    }  
+
 
     def fail(message, signature = null) {
         def callState = callState(signature).toString()
@@ -203,9 +164,9 @@ class InternalMockController {
     }
 
     private callState(signature) {
-        def callState = new CallState(mockCount > 1, !orderedExpectations.empty)
-        orderedExpectations.appendToCallState(callState)
-        unorderedExpectations.appendToCallState(callState)
+        def callState = new CallState(mockCount > 1, !orderingController.orderedExpectations.empty)
+        orderingController.orderedExpectations.appendToCallState(callState)
+        orderingController.unorderedExpectations.appendToCallState(callState)
         if (signature) {
             callState.nowCalling(signature)
         }
@@ -240,4 +201,3 @@ class InternalMockController {
 
 }
 
-enum Order {NONE, STRICT, LOOSE}
