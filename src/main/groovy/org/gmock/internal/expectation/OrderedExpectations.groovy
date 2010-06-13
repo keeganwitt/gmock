@@ -89,7 +89,7 @@ class StrictGroup {
     }
 
     def add(expectation) {
-        if (controller.strictOrdered) {
+        if (controller.orderingController.strictOrdered) {
             expectation.signatureObserver = this
             expectation.expectations = this
             expectations << expectation

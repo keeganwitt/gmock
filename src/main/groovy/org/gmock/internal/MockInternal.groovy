@@ -87,7 +87,7 @@ class MockInternal {
                 return null
             } else {
                 def expectation = new Expectation(signature: signature)
-                addToExpectations(expectation, expectations, controller)
+                controller.addToExpectations(expectation, expectations)
                 return new MethodRecorder(expectation)
             }
         }
@@ -116,7 +116,7 @@ class MockInternal {
                 return new StaticRecoder(clazz, classExpectations)
             } else {
                 def expectation = new Expectation(signature: new PropertySignature(this, property))
-                addToExpectations(expectation, expectations, controller)
+                controller.addToExpectations(expectation, expectations)
                 return new PropertyRecorder(expectation)
             }
         }
@@ -133,7 +133,7 @@ class MockInternal {
     }
 
     def findSignature(signature) {
-        return controller.orderedExpectations.findSignature(signature) ?: expectations.findSignature(signature)
+        return controller.orderingController.orderedExpectations.findSignature(signature) ?: expectations.findSignature(signature)
     }
 
 }
