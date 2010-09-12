@@ -30,6 +30,7 @@ import org.gmock.internal.signature.MethodSignature
 import org.gmock.internal.signature.PropertySignature
 import org.gmock.internal.times.AnyTimes
 import static org.gmock.internal.metaclass.MetaClassHelper.*
+import org.gmock.internal.result.AsBooleanDefaultBehavior
 
 class MockInternal {
 
@@ -65,6 +66,7 @@ class MockInternal {
         addMethodDefaultBehavior("equals", [AlwaysMatchMatcher.INSTANCE], new EqualsDefaultBehavior())
         addMethodDefaultBehavior("hashCode", [], new HashCodeDefaultBehavior())
         addMethodDefaultBehavior("toString", [], new ToStringDefaultBehavior(mockName))
+        addMethodDefaultBehavior("asBoolean", [], new AsBooleanDefaultBehavior())
     }
 
     private addMethodDefaultBehavior(methodName, arguments, result) {

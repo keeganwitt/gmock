@@ -49,6 +49,16 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
         }
     }
 
+    void testAsBoolean(){
+      def m = mock()
+
+      play {
+          if (!m){
+            fail("Not null should be considered true")
+          }
+      }
+    }
+
     void testHashCodeInJava() {
         def m = mock()
         play {
