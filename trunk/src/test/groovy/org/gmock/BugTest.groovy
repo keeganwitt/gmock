@@ -24,6 +24,7 @@ import org.gmock.utils.JavaTestHelper
 import org.gmock.utils.Meh
 import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE
 import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE_VALUE
+import org.gmock.utils.Echo
 
 class BugTest extends GMockTestCase {
 
@@ -73,5 +74,19 @@ class BugTest extends GMockTestCase {
             meh.doSomething()
         }
     }
+
+
+    void testAsStringThrowANullPointerException() {
+        def mockOutput = mock()
+        mockOutput.print(["stuff"] as String[])
+
+        play {
+            def echo = new Echo()
+            echo.output = mockOutput
+            echo.echo(["stuff"])
+        }
+    }
+
+
 
 }

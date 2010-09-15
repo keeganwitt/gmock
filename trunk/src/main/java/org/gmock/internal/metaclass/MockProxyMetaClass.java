@@ -21,6 +21,7 @@ import groovy.lang.ProxyMetaClass;
 import org.gmock.internal.Callable;
 import org.gmock.internal.InternalMockController;
 import org.gmock.internal.MockInternal;
+import org.codehaus.groovy.runtime.wrappers.PojoWrapper;
 
 import java.beans.IntrospectionException;
 
@@ -40,6 +41,7 @@ public class MockProxyMetaClass extends ProxyMetaClass {
     }
 
     public Object invokeMethod(final Class sender, final Object receiver, final String methodName, final Object[] arguments, final boolean isCallToSuper, final boolean fromInsideClass) {
+        unWrappArguments(arguments);
         return controller.doInternal(new Callable() {
             public Object call() {
                 return adaptee.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass);
@@ -99,6 +101,16 @@ public class MockProxyMetaClass extends ProxyMetaClass {
 
     public MockInternal getMock() {
         return mock;
+    }
+
+
+    private void unWrappArguments(Object[] arguments){
+        for (int i=0; i<arguments.length; i++){
+            if (arguments[i] instanceof PojoWrapper){
+                PojoWrapper wrapper = (PojoWrapper) arguments[i];
+                arguments[i] = wrapper.unwrap();
+            }
+        }
     }
 
 }
