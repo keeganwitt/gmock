@@ -1,0 +1,18 @@
+dependencies {
+    testCompile "org.testng:testng:5.8:jdk15",
+                project(':')
+}
+
+createTask('test', overwrite: true, dependsOn: 'testCompile') {
+    ant {
+        taskdef(resource: 'testngtasks', classpath: dependencies.antpath('testCompile'))
+        testng(outputDir: testReportDir, haltOnFailure: "true", verbose: "2") {
+            classpath {
+                pathelement(path: dependencies.antpath('testRuntime'))
+                pathelement(location: classesDir)
+                pathelement(location: testClassesDir)
+            }
+            classfileset(dir: testClassesDir, includes: "**/*Test.class")
+        }
+    }
+}
