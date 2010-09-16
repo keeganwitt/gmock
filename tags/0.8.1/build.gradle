@@ -1,0 +1,175 @@
+usePlugin('groovy')
+usePlugin('maven')
+
+group = 'org.gmock'
+version = '0.8.0'
+archivesBaseName = 'gmock'
+
+sourceCompatibility = 1.5
+targetCompatibility = 1.5
+
+srcDirNames = []
+groovySrcDirNames = ['main/java', 'main/groovy']
+
+groovyVersion = '1.6.1'
+junitVersion = '4.5'
+
+dependencies {
+    addConfiguration 'jarjar'
+    addConfiguration 'jarjarify'
+    addConfiguration 'deployerJars'
+
+    addMavenRepo()
+    addMavenStyleRepo('JBossRepo', 'http://repository.jboss.org/maven2/')
+
+    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
+    compile "junit:junit:$junitVersion"
+    testCompile 'org.hamcrest:hamcrest-library:1.1',
+                'org.testng:testng:5.8:jdk15'
+
+    jarjar 'com.google.code:jarjar:1.0'
+    jarjarify 'cglib:cglib:2.2',
+              'org.objenesis:objenesis:1.1'
+    deployerJars "org.apache.maven.wagon:wagon-ssh:1.0-beta-2"
+
+    linkConfWithTask 'testCompile', 'integrationTestCompile'
+    linkConfWithTask 'testRuntime', 'integrationTest'
+}
+
+if (System.getProperty('release') == null) {
+    version += '-SNAPSHOT'
+}
+
+archivePaths = libs.archiveTasks*.archivePath
+integrationTestClassesDir = file("$buildDir/integration-test-classes")
+integrationTestResultsDir = file("$buildDir/integration-test-results")
+integrationTestReportDir = file("$buildDir/$reportsDirName/integration-tests")
+docsTemplateDir = file(docsDirName)
+templateFile = file("$docsTemplateDir/template.gsp")
+docFile = file("$docsDir/index.html")
+
+
+install {
+    uploadResolvers.get('maven-installer').artifactPomContainer = [
+        addArtifact: { org.apache.ivy.core.module.descriptor.Artifact artifact, File src -> artifactFile = src },
+        createDeployableUnits: { List dependencies -> [(pomFile): artifactFile] }
+    ] as org.gradle.api.internal.dependencies.maven.deploy.ArtifactPomContainer
+}
+
+uploadLibs {
+    uploadResolvers.addMavenDeployer('maven-deployer') {
+        repository(url: "scp://gmock.org/home/rsync/gmock/releases"){
+           authentication(userName: "rsync")
+        }
+        addProtocolProviderJars(dependencies.resolve('deployerJars'))
+    }
+}
+
+dists {
+    zip(classifier: 'all') {
+        fileSet(dir: rootDir) {
+            include('src/**', 'apache-license-2.0.txt', 'samples/*/pom.xml', 'samples/*/src/**')
+        }
+        fileSet(dir: buildDir) {
+            include('docs/**')
+        }
+        files(archivePaths as File[])
+    }
+}
+
+[compile, test]*.doFirst {
+    it.unmanagedClasspath = dependencies.jarjarify.files.toList()
+}
+
+libs.archiveTasks*.doFirst {
+    ant.delete(file: it.archivePath)
+}
+
+getTasksDependingOn(libs)*.dependsOn 'integrationTest'
+install.dependsOn 'generatePom'
+dists.archiveTasks*.dependsOn ':samples:cache:test',
+                              ':samples:collaborator:test',
+                              'generateDoc'
+
+createTask('generatePom') {
+    pomFile = file("$buildDir/pom.xml")
+    ant {
+        filter(token: 'gmockVersion', value: version)
+        filter(token: 'groovyVersion', value: groovyVersion)
+        filter(token: 'junitVersion', value: junitVersion)
+        copy(file: file('pom.xml'), tofile: pomFile, overwrite: 'true', filtering: 'true')
+    }
+}
+
+createTask('jarjarify', dependsOn: 'libs') {
+    archivePath = archive_jar.archivePath
+    tmpArchivePath = "${archivePath}.tmp"
+    ant {
+        move(file: archivePath, tofile: tmpArchivePath)
+        taskdef(name: 'jarjar', classname: 'com.tonicsystems.jarjar.JarJarTask', classpath: dependencies.antpath('jarjar'))
+        jarjar(jarfile: archivePath) {
+            zipfileset(src: tmpArchivePath)
+            dependencies.jarjarify.each {
+                zipfileset(src: it) {
+                    include(name: '**/*.class')
+                }
+            }
+            rule(pattern: "net.sf.cglib.**", result: "org.gmock.internal.cglib.@1")
+            rule(pattern: "org.objenesis.**", result: "org.gmock.internal.objenesis.@1")
+            rule(pattern: "org.objectweb.asm.**", result: "org.gmock.internal.asm.@1")
+        }
+        delete(file: tmpArchivePath)
+    }
+}
+
+createTask('integrationTestCompile', dependsOn: 'jarjarify', type: GroovyCompile).configure {
+    srcDirs = testSrcDirs
+    groovySourceDirs = groovyTestSrcDirs
+    groovyClasspath = dependencies.resolve('groovy')
+    destinationDir = integrationTestClassesDir
+    sourceCompatibility = project.sourceCompatibility
+    targetCompatibility = project.targetCompatibility
+    unmanagedClasspath = archivePaths
+    dependencyManager = dependencies
+    skipProperties << 'skip.test'
+}
+
+createTask('integrationTest', dependsOn: 'integrationTestCompile', type: Test).configure {
+    options.fork = true
+    options.forkOptions.forkMode = ForkMode.ONCE
+    options.forkOptions.dir = projectDir
+    include("**/*Tests.class", "**/*Test.class")
+    exclude("**/Abstract*.class")
+    testClassesDir = integrationTestClassesDir
+    testResultsDir = integrationTestResultsDir
+    testReportDir = integrationTestReportDir
+    unmanagedClasspath = archivePaths
+    dependencyManager = dependencies
+    skipProperties << 'skip.test'
+}
+
+createTask('generateDoc', dependsOn: dir("$buildDirName/$docsDirName")) {
+    ant {
+        copy(todir: docsDir, overwrite: 'true') {
+            fileset(dir: docsTemplateDir, excludes: "**/*template*")
+        }
+    }
+
+    def wiki = "http://gmock.googlecode.com/svn/wiki/Documentation_${version[0]}_${version[2]}.wiki".toURL().text
+    def converter = new org.gmock.build.wiki.GoogleCodeWikiConverter()
+    def binding = [content: converter.convert(wiki), catalog: converter.catalog, version: version]
+    def engine = new groovy.text.SimpleTemplateEngine()
+    def template = engine.createTemplate(templateFile).make(binding)
+    docFile.withPrintWriter { template.writeTo(it) }
+}
+
+defaultTasks ':test'
+
+
+
+def getTasksDependingOn(theTask) {
+    tasks.findAll { name, task -> theTask in task.taskDependencies.getDependencies(task) }.values()
+}
+
+
+//tasks.findAll { it.key.toLowerCase().contains('test') }*.value*.enabled = false
