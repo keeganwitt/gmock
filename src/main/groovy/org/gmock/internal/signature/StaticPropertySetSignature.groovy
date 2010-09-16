@@ -18,20 +18,14 @@ package org.gmock.internal.signature
 class StaticPropertySetSignature extends BasePropertySetSignature {
 
     Class clazz
-    @Delegate StaticPropertySignature propertySignature
 
     StaticPropertySetSignature(clazz, setterName, arguments) {
         super(setterName, arguments)
         this.clazz = clazz
-        propertySignature = new StaticPropertySignature(clazz, setterName)
     }
 
-    String toString() {
-        "${clazz.simpleName}.$setterName = $arguments"
-    }
-
-    String toString(boolean showMockName) {
-        "'${toString()}'"
+    String toString(boolean showMockName = false) {
+        "'${clazz.simpleName}.$setterName = $arguments'"
     }
 
     boolean equals(Object signature) {

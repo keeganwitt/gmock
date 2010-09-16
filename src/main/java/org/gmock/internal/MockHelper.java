@@ -27,8 +27,4 @@ public class MockHelper {
         object.setCallbacks(callbacks);
     }
 
-    public static Class<?> getClassOfObject(Object object) {
-        return object.getClass();
-    }
-
 }

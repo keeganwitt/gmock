@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.result
+package org.gmock.internal.recorder
 
-import org.gmock.internal.Result
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
+import org.gmock.internal.signature.StaticPropertyGetSignature
+import org.gmock.internal.signature.StaticPropertySetSignature
+import org.gmock.internal.signature.StaticPropertyUncompleteSignature
 
-class EqualsDefaultBehavior implements Result {
+class StaticPropertyRecorder extends PropertyRecorder {
 
-    def mock
-
-    EqualsDefaultBehavior(mock) {
-        this.mock = mock
-    }
-
-    def answer(Object[] arguments) {
-        return DefaultGroovyMethods.is(mock, arguments[0])
+    StaticPropertyRecorder(clazz, property, expectation) {
+        super(clazz, property, expectation, StaticPropertyUncompleteSignature, StaticPropertySetSignature, StaticPropertyGetSignature)
     }
 
 }

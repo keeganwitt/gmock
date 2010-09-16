@@ -49,16 +49,6 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
         }
     }
 
-    void testAsBoolean(){
-      def m = mock()
-
-      play {
-          if (!m){
-            fail("Not null should be considered true")
-          }
-      }
-    }
-
     void testHashCodeInJava() {
         def m = mock()
         play {
@@ -174,13 +164,6 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
             assertEquals 'Mock for Date (2)', JavaTestHelper.toStringOn(m4)
             assertEquals 'Mock for Date (3)', JavaTestHelper.toStringOn(m5)
         }
-    }
-
-    void testDefaultBehaviorsInRecordStage() {
-        def m = mock()
-        assertEquals 'Mock for Object', JavaTestHelper.toStringOn(m)
-        assertEquals System.identityHashCode(m), JavaTestHelper.hashCodeOf(m)
-        assertTrue JavaTestHelper.equalsToEachOther(m, m)
     }
 
 }

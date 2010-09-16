@@ -16,7 +16,9 @@
 package org.gmock
 
 import junit.framework.AssertionFailedError
-import org.gmock.utils.*
+import org.gmock.utils.JavaCache
+import org.gmock.utils.JavaLoader
+import org.gmock.utils.Loader
 import static org.hamcrest.Matchers.greaterThan
 import static org.hamcrest.Matchers.greaterThanOrEqualTo
 
@@ -170,6 +172,19 @@ class FunctionnalConstructorsTest extends GMockTestCase {
         }
     }
 
+    void testOldStyleConstructorStillWork(){
+        Date now = new Date()
+        def mockLoader1 = mock(Loader, constructor: ["1", "2"])
+        def mockLoader2 = mock(Loader, constructor: [now])
+
+        play {
+            def epectedLoader2 = new Loader(now)
+            def epectedLoader1 = new Loader("1", "2")
+            assertSame epectedLoader1, mockLoader1
+            assertSame epectedLoader2, mockLoader2
+        }
+    }
+
     void testInvokeOriginalConstructor() {
         JavaLoader mock = mock(JavaLoader, invokeConstructor("loader"))
         mock.getName().returns("name")
@@ -201,29 +216,6 @@ class FunctionnalConstructorsTest extends GMockTestCase {
             def cache = new JavaCache(new JavaLoader("name"))
             assertEquals "name", mock.getName()
             assertEquals "loader", cache.getLoaderName()
-        }
-    }
-
-    void testCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
-        def createGroovyLoader = { ->
-            new GroovyLoader()
-        }
-        mock(GroovyLoader, constructor()).load('a').returns('b')
-        play {
-            assertEquals 'b', createGroovyLoader().load('a')
-        }
-        mock(GroovyLoader, constructor()).load('a').returns('b')
-        assertEquals 'a', createGroovyLoader().load('a')
-    }
-
-    void testCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
-        def createGroovyLoader = { ->
-            new GroovyLoader()
-        }
-        mock(GroovyLoader, constructor()).load('a').returns('b')
-        assertEquals 'a', createGroovyLoader().load('a')
-        play {
-            assertEquals 'b', createGroovyLoader().load('a')
         }
     }
 

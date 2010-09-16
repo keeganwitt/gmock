@@ -28,7 +28,7 @@ public class GroovyObjectMethodFilter implements CallbackFilter {
     }
 
     public int accept(Method method) {
-        return hasMethod(GroovyObject.class, method) ? 1 : 0;
+        return hasMethod(GroovyObject.class, method) ? 0 : 1;
     }
 
     private boolean hasMethod(Class<?> clazz, Method method) {

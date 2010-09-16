@@ -29,12 +29,8 @@ class MethodSignature extends BaseMethodSignature {
         this.object = object
     }
 
-    String toString() {
-        "$methodName($arguments)"
-    }
-
-    String toString(boolean showMockName, String postfix = '') {
-        "'${toString()}$postfix'${object.mockName.toString(showMockName)}"
+    String toString(boolean showMockName = false) {
+        "'$methodName($arguments)'${object.mockName.toString(showMockName)}"
     }
 
     boolean equals(Object signature) {

@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.result
+package org.gmock.internal;
 
-import org.gmock.internal.Result
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
+public interface MockController {
 
-class EqualsDefaultBehavior implements Result {
+    boolean getReplay();
 
-    def mock
-
-    EqualsDefaultBehavior(mock) {
-        this.mock = mock
-    }
-
-    def answer(Object[] arguments) {
-        return DefaultGroovyMethods.is(mock, arguments[0])
-    }
+    boolean getInternal();
 
 }

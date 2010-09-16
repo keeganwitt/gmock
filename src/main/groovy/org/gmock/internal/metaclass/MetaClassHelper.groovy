@@ -17,26 +17,40 @@ package org.gmock.internal.metaclass
 
 class MetaClassHelper {
 
-    static Object findExpectation(expectations, signature, message, mock, method, arguments, controller) {
-        def expectation = controller.orderingController.orderedExpectations.findMatching(signature) ?: expectations.findMatching(signature)
+    static findExpectation(expectations, signature, message, arguments, controller) {
+        def expectation = controller.orderedExpectations.findMatching(signature) ?: expectations.findMatching(signature)
         if (expectation){
-            return expectation.answer(mock, method, arguments)
+            return expectation.answer(arguments)
         } else {
             controller.fail(message, signature)
         }
     }
 
-
-    static String getGetterMethodName(String property) {
-        'get' + capitalize(property)
+    static addToExpectations(expectation, expectations, controller) {
+        if (!controller.ordered) {
+            controller.unorderedExpectations.add(expectation, expectations)
+        } else {
+            controller.orderedExpectations.add(expectation)
+        }
     }
 
-    static String getSetterMethodName(String property) {
-        'set' + capitalize(property)
+    static setMetaClassTo(object, Class clazz, MetaClass mc, controller) {
+        if (GroovyObject.isInstance(object)) {
+            object.metaClass = mc
+        } else {
+            def dpmc = DispatcherProxyMetaClass.getInstance(clazz)
+            dpmc.controller = controller
+            dpmc.setMetaClassForInstance(object, mc)
+        }
     }
 
-    private static capitalize(String s) {
-        s[0].toUpperCase() + s.substring(1)
+    static getMetaClassFrom(object) {
+        def metaClass = object.metaClass
+        if (metaClass instanceof DispatcherProxyMetaClass) {
+            return metaClass.getMetaClassForInstance(object)
+        } else {
+            return metaClass
+        }
     }
 
 }

@@ -543,27 +543,4 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         }
     }
 
-    void testCallSiteShouldBeUpdatedAfterTheOriginalMetaClassIsRestored() {
-        def loaderOne = { ->
-            Loader.one()
-        }
-        mock(Loader).static.one().returns(2)
-        play {
-            assertEquals 2, loaderOne()
-        }
-        mock(Loader).static.one().returns(2)
-        assertEquals 1, loaderOne()
-    }
-
-    void testCallSiteShouldBeUpdatedAfterTheProxyMetaClassIsSet() {
-        def loaderOne = { ->
-            Loader.one()
-        }
-        mock(Loader).static.one().returns(2)
-        assertEquals 1, loaderOne()
-        play {
-            assertEquals 2, loaderOne()
-        }
-    }
-
 }

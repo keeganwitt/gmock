@@ -17,7 +17,6 @@ package org.gmock.utils
 
 class FakeTagLib {
 
-    public String field = 'field'
 
     def hello = { attrs ->
         out << "hello"

@@ -22,8 +22,8 @@ import org.codehaus.groovy.reflection.ReflectionCache
 class ProxyMetaMethod extends MetaMethod {
 
     private MetaClass theMetaClass
-    private String name
-    private CachedClass declaringClass
+    String name
+    CachedClass declaringClass
 
     ProxyMetaMethod(MetaClass metaClass, String name, Class[] parameterTypes) {
         super(parameterTypes)
@@ -39,14 +39,6 @@ class ProxyMetaMethod extends MetaMethod {
 
     Class getReturnType() {
         Object
-    }
-
-    CachedClass getDeclaringClass() {
-        declaringClass
-    }
-
-    String getName() {
-        name
     }
 
     Object invoke(Object object, Object[] arguments) {

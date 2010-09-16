@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gmock.internal.result
+package org.gmock.internal.signature
 
-import org.gmock.internal.Result
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
+class PropertyUncompleteSignature {
 
-class EqualsDefaultBehavior implements Result {
+    def object
+    def propertyName
 
-    def mock
-
-    EqualsDefaultBehavior(mock) {
-        this.mock = mock
+    PropertyUncompleteSignature(object, propertyName) {
+        this.object = object
+        this.propertyName = propertyName
     }
 
-    def answer(Object[] arguments) {
-        return DefaultGroovyMethods.is(mock, arguments[0])
+    def validate(){
+        throw new IllegalStateException("Missing property expectation for '$propertyName' on '$object.mockName'")
     }
 
 }

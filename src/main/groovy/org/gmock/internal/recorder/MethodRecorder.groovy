@@ -57,10 +57,6 @@ class MethodDuplicateRecorder extends MethodRecorder {
         return super.returns(value)
     }
 
-    def chains() {
-        throw new MissingMethodException('chains', this.class, [])
-    }
-
     def raises(Throwable exception) {
         expectation = expectation.duplicate()
         return super.raises(exception)

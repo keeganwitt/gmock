@@ -15,39 +15,36 @@
  */
 package org.gmock.internal
 
-import org.gmock.internal.MockDelegate
+import org.gmock.internal.signature.MethodSignature
+import org.gmock.internal.result.ToStringDefaultBehavior
+import org.gmock.internal.result.HashCodeDefaultBehavior
+import org.gmock.internal.result.EqualsDefaultBehavior
+import org.gmock.internal.matcher.AlwaysMatchMatcher
+import org.gmock.internal.times.AnyTimes
+import org.gmock.internal.recorder.MethodRecorder
+import static org.gmock.internal.metaclass.MetaClassHelper.*
+import org.gmock.internal.recorder.StaticMethodRecoder
+import org.gmock.internal.signature.PropertyGetSignature
+import org.gmock.internal.recorder.PropertyRecorder
+import org.gmock.internal.signature.PropertySetSignature
 import org.gmock.internal.expectation.Expectation
 import org.gmock.internal.expectation.ExpectationCollection
-import org.gmock.internal.factory.DefaultSignatureFactory
-import org.gmock.internal.matcher.AlwaysMatchMatcher
-import org.gmock.internal.recorder.MethodRecorder
-import org.gmock.internal.recorder.PropertyRecorder
-import org.gmock.internal.recorder.StaticRecoder
-import org.gmock.internal.result.EqualsDefaultBehavior
-import org.gmock.internal.result.HashCodeDefaultBehavior
-import org.gmock.internal.result.ToStringDefaultBehavior
-import org.gmock.internal.signature.MethodSignature
-import org.gmock.internal.signature.PropertySignature
-import org.gmock.internal.times.AnyTimes
-import static org.gmock.internal.metaclass.MetaClassHelper.*
-import org.gmock.internal.result.AsBooleanDefaultBehavior
 
 class MockInternal {
 
     def expectations
+    def mockInstance
     def controller
+    def mockProxyMetaClass
     def mockName
-    def clazz
-    def classExpectations
-    def signatureFactory
 
-    MockInternal(controller, mockName, clazz, classExpectations, signatureFactory = new DefaultSignatureFactory()) {
+    MockInternal(controller, mockInstance, mockName, mockProxyMetaClass){
         this.expectations = new ExpectationCollection(controller)
         this.controller = controller
         this.mockName = mockName
-        this.clazz = clazz
-        this.classExpectations = classExpectations
-        this.signatureFactory = signatureFactory
+        this.mockProxyMetaClass = mockProxyMetaClass
+        this.mockInstance = mockInstance
+        mockProxyMetaClass.mock = this
     }
 
     void verify(){
@@ -63,40 +60,38 @@ class MockInternal {
     }
 
     void replay() {
-        addMethodDefaultBehavior("equals", [AlwaysMatchMatcher.INSTANCE], new EqualsDefaultBehavior())
-        addMethodDefaultBehavior("hashCode", [], new HashCodeDefaultBehavior())
+        addMethodDefaultBehavior("equals", [AlwaysMatchMatcher.INSTANCE], new EqualsDefaultBehavior(mockInstance))
+        addMethodDefaultBehavior("hashCode", [], new HashCodeDefaultBehavior(mockInstance))
         addMethodDefaultBehavior("toString", [], new ToStringDefaultBehavior(mockName))
-        addMethodDefaultBehavior("asBoolean", [], new AsBooleanDefaultBehavior())
     }
 
     private addMethodDefaultBehavior(methodName, arguments, result) {
-        def signature = new MethodSignature(this, methodName, arguments)
-        if (!findSignature(signature)) {
+        def signature = new MethodSignature(mockProxyMetaClass, methodName, arguments)
+        if (!expectations.findSignature(signature) && !controller.orderedExpectations.findSignature(signature)) {
             def expectation = new Expectation(signature: signature, result: result, times: AnyTimes.INSTANCE, hidden: true)
             expectations.add(expectation)
         }
     }
 
-    Object invokeMockMethod(Object mockObject, String methodName, Object[] arguments) {
+
+    Object invokeMockMethod(String methodName, Object[] arguments) {
+        def signature = new MethodSignature(mockProxyMetaClass, methodName, arguments)
         if (controller.replay){
-            def signature = signatureFactory.createMethodSignature(this, methodName, arguments)
-            def result = findExpectation(expectations, signature, "Unexpected method call", mockObject, methodName, arguments, controller)
+            def result =  findExpectation(expectations, signature, "Unexpected method call", arguments, controller)
             return result
         } else {
-            def signature = new MethodSignature(this, methodName, arguments)
             if (methodName == "static" && arguments.length == 1 && arguments[0] instanceof Closure) {
                 invokeStaticExpectationClosure(arguments[0])
                 return null
             } else {
                 def expectation = new Expectation(signature: signature)
-                controller.addToExpectations(expectation, expectations)
+                addToExpectations(expectation, expectations, controller)
                 return new MethodRecorder(expectation)
             }
         }
     }
-
     private invokeStaticExpectationClosure(Closure staticExpectationClosure) {
-        def recorder = new StaticRecoder(clazz, classExpectations)
+        def recorder = new StaticMethodRecoder(mockProxyMetaClass.theClass, mockProxyMetaClass.classExpectations)
         staticExpectationClosure.resolveStrategy = Closure.DELEGATE_FIRST
         def backup = controller.mockDelegate
         try {
@@ -109,25 +104,25 @@ class MockInternal {
         }
     }
 
-    Object getMockProperty(Object mockObject, String property) {
+    Object getMockProperty(String property) {
         if (controller.replay){
-            def signature = signatureFactory.createPropertyGetSignature(this, property)
-            return findExpectation(expectations, signature, "Unexpected property getter call", mockObject, getGetterMethodName(property), [], controller)
+            def signature = new PropertyGetSignature(mockProxyMetaClass, property)
+            return findExpectation(expectations, signature, "Unexpected property getter call", [], controller)
         } else {
             if (property == "static"){
-                return new StaticRecoder(clazz, classExpectations)
+                return new StaticMethodRecoder(mockProxyMetaClass.theClass, mockProxyMetaClass.classExpectations)
             } else {
-                def expectation = new Expectation(signature: new PropertySignature(this, property))
-                controller.addToExpectations(expectation, expectations)
-                return new PropertyRecorder(expectation)
+                def expectation = new Expectation()
+                addToExpectations(expectation, expectations, controller)
+                return new PropertyRecorder(mockProxyMetaClass, property, expectation)
             }
         }
     }
 
-    Object setMockProperty(Object mockObject, String property, Object value) {
+    Object setMockProperty(String property, Object value) {
         if (controller.replay){
-            def signature = signatureFactory.createPropertySetSignature(this, property, value)
-            findExpectation(expectations, signature, "Unexpected property setter call", mockObject, getSetterMethodName(property), [value], controller)
+            def signature = new PropertySetSignature(mockProxyMetaClass, property, value)
+            findExpectation(expectations, signature, "Unexpected property setter call", [value], controller)
         } else {
             throw new MissingPropertyException("Cannot use property setter in record mode. " +
                     "Are you trying to mock a setter? Use '${property}.set(${value.inspect()})' instead.")
@@ -135,7 +130,7 @@ class MockInternal {
     }
 
     def findSignature(signature) {
-        return controller.orderingController.orderedExpectations.findSignature(signature) ?: expectations.findSignature(signature)
+        return expectations.findSignature(signature)
     }
 
 }

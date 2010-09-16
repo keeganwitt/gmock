@@ -60,26 +60,13 @@ class PropertyGetSignatureTest extends GMockTestCase {
     }
 
     void testToString() {
-        def object = new Object()
-        def signature = new PropertyGetSignature(object, "tostring")
-        assertEquals "tostring", signature.toString()
-    }
-
-    void testToStringWithMockName() {
-        def object = mock()
-        object.mockName.chains().toString(true).returns(" on 'Mock'")
-        def signature = new PropertyGetSignature(object, "tostring")
-        play {
-            assertEquals "'tostring' on 'Mock'", signature.toString(true)
+        def object = mock {
+            mockName.returns(it)
+            toString(false).returns('')
         }
-    }
-
-    void testToStringWithMockNameAndPostfix() {
-        def object = mock()
-        object.mockName.chains().toString(true).returns(" on 'Mock'")
         def signature = new PropertyGetSignature(object, "tostring")
         play {
-            assertEquals "'tostring.other' on 'Mock'", signature.toString(true, '.other')
+            assertEquals "'tostring'", signature.toString()
         }
     }
 

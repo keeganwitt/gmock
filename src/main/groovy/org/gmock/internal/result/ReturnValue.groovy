@@ -25,7 +25,7 @@ class ReturnValue implements Result {
         this.value = value
     }
 
-    def answer(Object receiver, String method, Object[] arguments) {
+    def answer(Object[] arguments) {
         return value
     }
 

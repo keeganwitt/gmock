@@ -17,6 +17,7 @@ package org.gmock.internal.expectation
 
 import org.gmock.internal.result.ReturnNull
 import org.gmock.internal.times.StrictTimes
+import org.gmock.internal.signature.MethodSignature
 
 class Expectation {
 
@@ -50,9 +51,9 @@ class Expectation {
         return times.stillRemain(called) && signature.match(methodSignature)
     }
 
-    def answer(mock, method, arguments) {
+    def answer(arguments) {
         ++called
-        return result.answer(mock, method, arguments as Object[])
+        return result.answer(arguments as Object[])
     }
 
     def isVerified() {
@@ -79,8 +80,5 @@ class Expectation {
         signature.match(this.signature) ? this : null
     }
 
-    def getController() {
-        expectations.controller
-    }
 
 }

@@ -20,22 +20,24 @@ import org.gmock.internal.expectation.Expectation
 import org.gmock.internal.result.ReturnNull
 import org.gmock.internal.result.ReturnValue
 import org.gmock.internal.result.ThrowException
+import org.gmock.internal.signature.PropertyGetSignature
+import org.gmock.internal.signature.PropertySetSignature
+import org.gmock.internal.signature.PropertyUncompleteSignature
 import org.gmock.internal.times.AnyTimes
+import org.gmock.internal.expectation.Expectation
 
 class PropertyRecorderTest extends GMockTestCase {
 
     void testRecordGetProperty(){
-        def getSignature = mock()
-        def signature = mock()
-        signature.getGetter().returns(getSignature)
+        def object = new Object()
+        def getSignature = mock(PropertyGetSignature, constructor(object, "name"))
 
         def mockExpectations = mock()
         def expectation = new Expectation(signatureObserver: mockExpectations)
         mockExpectations.signatureChanged(expectation).times(2)
 
         play {
-            expectation.signature = signature
-            PropertyRecorder propertyRecorder = new PropertyRecorder(expectation)
+            PropertyRecorder propertyRecorder = new PropertyRecorder(object, "name", expectation)
             propertyRecorder.returns("a name")
         }
 
@@ -45,17 +47,16 @@ class PropertyRecorderTest extends GMockTestCase {
     }
 
     void testRecordSetProperty(){
-        def setSignature = mock()
-        def signature = mock()
-        signature.getSetter('a value').returns(setSignature)
+        def object = new Object()
+        def setSignature = mock(PropertySetSignature, constructor(object, "name", "a value"))
 
         def mockExpectations = mock()
         def expectation = new Expectation(signatureObserver: mockExpectations)
         mockExpectations.signatureChanged(expectation).times(2)
 
+
         play {
-            expectation.signature = signature
-            PropertyRecorder propertyRecorder = new PropertyRecorder(expectation)
+            PropertyRecorder propertyRecorder = new PropertyRecorder(object, "name", expectation)
             propertyRecorder.set("a value")
         }
 
@@ -65,54 +66,41 @@ class PropertyRecorderTest extends GMockTestCase {
 
     void testStubRecord(){
         def expectation = mock()
+
+        expectation.signature.set(match {it instanceof PropertyUncompleteSignature})
         expectation.times.set(match { it instanceof AnyTimes })
 
         play {
-            PropertyRecorder propertyRecorder = new PropertyRecorder(expectation)
+            PropertyRecorder propertyRecorder = new PropertyRecorder(new Object(), "name", expectation)
             propertyRecorder.stub()
         }
     }
 
     void testRaisesException(){
-        def getSignature = mock()
-        def signature = mock()
-        signature.getGetter().returns(getSignature)
-
         def mockExpectations = mock()
         def expectation = new Expectation(signatureObserver: mockExpectations)
-        mockExpectations.signatureChanged(expectation).times(2)
+        mockExpectations.checkTimes(expectation)
 
+        PropertyRecorder propertyRecorder = new PropertyRecorder(new Object(), "name", expectation)
         def exception = new RuntimeException()
 
-        play {
-            expectation.signature = signature
-            PropertyRecorder propertyRecorder = new PropertyRecorder(expectation)
-            propertyRecorder.raises(exception)
-        }
+        propertyRecorder.raises(exception)
 
-        assertEquals getSignature, expectation.signature
         assertEquals ThrowException, expectation.result.class
         assertEquals exception, expectation.result.exception
+
     }
 
     void testRaisesExceptionClass() {
-        def getSignature = mock()
-        def signature = mock()
-        signature.getGetter().returns(getSignature)
-
         def mockExpectations = mock()
         def expectation = new Expectation(signatureObserver: mockExpectations)
-        mockExpectations.signatureChanged(expectation).times(2)
+        mockExpectations.checkTimes(expectation)
 
+        PropertyRecorder propertyRecorder = new PropertyRecorder(new Object(), "name", expectation)
         def cause = new RuntimeException()
 
-        play {
-            expectation.signature = signature
-            PropertyRecorder propertyRecorder = new PropertyRecorder(expectation)
-            propertyRecorder.raises(Exception, "test", cause)
-        }
+        propertyRecorder.raises(Exception, "test", cause)
 
-        assertEquals getSignature, expectation.signature
         assertEquals ThrowException, expectation.result.class
         assertEquals Exception, expectation.result.exception.class
         assertEquals "test", expectation.result.exception.message

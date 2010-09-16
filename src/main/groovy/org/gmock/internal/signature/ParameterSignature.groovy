@@ -16,7 +16,6 @@
 package org.gmock.internal.signature
 
 import org.gmock.Matcher
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
 
 class ParameterSignature {
 
@@ -37,7 +36,7 @@ class ParameterSignature {
     }
 
     String toString() {
-        arguments.collect { DefaultGroovyMethods.inspect(it) }.join(", ")
+        arguments*.inspect().join(", ")
     }
 
     def validate(){

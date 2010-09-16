@@ -19,8 +19,14 @@ import org.gmock.internal.Result
 
 class HashCodeDefaultBehavior implements Result {
 
-    def answer(Object receiver, String method, Object[] arguments) {
-        return System.identityHashCode(receiver)
+    def mock
+
+    HashCodeDefaultBehavior(mock) {
+        this.mock = mock
+    }
+
+    def answer(Object[] arguments) {
+        return System.identityHashCode(mock)
     }
 
 }
