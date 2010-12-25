@@ -19,8 +19,6 @@
         <ul>
             <li><a href="http://gmock.org/">Home</a></li>
             <li><a href="#">Documentation</a></li>
-            <li><a href="http://gmock.org/download/index">Download</a></li>
-            <li><a href="http://gmock.org/roadmap">Roadmap</a></li>
         </ul>
     </div>
 </div>
@@ -36,7 +34,7 @@ $content
 </div>
 <div class="footer">
     <div class="container">
-        <div>© Gmock - 2008-2009 - All right reserved</div>
+        <div>© Gmock - 2008-2011 - All right reserved</div>
     </div>
 </div>
 </body></html>

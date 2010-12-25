@@ -16,8 +16,9 @@ configurations {
     testCompileConf
     compile.extendsFrom compileConf, jarjarify
     testCompile.extendsFrom testCompileConf
-    intTestCompile.extendsFrom compileConf, testCompileConf
+    intTestCompile.extendsFrom groovy, compileConf, testCompileConf
     intTestRuntime.extendsFrom intTestCompile
+    deployerJars
 }
 
 dependencies {
@@ -32,9 +33,7 @@ dependencies {
               'org.objenesis:objenesis:1.1'
     intTestCompile files(jar.archivePath)
 
-    // Hack for maven pom generating
-    compile configurations.groovy.dependencies,
-            configurations.compileConf.dependencies
+    deployerJars 'org.apache.maven.wagon:wagon-ssh:1.0-beta-2'
 }
 
 sourceSets {
@@ -46,7 +45,7 @@ sourceSets {
         java.srcDirs = test.java.srcDirs
         groovy.srcDirs = test.groovy.srcDirs
         compileClasspath = configurations.intTestCompile
-        runtimeClasspath = files(classes, configurations.groovy, configurations.intTestRuntime)
+        runtimeClasspath = files(classes, configurations.intTestRuntime)
     }
 }
 
@@ -77,11 +76,52 @@ tasks.jar << {
 
 tasks.compileIntTestJava.dependsOn jar
 
-task intTest(type: Test, dependsOn: intTestClasses) {
+task intTest(type: Test, dependsOn: [jar, intTestClasses]) {
+    group = 'verification'
+    description = 'Runs the integration tests.'
     testClassesDir = sourceSets.intTest.classesDir
     classpath = sourceSets.intTest.runtimeClasspath
     testReportDir = file("$reportsDir/int-tests")
     testResultsDir = file("$buildDir/int-test-results")
 }
 
-tasks.build.dependsOn intTest
+tasks.check.dependsOn intTest
+
+tasks.uploadArchives {
+    repositories.mavenDeployer {
+        configuration = configurations.deployerJars
+        repository url: 'scp://gmock.org/home/rsync/gmock/releases', {
+            authentication(userName: "rsync")
+        }
+    }
+}
+
+[tasks.install.repositories.mavenInstaller(), tasks.uploadArchives.repositories.mavenDeployer()]*.pom {
+    scopeMappings.with {
+        addMapping 0, configurations.groovy, 'compile'
+        addMapping 1, configurations.compileConf, 'compile'
+    }
+    project {
+        description 'Mocking Framework for Groovy'
+        url 'http://www.gmock.org'
+        licenses {
+            license {
+                name 'Apache License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        scm {
+            connection 'scm:svn:http://gmock.googlecode.com/svn/trunk/'
+            developerConnection 'scm:svn:https://gmock.googlecode.com/svn/trunk/'
+            url 'http://code.google.com/p/gmock/source/browse/'
+        }
+        distributionManagement {
+            repository = new org.apache.maven.model.DeploymentRepository(
+                id: 'gmock.website',
+                name: 'Gmock Website',
+                url: 'scp://gmock.org/home/rsync/gmock/releases'
+            )
+        }
+    }
+}
