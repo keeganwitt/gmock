@@ -16,6 +16,7 @@ body {
     font-size: 5em;
     margin: 0;
     padding: 15px 0 22px 80px;
+    border-bottom: none;
 }
 
 h1 {
