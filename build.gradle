@@ -1,5 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: org.gmock.build.WikiPlugin
 
 group = 'org.gmock'
 archivesBaseName = 'gmock'
@@ -125,39 +126,19 @@ tasks.uploadArchives {
     }
 }
 
-task wikiDir(type: Directory) { dir = file("$buildDir/wiki") }
-task wiki(dependsOn: wikiDir) {
+tasks.wiki {
     filename = "Documentation_${version[0]}_${version[2]}.wiki"
     url = "http://gmock.googlecode.com/svn/wiki/$filename"
-    file = file("${wikiDir.dir}/$filename")
-}
-tasks.wiki << {
-    ant.get src: url, dest: file, usetimestamp: true, verbose: true
+    dir = file("$buildDir/wiki")
+    file = file("$dir/$filename")
 }
 
-task docsDir(type: Directory) { dir = project.docsDir }
-task docs(dependsOn: [wiki, tasks.docsDir]) {
-    group = 'documentation'
-    docsTemplateDir = file('docs')
-    indexTemplateFile = file("$docsTemplateDir/template.gsp")
-    indexFile = file("$docsDir/index.html")
-    inputs.file wiki.file
-    inputs.dir docsTemplateDir
-    outputs.dir docsDir
-}
-tasks.docs << {
-    copy {
-        from docsTemplateDir, {
-            exclude '**/*template*'
-        }
-        into docsDir
-    }
-    def wikiText = wiki.file.text
-    def converter = new org.gmock.build.wiki.GoogleCodeWikiConverter()
-    def binding = [content: converter.convert(wikiText), catalog: converter.catalog, version: version]
-    def engine = new groovy.text.SimpleTemplateEngine()
-    def template = engine.createTemplate(indexTemplateFile).make(binding)
-    indexFile.withPrintWriter { template.writeTo(it) }
+tasks.docs {
+    wikiFile = wiki.file
+    templateDir = file('docs')
+    templateFile = file("$templateDir/template.gsp")
+    docsDir = project.docsDir
+    docsFile = file("$docsDir/index.html")
 }
 
 task exploded(type: Sync, dependsOn: [jar, docs]) {
