@@ -145,3 +145,9 @@ task zip(type: Zip, dependsOn: exploded) {
     classifier = 'all'
     from exploded.destinationDir.parent
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '0.9'
+    jarFile = file('wrapper/gradle-wrapper.jar')
+    urlRoot = 'http://gradle.artifactoryonline.com/gradle/distributions'
+}
