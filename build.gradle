@@ -1,17 +1,16 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
-apply plugin: org.gmock.build.WikiPlugin
+apply plugin: 'wiki'
+apply plugin: 'jarjar'
 
 group = 'org.gmock'
 archivesBaseName = 'gmock'
 
 repositories {
     mavenCentral()
-    mavenRepo urls: ['http://repository.jboss.org/maven2/']
 }
 
 configurations {
-    jarjar
     jarjarify
     compileConf
     testCompileConf
@@ -29,7 +28,6 @@ dependencies {
                     'org.testng:testng:5.8:jdk15',
                     'org.apache.tomcat:servlet-api:6.0.18',
                     'dom4j:dom4j:1.6.1'
-    jarjar 'com.google.code:jarjar:1.0'
     jarjarify 'cglib:cglib:2.2',
               'org.objenesis:objenesis:1.1'
     intTestCompile files(jar.archivePath)
@@ -55,24 +53,12 @@ sourceSets {
 
 defaultTasks ':test'
 
-tasks.jar << {
-    tmpArchivePath = file("${archivePath}.tmp")
-    ant {
-        move file: archivePath, tofile: tmpArchivePath
-        taskdef name: 'jarjar', classname: 'com.tonicsystems.jarjar.JarJarTask', classpath: configurations.jarjar.asPath
-        jarjar jarfile: archivePath, {
-            zipfileset src: tmpArchivePath
-            configurations.jarjarify.each {
-                zipfileset src: it, {
-                    include name: '**/*.class'
-                }
-            }
-            rule pattern: "net.sf.cglib.**", result: "org.gmock.internal.cglib.@1"
-            rule pattern: "org.objenesis.**", result: "org.gmock.internal.objenesis.@1"
-            rule pattern: "org.objectweb.asm.**", result: "org.gmock.internal.asm.@1"
-        }
-        delete file: tmpArchivePath
-    }
+tasks.jar {
+    jarjarify = true
+    jarjarifyConfigurations = [configurations.jarjarify]
+    jarjarifyRule pattern: "net.sf.cglib.**", result: "org.gmock.internal.cglib.@1"
+    jarjarifyRule pattern: "org.objenesis.**", result: "org.gmock.internal.objenesis.@1"
+    jarjarifyRule pattern: "org.objectweb.asm.**", result: "org.gmock.internal.asm.@1"
 }
 
 tasks.compileIntTestJava.dependsOn jar

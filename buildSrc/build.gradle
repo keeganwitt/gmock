@@ -5,7 +5,8 @@ repositories {
 }
 
 dependencies {
-    groovy "org.codehaus.groovy:groovy-all:1.7.5"
-    compile "commons-lang:commons-lang:2.4", gradleApi()
-    testCompile "junit:junit:4.5"
+    groovy 'org.codehaus.groovy:groovy-all:1.7.5'
+    compile 'commons-lang:commons-lang:2.4',
+            gradleApi()
+    testCompile 'junit:junit:4.5'
 }
