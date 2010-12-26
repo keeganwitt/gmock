@@ -1,13 +1,23 @@
-apply plugin: 'groovy'
+allprojects {
+    apply plugin: 'groovy'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
+    }
+}
+
 apply plugin: 'maven'
 apply plugin: 'wiki'
 apply plugin: 'jarjar'
 
 group = 'org.gmock'
 archivesBaseName = 'gmock'
-
-repositories {
-    mavenCentral()
+if (!('release' in gradle.startParameter.taskNames)) {
+    version += '-SNAPSHOT'
 }
 
 configurations {
@@ -18,11 +28,11 @@ configurations {
     testCompile.extendsFrom testCompileConf
     intTestCompile.extendsFrom groovy, compileConf, testCompileConf
     intTestRuntime.extendsFrom intTestCompile
+
     deployerJars
 }
 
 dependencies {
-    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
     compileConf "junit:junit:$junitVersion"
     testCompileConf 'org.hamcrest:hamcrest-library:1.1',
                     'org.testng:testng:5.8:jdk15',
@@ -71,7 +81,7 @@ task intTest(type: Test, dependsOn: [jar, intTestClasses]) {
     testResultsDir = file("$buildDir/int-test-results")
 }
 
-tasks.check.dependsOn intTest
+tasks.check.dependsOn intTest, ':samples:cache:check', ':samples:collaborator:check'
 
 tasks.uploadArchives {
     repositories.mavenDeployer {
@@ -151,3 +161,5 @@ task wrapper(type: Wrapper) {
     jarFile = file('wrapper/gradle-wrapper.jar')
     urlRoot = 'http://gradle.artifactoryonline.com/gradle/distributions'
 }
+
+task release(dependsOn: build)
