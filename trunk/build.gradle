@@ -1,15 +1,4 @@
-allprojects {
-    apply plugin: 'groovy'
-
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
-    }
-}
-
+apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'wiki'
 apply plugin: 'jarjar'
@@ -18,6 +7,10 @@ group = 'org.gmock'
 archivesBaseName = 'gmock'
 if (!('release' in gradle.startParameter.taskNames)) {
     version += '-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
 }
 
 configurations {
@@ -33,6 +26,7 @@ configurations {
 }
 
 dependencies {
+    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
     compileConf 'junit:junit:4.5'
     testCompileConf 'org.hamcrest:hamcrest-library:1.1',
                     'org.testng:testng:5.8:jdk15',
@@ -79,6 +73,10 @@ task intTest(type: Test, dependsOn: [jar, intTestClasses]) {
     classpath = sourceSets.intTest.runtimeClasspath
     testReportDir = file("$reportsDir/int-tests")
     testResultsDir = file("$buildDir/int-test-results")
+}
+
+samples.each { sample ->
+    evaluationDependsOn sample.path
 }
 
 tasks.check.dependsOn intTest, samples*.check
@@ -155,7 +153,13 @@ task exploded(type: Copy, dependsOn: [jar, docs, samples*.wrapper]) {
     from buildDir, {
         include 'docs/**'
     }
-    // TODO Copy samples
+    from rootDir, {
+        include 'samples/*/build.gradle'
+        expand groovyVersion: groovyVersion
+        filter { line ->
+            line.replace 'rootProject', "files('../../$jar.archiveName')"
+        }
+    }
     into "$distsDir/exploded/$archivesBaseName-$version"
 }
 
