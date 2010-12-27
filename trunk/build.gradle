@@ -81,7 +81,7 @@ task intTest(type: Test, dependsOn: [jar, intTestClasses]) {
     testResultsDir = file("$buildDir/int-test-results")
 }
 
-tasks.check.dependsOn intTest, ':samples:cache:check', ':samples:collaborator:check'
+tasks.check.dependsOn intTest, samples*.check
 
 tasks.uploadArchives {
     repositories.mavenDeployer {
@@ -137,11 +137,20 @@ tasks.docs {
     docsFile = file("$docsDir/index.html")
 }
 
-task exploded(type: Sync, dependsOn: [jar, docs]) {
+task wrapper(type: Wrapper) {
+    gradleVersion = '0.9'
+    urlRoot = 'http://gradle.artifactoryonline.com/gradle/distributions'
+    jarFile = file('wrapper/gradle-wrapper.jar')
+}
+
+samples*.task('wrapper', type: Wrapper)
+
+task exploded(type: Copy, dependsOn: [jar, docs, samples*.wrapper]) {
     from jar.archivePath
     from 'apache-license-2.0.txt'
     from rootDir, {
         include 'src/**'
+        include 'samples/*/src/**'
     }
     from buildDir, {
         include 'docs/**'
@@ -150,16 +159,26 @@ task exploded(type: Sync, dependsOn: [jar, docs]) {
     into "$distsDir/exploded/$archivesBaseName-$version"
 }
 
+samples.each { sample ->
+    sample.wrapper {
+        projectRelativePath = relativePath(sample.projectDir)
+        explodedDir = exploded.destinationDir
+        gradleVersion = wrapper.gradleVersion
+        urlRoot = wrapper.urlRoot
+        jarFile = file("$explodedDir/wrapper/gradle-wrapper.jar")
+        scriptFile = file("$explodedDir/$projectRelativePath/gradlew")
+    }
+}
+
 task zip(type: Zip, dependsOn: exploded) {
     group = 'build'
     classifier = 'all'
     from exploded.destinationDir.parent
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '0.9'
-    jarFile = file('wrapper/gradle-wrapper.jar')
-    urlRoot = 'http://gradle.artifactoryonline.com/gradle/distributions'
-}
-
 task release(dependsOn: build)
+task snapshot(dependsOn: build)
+
+def getSamples() {
+   subprojects.findAll { it.path.startsWith ':samples:' }
+}
