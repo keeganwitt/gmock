@@ -1,4 +1,11 @@
+apply plugin: 'groovy'
+
+repositories {
+    mavenCentral()
+}   
+
 dependencies {
+    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
     testCompile 'org.testng:testng:5.8:jdk15',
                 rootProject
 }
