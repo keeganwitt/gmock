@@ -136,8 +136,7 @@ tasks.docs {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '0.9'
-    urlRoot = 'http://gradle.artifactoryonline.com/gradle/distributions'
+    gradleVersion = '0.9.1'
     jarFile = file('wrapper/gradle-wrapper.jar')
 }
 
@@ -168,7 +167,6 @@ samples.each { sample ->
         projectRelativePath = relativePath(sample.projectDir)
         explodedDir = exploded.destinationDir
         gradleVersion = wrapper.gradleVersion
-        urlRoot = wrapper.urlRoot
         jarFile = file("$explodedDir/wrapper/gradle-wrapper.jar")
         scriptFile = file("$explodedDir/$projectRelativePath/gradlew")
     }
