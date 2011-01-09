@@ -1,28 +1,18 @@
 #summary How to build Gmock with Gradle
 
-First of all, Gradle 0.5.2 is needed.
+You can use the following commands with the Gradle Wrapper in the root folder:
 
-You can use the following commands:
-
-  * `gradle clean`
+  * `gradlew clean`
     remove the 'build' directory
-  * `gradle test`
-    run the tests
-  * `gradle`
+  * `gradlew test`
+    run the unit tests
+  * `gradlew`
     the same as above
-  * `gradle libs`
-    create the jar file (without jarjarified)
-  * `gradle jarjarify`
-    jarjarify the jar file
-  * `gradle integrationTest`
-    run the tests with the jarjarified jar file
-  * `gradle install`
+  * `gradlew check`
+    run all the tests including the unit tests and integration tests
+  * `gradlew install`
     install the artifact to the local Maven repository
-  * `gradle generateDoc`
-    generate documentation from the wiki page, the result will be in 'build/docs' directory
-  * `gradle dists`
+  * `gradlew snapshot`
     package the jar file and all other additional files (e.g. source codes), the result will be in 'build/distributions' directory
-  * `gradle -Drelease [any task]`
-    run the task, but without '-SNAPSHOT' in the version
-  * `gradle -Dskip.test [any task]`
-    run the task, but skip all tests, including the integration tests
+  * `gradlew release`
+    the same as above, but without '-SNAPSHOT' in the version
