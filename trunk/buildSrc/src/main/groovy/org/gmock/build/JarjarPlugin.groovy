@@ -15,7 +15,7 @@ class JarjarPlugin implements Plugin<Project> {
         project.dependencies {
             jarjar 'com.google.code:jarjar:1.0'
         }
-        project.tasks.withType(Jar).allTasks { jar ->
+        project.tasks.withType(Jar) { jar ->
             jar.jarjarify = false
             jar.jarjarifyConfigurations = []
             jar.jarjarifyRules = []

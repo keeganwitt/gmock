@@ -136,7 +136,6 @@ tasks.docs {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '0.9.1'
     jarFile = file('wrapper/gradle-wrapper.jar')
 }
 
