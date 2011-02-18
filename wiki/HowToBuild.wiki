@@ -16,3 +16,7 @@ You can use the following commands with the Gradle Wrapper in the root folder:
     package the jar file and all other additional files (e.g. source codes), the result will be in 'build/distributions' directory
   * `gradlew release`
     the same as above, but without '-SNAPSHOT' in the version
+  * `gradlew eclipse`
+    generate eclipse project files
+  * `gradlew idea`
+    generate idea project files
