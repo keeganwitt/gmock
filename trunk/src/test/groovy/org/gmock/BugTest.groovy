@@ -75,7 +75,6 @@ class BugTest extends GMockTestCase {
         }
     }
 
-
     void testAsStringThrowANullPointerException() {
         def mockOutput = mock()
         mockOutput.print(["stuff"] as String[])
@@ -87,6 +86,13 @@ class BugTest extends GMockTestCase {
         }
     }
 
-
+    void testNullParameterThrowANullPointerException() {
+        def user = mock() {
+            setEmail(null)
+        }
+        play {
+            user.setEmail(null)
+        }
+    }
 
 }

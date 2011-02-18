@@ -26,11 +26,15 @@ class ProxyMetaMethod extends MetaMethod {
     private CachedClass declaringClass
 
     ProxyMetaMethod(MetaClass metaClass, String name, Class[] parameterTypes) {
-        super(parameterTypes)
+        super(fillNullClassWithObjectClass(parameterTypes))
         this.theMetaClass = metaClass
         this.name = name
         this.declaringClass = ReflectionCache.getCachedClass(metaClass.theClass)
-        getParameterTypes()
+    }
+    
+    private static Class[] fillNullClassWithObjectClass(Class[] parameterTypes) {
+        // To avoid the NPE in ParameterTypes.setParametersTypes(CachedClass[])
+        parameterTypes.collect { it ?: Object }
     }
 
     int getModifiers() {
