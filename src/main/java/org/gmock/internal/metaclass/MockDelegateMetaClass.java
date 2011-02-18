@@ -63,7 +63,7 @@ public class MockDelegateMetaClass extends ProxyMetaClass {
 
     public MetaMethod pickMethod(String methodName, Class[] arguments) {
         Object newDelegate = null;
-        if (arguments.length == 1 && Closure.class.isAssignableFrom(arguments[0])) {
+        if (arguments.length == 1 && arguments[0] != null && Closure.class.isAssignableFrom(arguments[0])) {
             if ("match".equals(methodName)) {
                 newDelegate = GMock.class;
             } else if ("ordered".equals(methodName) || "unordered".equals(methodName)) {
