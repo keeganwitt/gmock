@@ -18,6 +18,7 @@ package org.gmock.internal
 import junit.framework.Assert
 import org.gmock.internal.MockDelegate
 import org.gmock.internal.MockInternal
+import org.gmock.internal.ChainsMockInternal
 import org.gmock.internal.callstate.CallState
 import org.gmock.internal.expectation.ClassExpectations
 import org.gmock.internal.expectation.OrderedExpectations
@@ -103,18 +104,20 @@ class InternalMockController {
             if (replay) {
                 throw new IllegalStateException("Cannot nest play closures.")
             }
-            if (orderingController.ordered) {
-                throw new IllegalStateException("Play closures cannot be inside ordered closure.")
-            }
-
-            mockCollection*.validate()
-            classExpectations.validate()
-            orderingController.validate()
-            mockCollection*.replay()
-            concreteMocks*.startProxy()
-            classExpectations.startProxy()
         }
         try {
+            doInternal {
+                if (orderingController.ordered) {
+                    throw new IllegalStateException("Play closures cannot be inside ordered closure.")
+                }
+                
+                mockCollection*.validate()
+                classExpectations.validate()
+                orderingController.validate()
+                mockCollection*.replay()
+                concreteMocks*.startProxy()
+                classExpectations.startProxy()
+            }
             try {
                 replay = true
                 closure.call()
@@ -135,8 +138,13 @@ class InternalMockController {
                 mockCollection*.reset()
                 classExpectations.reset()
                 orderingController.reset()
+                removeChainsMocks()
             }
         }
+    }
+    
+    private removeChainsMocks() {
+        mockCollection.removeAll { it instanceof ChainsMockInternal }
     }
 
     def with(mock, Closure withClosure) {

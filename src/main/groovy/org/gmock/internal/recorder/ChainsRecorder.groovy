@@ -35,6 +35,7 @@ class ChainsRecorder implements GroovyInterceptable {
     }
 
     Object invokeMethod(String name, Object args) {
+        mock.expectationSet = true
         def signature = new ChainsSignature(preExpectation.signature, new MethodSignature(mock, name, args))
         def expectation = new Expectation(signature: signature)
         controller.addToExpectations(expectation, expectations)
@@ -42,6 +43,7 @@ class ChainsRecorder implements GroovyInterceptable {
     }
 
     Object getProperty(String property) {
+        mock.expectationSet = true
         def signature = new ChainsSignature(preExpectation.signature, new PropertySignature(mock, property))
         def expectation = new Expectation(signature: signature)
         controller.addToExpectations(expectation, expectations)
@@ -52,7 +54,5 @@ class ChainsRecorder implements GroovyInterceptable {
         throw new MissingPropertyException("Cannot use property setter in record mode. " +
                 "Are you trying to mock a setter? Use '${property}.set(${value.inspect()})' instead.")
     }
-
-    // TODO: check if expectations are missing
 
 }
