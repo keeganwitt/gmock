@@ -228,6 +228,21 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
         }
         assertEquals expected, message
     }
+    
+    void testChainsMissingExpectation() {
+        def mock = mock()
+        mock.a().chains()
+        shouldFail(IllegalStateException) {
+            play {}
+        }
+        
+        play {}
+        
+        mock.a().chains().b().chains()
+        shouldFail(IllegalStateException) {
+            play {}
+        }
+    }
 
     // TODO: set times for the whole chain
 

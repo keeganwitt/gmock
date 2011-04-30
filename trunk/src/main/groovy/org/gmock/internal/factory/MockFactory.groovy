@@ -109,7 +109,7 @@ class MockFactory {
 
     def createChainsMockInternal(previousSignature) {
         def signatureFactory = new ChainsSignatureFactory(previousSignature)
-        def mock = new MockInternal(controller, new MockNameRecorder(''), Object, controller.classExpectations, signatureFactory)
+        def mock = new ChainsMockInternal(controller, new MockNameRecorder(''), Object, controller.classExpectations, signatureFactory)
         mockCollection << mock
         return mock
     }
