@@ -27,11 +27,19 @@ class Expectation {
     def called = 0
     def hidden = false
     def expectations
+    def previous = null
 
     def duplicate() {
-        def result = new Expectation(signature: signature, signatureObserver: signatureObserver, result: result, expectations: expectations)
-        expectations.duplicate(this, result)
-        return result
+        def previous = this.previous?.duplicate()
+        def duplicated = new Expectation(signature: signature, signatureObserver: signatureObserver,
+            result: result, hidden: hidden, expectations: expectations, previous: previous)
+        expectations.duplicate(this, duplicated)
+        return duplicated
+    }
+    
+    void setTimes(times) {
+        previous?.times = times
+        this.times = times
     }
 
     void setSignature(signature) {
