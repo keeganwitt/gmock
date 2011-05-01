@@ -243,7 +243,19 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
             play {}
         }
     }
-
-    // TODO: set times for the whole chain
+    
+    void testChainsSetTimes() {
+        def mock = mock()
+        mock.a().chains().b().returns(1).times(2)
+        mock.a().chains().b().chains().c().returns(2).times(2).times(3)
+        play {
+            2.times {
+                assert 1 == mock.a().b()
+            }
+            5.times {
+                assert 2 == mock.a().b().c()
+            }
+        }
+    }
 
 }

@@ -25,27 +25,27 @@ class ChainsRecorder implements GroovyInterceptable {
     def controller
     def mock
     def expectations
-    def preExpectation
+    def previousExpectation
 
-    def ChainsRecorder(controller, mock, expectations, preExpectation) {
+    def ChainsRecorder(controller, mock, expectations, previousExpectation) {
         this.controller = controller
         this.mock = mock
         this.expectations = expectations
-        this.preExpectation = preExpectation
+        this.previousExpectation = previousExpectation
     }
 
     Object invokeMethod(String name, Object args) {
         mock.expectationSet = true
-        def signature = new ChainsSignature(preExpectation.signature, new MethodSignature(mock, name, args))
-        def expectation = new Expectation(signature: signature)
+        def signature = new ChainsSignature(previousExpectation.signature, new MethodSignature(mock, name, args))
+        def expectation = new Expectation(signature: signature, previous: previousExpectation)
         controller.addToExpectations(expectation, expectations)
         return new MethodRecorder(expectation)
     }
 
     Object getProperty(String property) {
         mock.expectationSet = true
-        def signature = new ChainsSignature(preExpectation.signature, new PropertySignature(mock, property))
-        def expectation = new Expectation(signature: signature)
+        def signature = new ChainsSignature(previousExpectation.signature, new PropertySignature(mock, property))
+        def expectation = new Expectation(signature: signature, previous: previousExpectation)
         controller.addToExpectations(expectation, expectations)
         return new PropertyRecorder(expectation)
     }
