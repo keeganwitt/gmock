@@ -74,5 +74,29 @@ class BaseRecorder {
         expectation.hidden = true
         return new ChainsRecorder(controller, mockInternal, mockInternal.expectations, expectation)
     }
+    
+    def getNever() {
+        never()
+    }
+    
+    def getOnce() {
+        once()
+    }
+    
+    def getAtLeastOnce() {
+        atLeastOnce()
+    }
+    
+    def getAtMostOnce() {
+        atMostOnce()
+    }
+    
+    def getStub() {
+        stub()
+    }
+    
+    def getChains() {
+        chains()
+    }
 
 }
