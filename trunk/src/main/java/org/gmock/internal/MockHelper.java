@@ -15,6 +15,7 @@
  */
 package org.gmock.internal;
 
+import groovy.lang.GString;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Factory;
 
@@ -29,6 +30,24 @@ public class MockHelper {
 
     public static Class<?> getClassOfObject(Object object) {
         return object.getClass();
+    }
+
+    public static Object[] evaluateGStrings(Object[] arguments, InternalMockController controller) {
+        final Object[] evaluated = arguments.clone();
+        for (int i = 0; i < evaluated.length; ++i) {
+            final int current = i;
+            if (evaluated[i] instanceof GString) {
+                controller.doExternal(new Callable() {
+
+                    public Object call() {
+                        evaluated[current] = evaluated[current].toString();
+                        return null;
+                    }
+
+                });
+            }
+        }
+        return evaluated;
     }
 
 }

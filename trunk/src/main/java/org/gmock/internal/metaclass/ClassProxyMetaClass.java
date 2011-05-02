@@ -21,6 +21,7 @@ import groovy.lang.MetaClassRegistry;
 import groovy.lang.ProxyMetaClass;
 import org.gmock.internal.Callable;
 import org.gmock.internal.InternalMockController;
+import org.gmock.internal.MockHelper;
 import org.gmock.internal.expectation.Expectation;
 import org.gmock.internal.expectation.ExpectationCollection;
 import static org.gmock.internal.metaclass.MetaClassHelper.*;
@@ -110,8 +111,9 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
             }
         }, new Callable() {
             public Object call() {
-                ConstructorSignature signature = new ConstructorSignature(theClass, arguments);
-                return findExpectation(constructorExpectations, signature, "Unexpected constructor call", theClass, null, arguments, controller);
+                Object[] evaluated = MockHelper.evaluateGStrings(arguments, controller);
+                ConstructorSignature signature = new ConstructorSignature(theClass, evaluated);
+                return findExpectation(constructorExpectations, signature, "Unexpected constructor call", theClass, null, evaluated, controller);
             }
         });
     }
@@ -123,8 +125,9 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
             }
         }, new Callable() {
             public Object call() {
-                StaticMethodSignature signature = new StaticMethodSignature(clazz, method, arguments);
-                return findExpectation(staticExpectations, signature, "Unexpected static method call", clazz, method, arguments, controller);
+                Object[] evaluated = MockHelper.evaluateGStrings(arguments, controller);
+                StaticMethodSignature signature = new StaticMethodSignature(clazz, method, evaluated);
+                return findExpectation(staticExpectations, signature, "Unexpected static method call", clazz, method, evaluated, controller);
             }
         });
     }
