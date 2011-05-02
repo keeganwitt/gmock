@@ -226,5 +226,14 @@ class FunctionnalConstructorsTest extends GMockTestCase {
             assertEquals 'b', createGroovyLoader().load('a')
         }
     }
+    
+    void testMockConstructorOfInnerClass() {
+        mock InnerClass, constructor(1, 2)
+        play {
+            new InnerClass(1, 2)
+        }
+    }
+    
+    class InnerClass {}
 
 }

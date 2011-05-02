@@ -31,6 +31,7 @@ import org.gmock.internal.signature.StaticPropertyGetSignature;
 import org.gmock.internal.signature.StaticPropertySetSignature;
 
 import java.beans.IntrospectionException;
+import java.lang.reflect.Modifier;
 
 /**
  * ClassProxyMetaClass capture all static and constructor call in replay mode.
@@ -111,11 +112,26 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
             }
         }, new Callable() {
             public Object call() {
-                Object[] evaluated = MockHelper.evaluateGStrings(arguments, controller);
+                Object[] removed = removeFirstArgumentOfInnerClass(arguments);
+                Object[] evaluated = MockHelper.evaluateGStrings(removed, controller);
                 ConstructorSignature signature = new ConstructorSignature(theClass, evaluated);
                 return findExpectation(constructorExpectations, signature, "Unexpected constructor call", theClass, null, evaluated, controller);
             }
         });
+    }
+
+    private Object[] removeFirstArgumentOfInnerClass(Object[] arguments) {
+        if (isInnerClass(mockClass)) {
+            Object[] removed = new Object[arguments.length - 1];
+            System.arraycopy(arguments, 1, removed, 0, removed.length);
+            return removed;
+        } else {
+            return arguments;
+        }
+    }
+
+    private boolean isInnerClass(Class<?> clazz) {
+        return clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers());
     }
 
     public Object invokeStaticMethod(final Object clazz, final String method, final Object[] arguments) {
