@@ -552,8 +552,8 @@ class FunctionalTest extends GMockTestCase {
         def mock3 = mock()
         mock1.is(mock2).returns(true)
 
-        def expected = "Unexpected method call 'is(Mock for Object (3))' on 'Mock for Object (1)'\n" +
-                       "  'is(Mock for Object (2))' on 'Mock for Object (1)': expected 1, actual 0"
+        def expected = "Unexpected method call 'is(<Mock for Object (3)>)' on 'Mock for Object (1)'\n" +
+                       "  'is(<Mock for Object (2)>)' on 'Mock for Object (1)': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {
                 mock1.is(mock3)
@@ -568,7 +568,7 @@ class FunctionalTest extends GMockTestCase {
         mock1.is(mock2).returns(true)
 
         def expected = "Expectation not matched on verify:\n" +
-                       "  'is(Mock for Object (2))' on 'Mock for Object (1)': expected 1, actual 0"
+                       "  'is(<Mock for Object (2)>)' on 'Mock for Object (1)': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {}
         }
@@ -724,7 +724,7 @@ class FunctionalTest extends GMockTestCase {
         m1.is(m2).returns(false)
 
         def expected = "Expectation not matched on verify:\n" +
-                       "  'is(test mock)' on 'Mock for Object': expected 1, actual 0"
+                       "  'is(<test mock>)' on 'Mock for Object': expected 1, actual 0"
         def message = shouldFail(AssertionFailedError) {
             play {}
         }

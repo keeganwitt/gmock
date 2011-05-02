@@ -105,8 +105,8 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
             assertEquals System.identityHashCode(m1), m1.hashCode()
             assertEquals "Mock for Object (1)", m1.toString()
 
-            def expected = "Unexpected method call 'equals(Mock for Object (2))' on 'Mock for Object (1)'\n" +
-                           "  'equals(Mock for Object (2))' on 'Mock for Object (1)': expected 1, actual 1 (+1)"
+            def expected = "Unexpected method call 'equals(<Mock for Object (2)>)' on 'Mock for Object (1)'\n" +
+                           "  'equals(<Mock for Object (2)>)' on 'Mock for Object (1)': expected 1, actual 1 (+1)"
             def message = shouldFail(AssertionFailedError) {
                 m1.equals(m2)
             }
