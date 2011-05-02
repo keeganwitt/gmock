@@ -78,6 +78,7 @@ class MockInternal {
     }
 
     Object invokeMockMethod(Object mockObject, String methodName, Object[] arguments) {
+        arguments = MockHelper.evaluateGStrings(arguments, controller)
         if (controller.replay){
             def signature = signatureFactory.createMethodSignature(this, methodName, arguments)
             def result = findExpectation(expectations, signature, "Unexpected method call", mockObject, methodName, arguments, controller)
