@@ -6,14 +6,11 @@ import org.gradle.api.tasks.bundling.Jar
 class JarjarPlugin implements Plugin<Project> {
 
     void apply(Project project) {
-        project.repositories {
-            mavenRepo name: 'JbossRepo', urls: ['http://repository.jboss.org/maven2/']
-        }
         project.configurations {
             jarjar
         }
         project.dependencies {
-            jarjar 'com.google.code:jarjar:1.0'
+            jarjar project.files('lib/jarjar-1.0.jar')
         }
         project.tasks.withType(Jar) { jar ->
             jar.jarjarify = false
