@@ -16,6 +16,7 @@
 package org.gmock.internal.signature
 
 import org.gmock.Matcher
+import org.gmock.internal.MockHelper
 import org.codehaus.groovy.runtime.DefaultGroovyMethods
 import org.codehaus.groovy.runtime.InvokerHelper
 
@@ -39,11 +40,11 @@ class ParameterSignature {
 
     String toString() {
         arguments.collect { 
-            def s = DefaultGroovyMethods.inspect(it)
             if (InvokerHelper.getMetaClass(it).getClass().package.name == 'org.gmock.internal.metaclass') {
+                def s = MockHelper.toString(it)
                 return "<$s>"
             } else {
-                return s
+                return DefaultGroovyMethods.inspect(it)
             }
         }.join(", ")
     }
