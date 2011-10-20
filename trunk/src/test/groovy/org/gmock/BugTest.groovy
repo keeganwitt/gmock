@@ -22,9 +22,11 @@ import org.dom4j.io.SAXReader
 import org.gmock.GMockTestCase
 import org.gmock.utils.JavaTestHelper
 import org.gmock.utils.Meh
+import org.gmock.utils.TestClass
 import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE
 import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE_VALUE
 import org.gmock.utils.Echo
+import org.w3c.dom.Element
 
 class BugTest extends GMockTestCase {
 
@@ -92,6 +94,15 @@ class BugTest extends GMockTestCase {
         }
         play {
             user.setEmail(null)
+        }
+    }
+
+    void testMockedElementParameter() {
+        def m = mock(TestClass)
+        def element = mock(Element)
+        m.hello(element).returns('world')
+        shouldFail(AssertionFailedError) {
+            play {}
         }
     }
 
