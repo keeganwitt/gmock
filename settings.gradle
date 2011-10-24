@@ -1,1 +1,1 @@
-include 'samples:cache', 'samples:collaborator'
+include 'grails-test', 'samples:cache', 'samples:collaborator'

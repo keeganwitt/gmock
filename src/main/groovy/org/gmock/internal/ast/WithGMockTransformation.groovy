@@ -36,6 +36,7 @@ public class WithGMockTransformation implements ASTTransformation {
     private static final ClassNode GMOCK_CONTROLLER_TYPE = new ClassNode(GMockController)
     private static final ClassNode GMOCK_TYPE = new ClassNode(GMock)
     private static final ClassNode OBJECT_ARRAY_TYPE = OBJECT_TYPE.makeArray()
+    private static final ClassNode CLOSURE_TYPE = new ClassNode(Closure)
 
     public void visit(ASTNode[] nodes, SourceUnit sourceUnit) {
         AnnotatedNode parent = (AnnotatedNode) nodes[1]
