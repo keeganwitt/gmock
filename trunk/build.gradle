@@ -81,7 +81,7 @@ samples.each { sample ->
     evaluationDependsOn sample.path
 }
 
-tasks.check.dependsOn intTest, samples*.check
+tasks.check.dependsOn intTest, ':grails-test:grailsTest', samples*.check
 
 tasks.uploadArchives {
     repositories.mavenDeployer {
