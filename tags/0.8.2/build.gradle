@@ -1,0 +1,187 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'wiki'
+apply plugin: 'jarjar'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+group = 'org.gmock'
+archivesBaseName = 'gmock'
+if (!('release' in gradle.startParameter.taskNames)) {
+    version += '-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    jarjarify
+    compileConf
+    testCompileConf
+    compile.extendsFrom compileConf, jarjarify
+    testCompile.extendsFrom testCompileConf
+    intTestCompile.extendsFrom groovy, compileConf, testCompileConf
+    intTestRuntime.extendsFrom intTestCompile
+
+    deployerJars
+}
+
+dependencies {
+    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
+    compileConf 'junit:junit:4.5'
+    testCompileConf 'org.hamcrest:hamcrest-library:1.1',
+                    'org.testng:testng:5.8:jdk15',
+                    'org.apache.tomcat:servlet-api:6.0.18',
+                    'dom4j:dom4j:1.6.1'
+    jarjarify 'cglib:cglib:2.2',
+              'org.objenesis:objenesis:1.1'
+    intTestCompile files(jar.archivePath)
+
+    deployerJars 'org.apache.maven.wagon:wagon-ssh:1.0-beta-2'
+}
+
+sourceSets {
+    main {
+        java.srcDirs = []
+        groovy.srcDirs = ['src/main/java', 'src/main/groovy']
+    }
+    intTest {
+        java.srcDirs = test.java.srcDirs
+        groovy.srcDirs = test.groovy.srcDirs
+        compileClasspath = configurations.intTestCompile
+        runtimeClasspath = files(classes, configurations.intTestRuntime)
+    }
+}
+
+
+// Tasks
+
+defaultTasks ':test'
+
+tasks.jar {
+    jarjarify = true
+    jarjarifyConfigurations = [configurations.jarjarify]
+    jarjarifyRule pattern: "net.sf.cglib.**", result: "org.gmock.internal.cglib.@1"
+    jarjarifyRule pattern: "org.objenesis.**", result: "org.gmock.internal.objenesis.@1"
+    jarjarifyRule pattern: "org.objectweb.asm.**", result: "org.gmock.internal.asm.@1"
+}
+
+tasks.compileIntTestJava.dependsOn jar
+
+task intTest(type: Test, dependsOn: [jar, intTestClasses]) {
+    group = 'verification'
+    testClassesDir = sourceSets.intTest.classesDir
+    classpath = sourceSets.intTest.runtimeClasspath
+    testReportDir = file("$reportsDir/int-tests")
+    testResultsDir = file("$buildDir/int-test-results")
+}
+
+samples.each { sample ->
+    evaluationDependsOn sample.path
+}
+
+tasks.check.dependsOn intTest, ':grails-test:grailsTest', samples*.check
+
+tasks.uploadArchives {
+    repositories.mavenDeployer {
+        configuration = configurations.deployerJars
+        repository url: 'scp://gmock.org/home/rsync/gmock/releases', {
+            authentication(userName: "rsync")
+        }
+    }
+}
+
+[tasks.install.repositories.mavenInstaller(), tasks.uploadArchives.repositories.mavenDeployer()]*.pom {
+    scopeMappings.with {
+        addMapping 0, configurations.groovy, 'compile'
+        addMapping 1, configurations.compileConf, 'compile'
+    }
+    project {
+        description 'Mocking Framework for Groovy'
+        url 'http://www.gmock.org'
+        licenses {
+            license {
+                name 'Apache License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        scm {
+            connection 'scm:svn:http://gmock.googlecode.com/svn/trunk/'
+            developerConnection 'scm:svn:https://gmock.googlecode.com/svn/trunk/'
+            url 'http://code.google.com/p/gmock/source/browse/'
+        }
+        distributionManagement {
+            repository = new org.apache.maven.model.DeploymentRepository(
+                id: 'gmock.website',
+                name: 'Gmock Website',
+                url: 'scp://gmock.org/home/rsync/gmock/releases'
+            )
+        }
+    }
+}
+
+tasks.wiki {
+    filename = "Documentation_${version[0]}_${version[2]}.wiki"
+    url = "http://gmock.googlecode.com/svn/wiki/$filename"
+    dir = file("$buildDir/wiki")
+    file = file("$dir/$filename")
+}
+
+tasks.docs {
+    wikiFile = wiki.file
+    templateDir = file('docs')
+    templateFile = file("$templateDir/template.gsp")
+    docsDir = project.docsDir
+    docsFile = file("$docsDir/index.html")
+}
+
+task wrapper(type: Wrapper) {
+    jarFile = file('wrapper/gradle-wrapper.jar')
+}
+
+samples*.task('wrapper', type: Wrapper)
+
+task exploded(type: Copy, dependsOn: [jar, docs, samples*.wrapper]) {
+    from jar.archivePath
+    from 'apache-license-2.0.txt'
+    from rootDir, {
+        include 'src/**'
+        include 'samples/*/src/**'
+    }
+    from buildDir, {
+        include 'docs/**'
+    }
+    from rootDir, {
+        include 'samples/*/build.gradle'
+        expand groovyVersion: groovyVersion
+        filter { line ->
+            line.replace 'rootProject', "files('../../$jar.archiveName')"
+        }
+    }
+    into "$distsDir/exploded/$archivesBaseName-$version"
+}
+
+samples.each { sample ->
+    sample.wrapper {
+        projectRelativePath = relativePath(sample.projectDir)
+        explodedDir = exploded.destinationDir
+        gradleVersion = wrapper.gradleVersion
+        jarFile = file("$explodedDir/wrapper/gradle-wrapper.jar")
+        scriptFile = file("$explodedDir/$projectRelativePath/gradlew")
+    }
+}
+
+task zip(type: Zip, dependsOn: exploded) {
+    group = 'build'
+    classifier = 'all'
+    from exploded.destinationDir.parent
+}
+
+task release(dependsOn: build)
+task snapshot(dependsOn: build)
+
+def getSamples() {
+   subprojects.findAll { it.path.startsWith ':samples:' }
+}

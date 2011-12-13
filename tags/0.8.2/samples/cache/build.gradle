@@ -1,0 +1,13 @@
+apply plugin: 'groovy'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
+    compile 'hsqldb:hsqldb:1.8.0.7'
+    testCompile 'junit:junit:4.5',
+                'org.hamcrest:hamcrest-library:1.1',
+                rootProject
+}

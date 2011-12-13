@@ -1,0 +1,21 @@
+jar = tasks.getByPath(':jar')
+
+task copyJar(type: Copy, dependsOn: jar) {
+    from(jar.destinationDir) {
+        include jar.archiveName
+        rename { 'gmock.jar' }
+    }
+    into 'lib'
+}
+
+task grailsTest(type: Exec, dependsOn: copyJar) {
+    if (System.getProperty('os.name').startsWith('Windows')) {
+        commandLine = ['cmd', '/c', 'grails', 'test-app']
+    } else {
+        commandLine = ['grails', 'test-app']
+    }
+}
+
+task clean(type: Delete) {
+    delete 'target'
+}
