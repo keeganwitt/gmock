@@ -97,8 +97,18 @@ class MockFactory {
     }
 
     private boolean isFinalClass(Class clazz) {
-        return Modifier.isFinal(clazz.modifiers) ||
-                (clazz.declaredConstructors.size() > 0 && clazz.declaredConstructors.every { Modifier.isPrivate(it.modifiers) })
+        return Modifier.isFinal(clazz.modifiers) || // the class is final
+               (clazz.declaredConstructors.size() > 0 && clazz.declaredConstructors.every { Modifier.isPrivate(it.modifiers) }) || // all constructors are private
+               isGetMetaClassMethodFinal(clazz) // the getMetaClass() method is final
+    }
+    
+    private boolean isGetMetaClassMethodFinal(Class clazz) {
+        try {
+            def method = clazz.getMethod("getMetaClass", null)
+            return Modifier.isFinal(method.modifiers)
+        } catch (NoSuchMethodException e) {
+            return false
+        }
     }
 
     private createMockInternal(clazz, mockName) {

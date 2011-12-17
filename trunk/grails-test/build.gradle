@@ -8,7 +8,7 @@ task copyJar(type: Copy, dependsOn: jar) {
     into 'lib'
 }
 
-task grailsTest(type: Exec, dependsOn: copyJar) {
+task test(type: Exec, dependsOn: copyJar) {
     if (System.getProperty('os.name').startsWith('Windows')) {
         commandLine = ['cmd', '/c', 'grails', 'test-app']
     } else {
