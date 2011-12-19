@@ -35,8 +35,8 @@ configurations {
 dependencies {
     groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
     providedCompile 'junit:junit:4.5'
-    jarjarifiedCompile 'cglib:cglib:2.2',
-                       'org.objenesis:objenesis:1.1'
+    jarjarifiedCompile 'cglib:cglib:2.2.2',
+                       'org.objenesis:objenesis:1.2'
 
     allTestCompile 'junit:junit:4.5',
                    'org.hamcrest:hamcrest-library:1.1',
