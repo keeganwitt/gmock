@@ -15,7 +15,6 @@
  */
 package org.gmock
 
-import junit.framework.AssertionFailedError
 import org.gmock.utils.Loader
 
 class FunctionalStrictOrderTest extends GMockTestCase {
@@ -65,7 +64,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "    'a()': expected 1, actual 1\n" +
                        "    'b()': expected 1, actual 0\n" +
                        "    'c()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.a()
                 mock.c()
@@ -109,7 +108,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "  ordered:\n" +
                        "    'c()': expected 1, actual 0\n" +
                        "    'd()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.b()
             }
@@ -127,7 +126,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "  ordered:\n" +
                        "    'a()': expected 1, actual 1\n" +
                        "    'b()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.a()
             }
@@ -189,7 +188,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "    'b()' on 'Mock for Object (2)': expected 1, actual 0\n" +
                        "    'b()' on 'Mock for Object (3)': expected 1, actual 0\n" +
                        "    'c()' on 'Mock for Object (1)': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 m1.a()
                 m3.b()
@@ -250,7 +249,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "  ordered:\n" +
                        "    'a()': expected 1, actual 0\n" +
                        "    'c()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.a()
                 mock.c()
@@ -395,7 +394,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "    'a = 1' on 'Mock for Object (1)': expected 1, actual 1\n" +
                        "    'a = 2' on 'Mock for Object (2)': expected 1, actual 0\n" +
                        "    'a' on 'Mock for Object (1)': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 m1.a = 1
                 assertEquals 0, m1.a
@@ -436,7 +435,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "    'Loader.a()': expected 1, actual 1\n" +
                        "    'Loader.b()': expected 1, actual 0\n" +
                        "    'Loader.c()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.a()
                 Loader.c()
@@ -480,7 +479,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "    'Loader.b = 2': expected 1, actual 1\n" +
                        "    'Loader.c = 3': expected 1, actual 0\n" +
                        "    'Loader.a': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.a = 1
                 Loader.b = 2
@@ -518,7 +517,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "    'new Loader(1)': expected 1, actual 1\n" +
                        "    'new Loader(2)': expected 1, actual 0\n" +
                        "    'new Loader(3)': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 new Loader(1)
                 new Loader(3)
@@ -565,7 +564,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "    'name = \"test\"' on 'Mock for Loader (2)': expected 1, actual 1\n" +
                        "    'name' on 'Mock for Loader (2)': expected 1, actual 0\n" +
                        "    'Loader.finalize()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.init()
                 def loader = new Loader()
@@ -924,7 +923,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "      'b()' on 'Mock for Object (2)': expected 2..3, actual 1\n" +
                        "      'c()' on 'Mock for Object (2)': expected any times, actual 3\n" +
                        "    'unlock()' on 'Mock for Object (1)': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 assertTrue mockLock.lock()
                 assertEquals 3, mockOther.c()
@@ -969,7 +968,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "    unordered:\n" +
                        "      'b()': expected 1, actual 0\n" +
                        "      'c()': expected 1, actual 1"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.a()
                 mock.c()
@@ -1129,7 +1128,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "  unordered:\n" +
                        "    'a()' on 'Mock for Object (1)': expected at least 3, actual 0\n" +
                        "    'b()' on 'Mock for Object (2)': expected never, actual 0 (+1)"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 m2.b()
             }

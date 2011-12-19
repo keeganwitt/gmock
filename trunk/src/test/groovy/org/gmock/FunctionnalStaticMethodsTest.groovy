@@ -15,7 +15,6 @@
  */
 package org.gmock
 
-import junit.framework.AssertionFailedError
 import static org.hamcrest.Matchers.*
 import org.gmock.utils.Loader
 
@@ -73,7 +72,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
                 assertEquals "one", Loader.one()
                 assertEquals "two", Loader.two()
             }
-        } catch (AssertionFailedError e){
+        } catch (AssertionError e){
             def expected = "Expectation not matched on verify:\n" +
                         "  'Loader.one()': expected 2, actual 1\n" +
                         "  'Loader.two()': expected 1, actual 1"
@@ -89,7 +88,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
             play {
                 assertEquals "two", Loader.two()
             }
-        } catch (AssertionFailedError e){
+        } catch (AssertionError e){
             def expected = "Unexpected static method call 'Loader.two()'\n" +
                            "  'Loader.one()': expected 1, actual 0"
             assertEquals expected, e.message
@@ -111,7 +110,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def expected = "Unexpected static method call 'Loader.check(0)'\n" +
                        "  'Loader.check(one of {<1>, <2>, <3>, <4>, <5>})': expected 1, actual 0"
 
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.check(0)
             }
@@ -134,7 +133,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def expected = "Unexpected static method call 'Loader.check(0)'\n" +
                        "  'Loader.check(a value matching the closure matcher)': expected 1, actual 0"
 
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.check(0)
             }
@@ -174,7 +173,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def expected = "Unexpected static method call 'Loader.one()'\n" +
                        "  'Loader.one()': expected 1..2, actual 2 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 3.times { Loader.one() }
             }
             assertEquals expected, message
@@ -195,7 +194,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def expected = "Unexpected static method call 'Loader.one()'\n" +
                        "  'Loader.one()': expected 2, actual 2 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 3.times { Loader.one() }
             }
             assertEquals expected, message
@@ -214,7 +213,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def expected = "Unexpected static method call 'Loader.one()'\n" +
                        "  'Loader.one()': expected never, actual 0 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 Loader.one()
             }
             assertEquals expected, message
@@ -247,7 +246,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         mockLoader.static.one().atLeast(2)
         def expected = "Expectation not matched on verify:\n" +
                        "  'Loader.one()': expected at least 2, actual 1"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.one()
             }
@@ -282,7 +281,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         def expected = "Unexpected static method call 'Loader.one()'\n" +
                        "  'Loader.one()': expected at most 2, actual 2 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 3.times { Loader.one() }
             }
             assertEquals expected, message
@@ -314,7 +313,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         mockLoader.static.one().times(1..2)
         def expected = "Expectation not matched on verify:\n" +
                        "  'Loader.one()': expected 4..5, actual 3"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 3.times { Loader.one() }
             }
@@ -365,7 +364,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
 
         def expected = "Unexpected static method call 'Loader.toString()'\n" +
                        "  'Loader.hashCode()': expected 2, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.toString()
             }
@@ -476,7 +475,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         mock(Loader).static./isE\w*/().returns(true)
         def expected = "Unexpected static property getter call 'Loader.empty'\n" +
                        "  'Loader.\"isE\\w*\"()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.empty
             }
@@ -488,7 +487,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         mock(Loader).static./setF\w*/(true)
         def expected = "Unexpected static property setter call 'Loader.full = true'\n" +
                        "  'Loader.\"setF\\w*\"(true)': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.full = true
             }
@@ -513,7 +512,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
         mock(Loader).static./.*/.returns(true)
         def expected = "Unexpected static property setter call 'Loader.something = true'\n" +
                        "  'Loader.\".*\"': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.something = true
             }

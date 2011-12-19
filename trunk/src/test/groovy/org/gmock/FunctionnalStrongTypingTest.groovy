@@ -15,7 +15,6 @@
  */
 package org.gmock
 
-import junit.framework.AssertionFailedError
 import org.gmock.utils.*
 
 class FunctionnalStrongTypingTest extends GMockTestCase {
@@ -208,7 +207,7 @@ class FunctionnalStrongTypingTest extends GMockTestCase {
                 closure.delegate = mock
                 [Closure.OWNER_FIRST, Closure.DELEGATE_FIRST, Closure.DELEGATE_ONLY].each { strategy ->
                     closure.resolveStrategy = strategy
-                    def message = shouldFail(AssertionFailedError) {
+                    def message = shouldFail(AssertionError) {
                         closure()
                     }
                     assertEquals expected, message

@@ -51,7 +51,7 @@ repositories {
 }
 
 dependencies {
-    compile project(':')
+    compile rootProject
     grailsLibs.each { lib ->
         compile "org.grails:$lib:$grailsVersion"
     }

@@ -16,7 +16,6 @@
 package org.gmock
 
 import org.gmock.utils.FakeTagLib
-import junit.framework.AssertionFailedError
 
 class FunctionnalMockMethodOutTest extends GMockTestCase {
 
@@ -61,7 +60,7 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
 
         mockTabLib.link([some: "attr"], "goodBye").returns("<a>link</a>")
 
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 tagLib.linkHello([some: "attr"])
             }

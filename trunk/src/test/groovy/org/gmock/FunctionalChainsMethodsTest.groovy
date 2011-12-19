@@ -15,7 +15,6 @@
  */
 package org.gmock
 
-import junit.framework.AssertionFailedError
 import org.gmock.utils.Loader
 import org.gmock.utils.ChainA
 import org.gmock.utils.JavaTestHelper
@@ -76,7 +75,7 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
 
         def expected = "Expectation not matched on verify:\n" +
                        "  'text.trim()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play { mock.text }
         }
         assertEquals expected, message
@@ -88,7 +87,7 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
 
         def expected = "Unexpected method call 'text.toUpperCase()'\n" +
                        "  'text.trim()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play { mock.text.toUpperCase() }
         }
         assertEquals expected, message
@@ -100,7 +99,7 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
 
         def expected = "Expectation not matched on verify:\n" +
                        "  'a.b.c.d()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play { mock.a.b }
         }
         assertEquals expected, message
@@ -112,7 +111,7 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
 
         def expected = "Unexpected property getter call 'a().x'\n" +
                        "  'a().b.c().d': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play { mock.a().x.c().d }
         }
         assertEquals expected, message
@@ -128,7 +127,7 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
                        "  'a.b' on 'Mock for Object (1)': expected 1, actual 0\n" +
                        "  'c().d().e()' on 'Mock for Object (2)': expected 1, actual 1\n" +
                        "  'f()' on 'Mock for Object (1)': expected 1, actual 1"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 m1.f()
                 m2.c().d().e()
@@ -148,7 +147,7 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
                        "  'a.b.c()' on 'Mock for Object (1)': expected 1, actual 0\n" +
                        "  'd()' on 'Mock for Object (2)': expected 1, actual 1\n" +
                        "  'e().f.g()' on 'Mock for Object (3)': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 m2.d()
                 m1.a.x.c()
@@ -162,7 +161,7 @@ class FunctionalChainsMethodsTest extends GMockTestCase {
 
         def expected = "Unexpected property getter call 'Loader.a.x'\n" +
                        "  'Loader.a.b.c': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.a.x.c
             }

@@ -17,7 +17,6 @@ package org.gmock
 
 import javax.servlet.http.HttpServletRequest
 import javax.sound.sampled.AudioSystem
-import junit.framework.AssertionFailedError
 import org.dom4j.io.SAXReader
 import org.gmock.GMockTestCase
 import org.gmock.utils.JavaTestHelper
@@ -35,7 +34,7 @@ class BugTest extends GMockTestCase {
         def mock = mock()
         mock.foo(request)
 
-        shouldFail(AssertionFailedError) {
+        shouldFail(AssertionError) {
             play {}
         }
     }
@@ -101,7 +100,7 @@ class BugTest extends GMockTestCase {
         def m = mock(TestClass)
         def element = mock(Element)
         m.hello(element).returns('world')
-        shouldFail(AssertionFailedError) {
+        shouldFail(AssertionError) {
             play {}
         }
     }
