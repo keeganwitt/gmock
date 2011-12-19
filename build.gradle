@@ -16,12 +16,17 @@ repositories {
 }
 
 configurations {
-    jarjarify
-    compileConf
-    testCompileConf
-    compile.extendsFrom compileConf, jarjarify
-    testCompile.extendsFrom testCompileConf
-    intTestCompile.extendsFrom groovy, compileConf, testCompileConf
+    publicCompile // dependencies which will be written to the pom.xml file
+    providedCompile // dependencies which are needed for compilation but optional at runtime
+    jarjarifiedCompile // dependencies which are needed but will be jarjarified into the jar file of gmock
+    allTestCompile // dependencies which are needed by both unit tests and integration tests
+
+    publicCompile.extendsFrom groovy
+
+    compile.extendsFrom publicCompile, providedCompile, jarjarifiedCompile
+    testCompile.extendsFrom allTestCompile
+
+    intTestCompile.extendsFrom publicCompile, allTestCompile
     intTestRuntime.extendsFrom intTestCompile
 
     deployerJars
@@ -29,13 +34,15 @@ configurations {
 
 dependencies {
     groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
-    compileConf 'junit:junit:4.5'
-    testCompileConf 'org.hamcrest:hamcrest-library:1.1',
-                    'org.testng:testng:5.8:jdk15',
-                    'org.apache.tomcat:servlet-api:6.0.18',
-                    'dom4j:dom4j:1.6.1'
-    jarjarify 'cglib:cglib:2.2',
-              'org.objenesis:objenesis:1.1'
+    providedCompile 'junit:junit:4.5'
+    jarjarifiedCompile 'cglib:cglib:2.2',
+                       'org.objenesis:objenesis:1.1'
+
+    allTestCompile 'junit:junit:4.5',
+                   'org.hamcrest:hamcrest-library:1.1',
+                   'org.testng:testng:5.8:jdk15',
+                   'org.apache.tomcat:servlet-api:6.0.18',
+                   'dom4j:dom4j:1.6.1'
     intTestCompile files(jar.archivePath)
 
     deployerJars 'org.apache.maven.wagon:wagon-ssh:1.0-beta-2'
@@ -61,7 +68,7 @@ defaultTasks ':test'
 
 tasks.jar {
     jarjarify = true
-    jarjarifyConfigurations = [configurations.jarjarify]
+    jarjarifyConfigurations = [configurations.jarjarifiedCompile]
     jarjarifyRule pattern: "net.sf.cglib.**", result: "org.gmock.internal.cglib.@1"
     jarjarifyRule pattern: "org.objenesis.**", result: "org.gmock.internal.objenesis.@1"
     jarjarifyRule pattern: "org.objectweb.asm.**", result: "org.gmock.internal.asm.@1"
@@ -95,7 +102,7 @@ tasks.uploadArchives {
 [tasks.install.repositories.mavenInstaller(), tasks.uploadArchives.repositories.mavenDeployer()]*.pom {
     scopeMappings.with {
         addMapping 0, configurations.groovy, 'compile'
-        addMapping 1, configurations.compileConf, 'compile'
+        addMapping 1, configurations.publicCompile, 'compile'
     }
     project {
         description 'Mocking Framework for Groovy'

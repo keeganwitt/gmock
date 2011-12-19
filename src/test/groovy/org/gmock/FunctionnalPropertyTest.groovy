@@ -15,7 +15,6 @@
  */
 package org.gmock
 
-import junit.framework.AssertionFailedError
 import org.gmock.utils.Loader
 import org.gmock.utils.FakeTagLib
 import org.gmock.utils.JavaFinalClass
@@ -65,7 +64,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
                 mockLoader.unexpected = 10
             }
             fail("Should throw an exception")
-        } catch (AssertionFailedError e){
+        } catch (AssertionError e){
             def expected = "Unexpected property setter call 'unexpected = 10'\n"+
                            "  'name': expected 1, actual 1\n"+
                            "  'id = \"some id\"': expected 1, actual 0\n"+
@@ -85,7 +84,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
             play {
                 assertEquals "a name", mockLoader.name
             }
-        } catch (AssertionFailedError e){
+        } catch (AssertionError e){
             def expected = "Expectation not matched on verify:\n" +
                    "  'name': expected 1, actual 1\n" +
                    "  'id = \"some id\"': expected 1, actual 0"
@@ -211,7 +210,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def expected = "Unexpected property setter call 'test = 0'\n" +
                        "  'test = one of {<1>, <2>, <3>}': expected 1, actual 0"
 
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mockLoader.test = 0
                 return null // prevent the getter of test from being invoked for evaluating the result of closure
@@ -236,7 +235,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def expected = "Unexpected property setter call 'test = 0'\n" +
                        "  'test = a value matching the closure matcher': expected 1, actual 0"
 
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mockLoader.test = 0
                 return null // prevent the getter of test from being invoked for evaluating the result of closure
@@ -276,7 +275,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def expected = "Unexpected property getter call 'id'\n" +
                        "  'id': expected 1..2, actual 2 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 3.times {
                     assertEquals 3, mockLoader.id
                 }
@@ -303,7 +302,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def expected = "Unexpected property setter call 'id = 6'\n" +
                        "  'id = 6': expected 2, actual 2 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 3.times {
                     mockLoader.id = 6
                     return null
@@ -325,7 +324,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def expected = "Unexpected property setter call 'id = 8'\n" +
                        "  'id = 8': expected never, actual 0 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 mockLoader.id = 8
             }
             assertEquals expected, message
@@ -349,7 +348,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         mockLoader.id.set(11).atLeastOnce()
         def expected = "Expectation not matched on verify:\n" +
                        "  'id = 11': expected at least 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {}
         }
         assertEquals expected, message
@@ -373,7 +372,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def expected = "Unexpected property getter call 'id'\n" +
                        "  'id': expected at most 2, actual 2 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 3.times {
                     assertEquals 14, mockLoader.id
                 }
@@ -420,7 +419,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
             3.times {
                 assertEquals 16, mockLoader.id
             }
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 assertEquals 16, mockLoader.id
             }
             assertEquals expected, message
@@ -496,7 +495,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         def expected = "Expectation not matched on verify:\n" +
                        "  'Loader.a': expected 1, actual 0\n" +
                        "  'Loader.b = 2': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {}
         }
         assertEquals expected, message
@@ -549,7 +548,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
                        "  'setIt(1)': expected 1, actual 0\n" +
                        "  'it = 1': expected 1, actual 0\n" +
                        "  'something = 2': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.setOther(0)
             }
@@ -573,7 +572,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
                        "  'it': expected 1, actual 0\n" +
                        "  'getIt()': expected 1, actual 0\n" +
                        "  'getSomething()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.getOther()
             }
@@ -597,7 +596,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
                        "  'Loader.setIt(1)': expected 1, actual 0\n" +
                        "  'Loader.it = 1': expected 1, actual 0\n" +
                        "  'Loader.something = 2': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.setOther(0)
             }
@@ -621,7 +620,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
                        "  'Loader.it': expected 1, actual 0\n" +
                        "  'Loader.getIt()': expected 1, actual 0\n" +
                        "  'Loader.getSomething()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 Loader.getOther()
             }

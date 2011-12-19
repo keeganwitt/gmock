@@ -15,7 +15,6 @@
  */
 package org.gmock
 
-import junit.framework.AssertionFailedError
 import static org.gmock.GMock.constructor
 import static org.gmock.GMock.match
 import org.gmock.utils.JavaCache
@@ -39,7 +38,7 @@ class GMockControllerTest extends GroovyTestCase {
 
         mockLoader.put(1, 2)
 
-        shouldFail(AssertionFailedError) {
+        shouldFail(AssertionError) {
             gmc.play {}
         }
     }
@@ -56,7 +55,7 @@ class GMockControllerTest extends GroovyTestCase {
 
         gmc.mock(Loader, constructor(1, 2))
 
-        shouldFail(AssertionFailedError) {
+        shouldFail(AssertionError) {
             gmc.play {}
         }
     }

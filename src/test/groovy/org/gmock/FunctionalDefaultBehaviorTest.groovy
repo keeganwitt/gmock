@@ -15,7 +15,6 @@
  */
 package org.gmock
 
-import junit.framework.AssertionFailedError
 import org.gmock.utils.JavaTestHelper
 
 class FunctionalDefaultBehaviorTest extends GMockTestCase {
@@ -107,7 +106,7 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
 
             def expected = "Unexpected method call 'equals(<Mock for Object (2)>)' on 'Mock for Object (1)'\n" +
                            "  'equals(<Mock for Object (2)>)' on 'Mock for Object (1)': expected 1, actual 1 (+1)"
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 m1.equals(m2)
             }
             assertEquals expected, message
@@ -124,7 +123,7 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
 
             def expected = "Unexpected method call 'hashCode()' on 'Mock for Object (1)'\n" +
                            "  'hashCode()' on 'Mock for Object (1)': expected 1, actual 1 (+1)"
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 m1.hashCode()
             }
             assertEquals expected, message
@@ -141,7 +140,7 @@ class FunctionalDefaultBehaviorTest extends GMockTestCase {
 
             def expected = "Unexpected method call 'toString()' on 'Mock for Object (1)'\n" +
                            "  'toString()' on 'Mock for Object (1)': expected 1, actual 1 (+1)"
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 m1.toString()
             }
             assertEquals expected, message

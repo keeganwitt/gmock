@@ -15,7 +15,6 @@
  */
 package org.gmock.internal
 
-import junit.framework.Assert
 import org.gmock.internal.MockDelegate
 import org.gmock.internal.MockInternal
 import org.gmock.internal.ChainsMockInternal
@@ -168,7 +167,7 @@ class InternalMockController {
         def callState = callState(signature).toString()
         if (callState) { callState = "\n$callState" }
         signature = signature ? ' ' + signature.toString(mockCount > 1) : ''
-        Assert.fail("$message$signature$callState")
+        throw new AssertionError("$message$signature$callState")
     }
 
     private callState(signature) {

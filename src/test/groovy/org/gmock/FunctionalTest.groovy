@@ -15,7 +15,6 @@
  */
 package org.gmock
 
-import junit.framework.AssertionFailedError
 import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 import org.gmock.utils.JavaLoader
 import org.gmock.utils.FakeTagLib
@@ -44,7 +43,7 @@ class FunctionalTest extends GMockTestCase {
                 mockLoader.load("bar")
                 mockLoader.load("bar")
                 fail("Should have throw an exception")
-            } catch (AssertionFailedError e) {
+            } catch (AssertionError e) {
                 message = e.message
             }
         }
@@ -88,7 +87,7 @@ class FunctionalTest extends GMockTestCase {
         try {
             play {}
             fail("Should have throw an exception")
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             assertEquals expected, e.message
         }
     }
@@ -109,7 +108,7 @@ class FunctionalTest extends GMockTestCase {
             try {
                 mockLoader.load("key")
                 fail("Should have throw an exception")
-            } catch (AssertionFailedError e) {
+            } catch (AssertionError e) {
                 assertEquals "Unexpected method call 'load(\"key\")'", e.message
             }
         }
@@ -159,7 +158,7 @@ class FunctionalTest extends GMockTestCase {
 
         try {
             play {}
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             assertEquals expected, e.message
         }
     }
@@ -213,7 +212,7 @@ class FunctionalTest extends GMockTestCase {
 
         try {
             play {}
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             assertEquals expected, e.message
         }
     }
@@ -248,7 +247,7 @@ class FunctionalTest extends GMockTestCase {
         def expected = "Unexpected method call 'load(\"test\")'\n" +
                        "  'load(is not \"test\")': expected 1, actual 0"
 
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mockLoader.load("test")
             }
@@ -271,7 +270,7 @@ class FunctionalTest extends GMockTestCase {
         def expected = "Unexpected method call 'load(\"test\")'\n" +
                        "  'load(a value matching the closure matcher)': expected 1, actual 0"
 
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mockLoader.load("test")
             }
@@ -299,7 +298,7 @@ class FunctionalTest extends GMockTestCase {
         mockLoader.load(1).returns(2).times(1..2)
         def expected = "Expectation not matched on verify:\n" +
                        "  'load(1)': expected 1..2, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {}
         }
         assertEquals expected, message
@@ -311,7 +310,7 @@ class FunctionalTest extends GMockTestCase {
         def expected = "Unexpected method call 'load(1)'\n" +
                        "  'load(1)': expected 1..2, actual 2 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 3.times { mockLoader.load(1) }
             }
             assertEquals expected, message
@@ -334,7 +333,7 @@ class FunctionalTest extends GMockTestCase {
         mockLoader.load(1).returns(2).times(2)
         def expected = "Expectation not matched on verify:\n" +
                        "  'load(1)': expected 2, actual 1"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 assertEquals 2, mockLoader.load(1)
             }
@@ -348,7 +347,7 @@ class FunctionalTest extends GMockTestCase {
         def expected = "Unexpected method call 'load(1)'\n" +
                        "  'load(1)': expected 2, actual 2 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 3.times { mockLoader.load(1) }
             }
             assertEquals expected, message
@@ -367,7 +366,7 @@ class FunctionalTest extends GMockTestCase {
         def expected = "Unexpected method call 'load(1)'\n" +
                        "  'load(1)': expected never, actual 0 (+1)"
         play {
-            def message = shouldFail(AssertionFailedError) {
+            def message = shouldFail(AssertionError) {
                 mockLoader.load(1)
             }
             assertEquals expected, message
@@ -404,7 +403,7 @@ class FunctionalTest extends GMockTestCase {
         mockLoader.load(1).returns(2).atLeast(2)
         def expected = "Expectation not matched on verify:\n" +
                        "  'load(1)': expected at least 2, actual 1"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 assertEquals 2, mockLoader.load(1)
             }
@@ -449,7 +448,7 @@ class FunctionalTest extends GMockTestCase {
         mockLoader.load(3).returns(4).atMost(2)
         def expected = "Unexpected method call 'load(3)'\n" +
                        "  'load(3)': expected at most 2, actual 2 (+1)"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 3.times { mockLoader.load(3) }
             }
@@ -502,7 +501,7 @@ class FunctionalTest extends GMockTestCase {
         def expected = "Expectation not matched on verify:\n" +
                        "  'load(1)': expected at least 7, actual 6\n" +
                        "  'put(9, 9)': expected 2..3, actual 2"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 3.times {
                     assertEquals 2, mockLoader.load(1)
@@ -554,7 +553,7 @@ class FunctionalTest extends GMockTestCase {
 
         def expected = "Unexpected method call 'is(<Mock for Object (3)>)' on 'Mock for Object (1)'\n" +
                        "  'is(<Mock for Object (2)>)' on 'Mock for Object (1)': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock1.is(mock3)
             }
@@ -569,7 +568,7 @@ class FunctionalTest extends GMockTestCase {
 
         def expected = "Expectation not matched on verify:\n" +
                        "  'is(<Mock for Object (2)>)' on 'Mock for Object (1)': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {}
         }
         assertEquals expected, message
@@ -633,7 +632,7 @@ class FunctionalTest extends GMockTestCase {
         def mock = mock()
         mock.hashCode().returns(1)
 
-        shouldFail(AssertionFailedError) {
+        shouldFail(AssertionError) {
             play {
                 mock.toString()
             }
@@ -646,7 +645,7 @@ class FunctionalTest extends GMockTestCase {
         def mock = mock()
         mock.hashCode().returns(1)
 
-        shouldFail(AssertionFailedError) {
+        shouldFail(AssertionError) {
             play {}
         }
 
@@ -725,7 +724,7 @@ class FunctionalTest extends GMockTestCase {
 
         def expected = "Expectation not matched on verify:\n" +
                        "  'is(<test mock>)' on 'Mock for Object': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {}
         }
         assertEquals expected, message
@@ -788,7 +787,7 @@ class FunctionalTest extends GMockTestCase {
                        "  'Date.e()': expected 1, actual 0\n" +
                        "  'Date.f': expected 1, actual 0\n" +
                        "  'Date.g = 4': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 m1.z()
             }
@@ -811,7 +810,7 @@ class FunctionalTest extends GMockTestCase {
         mock./getA.*/().returns(0)
         def expected = "Unexpected property getter call 'abc'\n" +
                        "  '\"getA.*\"()': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.abc
             }
@@ -824,7 +823,7 @@ class FunctionalTest extends GMockTestCase {
         mock./setX.*/(1)
         def expected = "Unexpected property setter call 'xyz = 1'\n" +
                        "  '\"setX.*\"(1)': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.xyz = 1
             }
@@ -849,7 +848,7 @@ class FunctionalTest extends GMockTestCase {
         mock./a.*/.returns(1)
         def expected = "Unexpected property getter call 'bbb'\n" +
                        "  '\"a.*\"': expected 1, actual 0"
-        def message = shouldFail(AssertionFailedError) {
+        def message = shouldFail(AssertionError) {
             play {
                 mock.bbb
             }
