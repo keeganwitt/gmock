@@ -19,6 +19,8 @@ import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.SourceUnit
+import org.codehaus.groovy.syntax.Token
+import org.codehaus.groovy.syntax.Types
 import org.codehaus.groovy.transform.ASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.gmock.GMock
@@ -37,6 +39,19 @@ public class WithGMockTransformation implements ASTTransformation {
     private static final ClassNode GMOCK_TYPE = new ClassNode(GMock)
     private static final ClassNode OBJECT_ARRAY_TYPE = OBJECT_TYPE.makeArray()
     private static final ClassNode CLOSURE_TYPE = new ClassNode(Closure)
+
+    private static final ClassNode TESTNG_BEFORE_METHOD_TYPE
+    
+    static {
+        try {
+            def testNGBeforeMethodClass = Class.forName('org.testng.annotations.BeforeMethod')
+            if (testNGBeforeMethodClass) {
+                TESTNG_BEFORE_METHOD_TYPE = new ClassNode(testNGBeforeMethodClass)
+            }
+        } catch (e) {
+            TESTNG_BEFORE_METHOD_TYPE = null
+        }
+    }
 
     public void visit(ASTNode[] nodes, SourceUnit sourceUnit) {
         AnnotatedNode parent = (AnnotatedNode) nodes[1]
@@ -63,6 +78,62 @@ public class WithGMockTransformation implements ASTTransformation {
         delegateToGmock(cNode, "constructor", [args: OBJECT_ARRAY_TYPE])
         delegateToGmock(cNode, "invokeConstructor", [args: OBJECT_ARRAY_TYPE])
         delegateToGmock(cNode, "name", [name: STRING_TYPE])
+
+        if (isTestNGTest(cNode)) {
+            addDependencyToBeforeMethods(cNode)
+            addTestNGBeforeMethod(cNode)
+        }
+    }
+
+    private addDependencyToBeforeMethods(ClassNode cNode) {
+        cNode.methods.each { MethodNode method ->
+            method.annotations.each { AnnotationNode annotation ->
+                if (annotation.classNode.name == 'org.testng.annotations.BeforeMethod') {
+                    def createGMockController = new ConstantExpression('$createGMockController')
+                    def dependsOnMethods = annotation.getMember('dependsOnMethods')
+                    if (dependsOnMethods == null) {
+                        dependsOnMethods = new ListExpression([createGMockController])
+                    } else if (dependsOnMethods instanceof ListExpression) {
+                        dependsOnMethods.addExpression(createGMockController)
+                    } else if (dependsOnMethods instanceof ConstantExpression) {
+                        dependsOnMethods = new ListExpression([dependsOnMethods, createGMockController])
+                    }
+                    annotation.setMember('dependsOnMethods', dependsOnMethods)
+                }
+            }
+        }
+    }
+
+    private addTestNGBeforeMethod(ClassNode cNode) {
+        def gmockController = new VariableExpression('$gmockController')
+        def assign = new Token(Types.ASSIGN, "=", -1, -1)
+        def constructorCall = new ConstructorCallExpression(GMOCK_CONTROLLER_TYPE, NO_ARGUMENTS)
+
+        def body = new BlockStatement()
+        body.addStatement(new ExpressionStatement(new BinaryExpression(gmockController, assign, constructorCall)))
+
+        def method = new MethodNode('$createGMockController', ACC_PUBLIC, VOID_TYPE, new Parameter[0], EMPTY_ARRAY, body)
+        def annotation = new AnnotationNode(TESTNG_BEFORE_METHOD_TYPE)
+        annotation.setMember('alwaysRun', ConstantExpression.TRUE)
+        method.addAnnotation(annotation)
+
+        cNode.addMethod(method)
+    }
+
+    private boolean isTestNGTest(ClassNode cNode) {
+        return hasTestNGTestAnnotation(cNode) && isTestNGBeforeMethodAnnotationAvailable()
+    }
+
+    private boolean hasTestNGTestAnnotation(ClassNode cNode) {
+        cNode.methods.any { MethodNode method ->
+            method.annotations.any { AnnotationNode annotation ->
+                annotation.classNode.name == 'org.testng.annotations.Test'
+            }
+        }
+    }
+
+    private boolean isTestNGBeforeMethodAnnotationAvailable() {
+        TESTNG_BEFORE_METHOD_TYPE != null
     }
 
     private delegateToGmock(ClassNode cNode, String methodName, Map args) {
