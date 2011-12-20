@@ -2,8 +2,11 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'wiki'
 apply plugin: 'jarjar'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+
+allprojects {
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+}
 
 group = 'org.gmock'
 archivesBaseName = 'gmock'
@@ -40,7 +43,7 @@ dependencies {
 
     allTestCompile 'junit:junit:4.5',
                    'org.hamcrest:hamcrest-library:1.1',
-                   'org.testng:testng:5.8:jdk15',
+                   'org.testng:testng:6.3.1',
                    'org.apache.tomcat:servlet-api:6.0.18',
                    'dom4j:dom4j:1.6.1'
     intTestCompile files(jar.archivePath)
