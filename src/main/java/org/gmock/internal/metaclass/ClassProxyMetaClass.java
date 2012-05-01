@@ -15,28 +15,36 @@
  */
 package org.gmock.internal.metaclass;
 
+import static org.gmock.internal.metaclass.MetaClassHelper.findExpectation;
+import static org.gmock.internal.metaclass.MetaClassHelper.getGetterMethodName;
+import static org.gmock.internal.metaclass.MetaClassHelper.getSetterMethodName;
 import groovy.lang.GroovySystem;
 import groovy.lang.MetaClass;
 import groovy.lang.MetaClassRegistry;
+import groovy.lang.MetaClassRegistryChangeEventListener;
 import groovy.lang.ProxyMetaClass;
+
+import java.beans.IntrospectionException;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.LinkedList;
+
 import org.gmock.internal.Callable;
 import org.gmock.internal.InternalMockController;
 import org.gmock.internal.MockHelper;
 import org.gmock.internal.expectation.Expectation;
 import org.gmock.internal.expectation.ExpectationCollection;
-import static org.gmock.internal.metaclass.MetaClassHelper.*;
 import org.gmock.internal.signature.ConstructorSignature;
 import org.gmock.internal.signature.StaticMethodSignature;
 import org.gmock.internal.signature.StaticPropertyGetSignature;
 import org.gmock.internal.signature.StaticPropertySetSignature;
 
-import java.beans.IntrospectionException;
-import java.lang.reflect.Modifier;
-
 /**
  * ClassProxyMetaClass capture all static and constructor call in replay mode.
  */
 public class ClassProxyMetaClass extends ProxyMetaClass {
+
+    private static final String META_CLASS_REGISTRY_CLEANER_CLASS_NAME = "org.codehaus.groovy.grails.cli.support.MetaClassRegistryCleaner";
 
     private ExpectationCollection constructorExpectations;
     private ExpectationCollection staticExpectations;
@@ -76,17 +84,42 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
         if (!empty()) {
             mockClass = theClass;
 
+            Collection<MetaClassRegistryChangeEventListener> cleaners = disableMetaClassRegistryCleaners();
             adaptee = registry.getMetaClass(theClass);
             registry.setMetaClass(theClass, this);
+            enableMetaClassRegistryCleaners(cleaners);
         }
     }
 
     public void stopProxy(){
         if (!empty()) {
+            Collection<MetaClassRegistryChangeEventListener> cleaners = disableMetaClassRegistryCleaners();
             registry.setMetaClass(theClass, adaptee);
+            enableMetaClassRegistryCleaners(cleaners);
 
             mockClass = null;
         }
+    }
+    
+    private void enableMetaClassRegistryCleaners(Collection<MetaClassRegistryChangeEventListener> cleaners) {
+        for (MetaClassRegistryChangeEventListener cleaner : cleaners) {
+            registry.addMetaClassRegistryChangeEventListener(cleaner);
+        }
+    }
+
+    private Collection<MetaClassRegistryChangeEventListener> disableMetaClassRegistryCleaners() {
+        // A hacky fix for issue 125
+        MetaClassRegistryChangeEventListener[] listeners = registry
+                .getMetaClassRegistryChangeEventListeners();
+        Collection<MetaClassRegistryChangeEventListener> cleaners =
+                new LinkedList<MetaClassRegistryChangeEventListener>();
+        for (MetaClassRegistryChangeEventListener listener : listeners) {
+            if (META_CLASS_REGISTRY_CLEANER_CLASS_NAME.equals(listener.getClass().getName())) {
+                cleaners.add(listener);
+                registry.removeMetaClassRegistryChangeEventListener(listener);
+            }
+        }
+        return cleaners;
     }
 
     public void validate(){

@@ -16,6 +16,8 @@
 package org.gmock
 
 import org.gmock.utils.*
+import org.junit.Test;
+
 import static org.hamcrest.Matchers.greaterThan
 import static org.hamcrest.Matchers.greaterThanOrEqualTo
 
@@ -234,5 +236,15 @@ class FunctionnalConstructorsTest extends GMockTestCase {
     }
     
     class InnerClass {}
+    
+    void testMockingFileConstructor() {
+        mock File, constructor('test.txt'), {
+            getText() returns 'some text'
+        }
+        play {
+            def file = new File('test.txt')
+            assert 'some text' == file.text
+        }
+    }
 
 }
