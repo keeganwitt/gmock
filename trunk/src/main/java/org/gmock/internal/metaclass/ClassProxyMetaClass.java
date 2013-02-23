@@ -85,17 +85,23 @@ public class ClassProxyMetaClass extends ProxyMetaClass {
             mockClass = theClass;
 
             Collection<MetaClassRegistryChangeEventListener> cleaners = disableMetaClassRegistryCleaners();
-            adaptee = registry.getMetaClass(theClass);
-            registry.setMetaClass(theClass, this);
-            enableMetaClassRegistryCleaners(cleaners);
+            try {
+                adaptee = registry.getMetaClass(theClass);
+                registry.setMetaClass(theClass, this);
+            } finally {
+                enableMetaClassRegistryCleaners(cleaners);
+            }
         }
     }
 
     public void stopProxy(){
         if (!empty()) {
             Collection<MetaClassRegistryChangeEventListener> cleaners = disableMetaClassRegistryCleaners();
-            registry.setMetaClass(theClass, adaptee);
-            enableMetaClassRegistryCleaners(cleaners);
+            try {
+                registry.setMetaClass(theClass, adaptee);
+            } finally {
+                enableMetaClassRegistryCleaners(cleaners);
+            }
 
             mockClass = null;
         }
