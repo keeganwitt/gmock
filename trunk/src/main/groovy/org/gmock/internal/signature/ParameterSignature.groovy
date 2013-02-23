@@ -39,8 +39,8 @@ class ParameterSignature {
     }
 
     String toString() {
-        arguments.collect { 
-            if (InvokerHelper.getMetaClass(it).getClass().package.name == 'org.gmock.internal.metaclass') {
+        arguments.collect {
+            if (it != null && InvokerHelper.getMetaClass(it).getClass().package.name == 'org.gmock.internal.metaclass') {
                 def s = MockHelper.toString(it)
                 return "<$s>"
             } else {

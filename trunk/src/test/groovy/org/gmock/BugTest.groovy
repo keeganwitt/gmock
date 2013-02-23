@@ -105,4 +105,12 @@ class BugTest extends GMockTestCase {
         }
     }
 
+    void testNullParameterAndExpectationNotMatchedThrowsNPE() {
+        def m = mock()
+        m.fun(null)
+        shouldFail(AssertionError) {
+            play {}
+        }
+    }
+
 }
