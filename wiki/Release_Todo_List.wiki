@@ -5,13 +5,10 @@
 *When releasing gmock:*
  * Create an updated documentation page 
  * Tag the release
- * Increment the current version
- * Install the artifact in the gmock.org repository
+ * Upload the artifact to the Sonatype OOS repository
+ * Release the artifact on Sonatype OOS
  * Make the artifacts available on google code
- * Update gmock.org documentation
- * Change gmock.org version number
  * Update the download page
- * Update the roadmap
- * Deploy gmock.org
  * Update google code site
+ * Increment the current version
  * Announce it
