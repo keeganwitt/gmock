@@ -19,11 +19,6 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.gmock.WithGMock
 import org.gmock.utils.JavaCache
 import org.gmock.utils.JavaLoader
-import org.gmock.utils.JavaTestHelper
-import org.testng.annotations.BeforeMethod
-import org.testng.annotations.Test
-import org.testng.TestListenerAdapter
-import org.testng.TestNG
 
 @WithGMock
 class FunctionnalASTTransformationTest extends GroovyTestCase {
@@ -169,27 +164,25 @@ new A().test()
     }
 
     void testTestNGWithGMock() {
-        new TestNG().with {
-            outputDirectory = 'build/reports/testng-tests'
-            testClasses = [TestNGWithGMock]
-            it.run()
-            assertFalse hasFailure()
-        }
-    }
+        Eval.me '''
+import org.gmock.utils.JavaCache
+import org.gmock.utils.JavaLoader
+import org.gmock.utils.JavaTestHelper
+import org.testng.annotations.BeforeMethod
+import org.testng.annotations.Test
+import org.testng.TestNG
 
-}
-
-@WithGMock
+@org.gmock.WithGMock
 class TestNGWithGMock {
 
     def fake
 
     boolean called = false
 
-    @BeforeMethod(dependsOnMethods = 'callFirst') void createMock() {
+    @BeforeMethod(dependsOnMethods = "callFirst") void createMock() {
         assert called
 
-        fake = mock(name('fake'))
+        fake = mock(name("fake"))
         fake.fail().raises(Exception).stub()
     }
 
@@ -271,7 +264,7 @@ class TestNGWithGMock {
     }
 
     @Test void name() {
-        def mockDate = mock(Date, name('my mock date'))
+        def mockDate = mock(Date, name("my mock date"))
         play {
             assert "my mock date" == mockDate.toString()
         }
@@ -279,13 +272,23 @@ class TestNGWithGMock {
 
     @Test(invocationCount = 3) void mockName() {
         def mock = mock()
-        assert JavaTestHelper.toStringOn(mock) == 'Mock for Object'
+        assert JavaTestHelper.toStringOn(mock) == "Mock for Object"
     }
 
     @Test(expectedExceptions = [Exception]) void mocksCreatedInBeforeMethod() {
         play {
             fake.fail()
         }
+    }
+
+}
+new TestNG().with {
+    outputDirectory = "build/reports/testng-tests"
+    testClasses = [TestNGWithGMock]
+    it.run()
+    assert !hasFailure()
+}
+'''
     }
 
 }

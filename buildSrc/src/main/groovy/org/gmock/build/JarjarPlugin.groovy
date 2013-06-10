@@ -13,13 +13,13 @@ class JarjarPlugin implements Plugin<Project> {
             jarjar project.files('lib/jarjar-1.0.jar')
         }
         project.tasks.withType(Jar) { jar ->
-            jar.jarjarify = false
-            jar.jarjarifyConfigurations = []
-            jar.jarjarifyRules = []
-            jar.jarjarifyRule = { Map rule -> jar.jarjarifyRules << rule }
+            jar.ext.jarjarify = false
+            jar.ext.jarjarifyConfigurations = []
+            jar.ext.jarjarifyRules = []
+            jar.ext.jarjarifyRule = { Map rule -> jar.jarjarifyRules << rule }
             jar << {
                 if (jarjarify) {
-                    tmpArchivePath = project.file("${archivePath}.tmp")
+                    def tmpArchivePath = project.file("${archivePath}.tmp")
                     project.ant {
                         move file: archivePath, tofile: tmpArchivePath
                         taskdef name: 'jarjar', classname: 'com.tonicsystems.jarjar.JarJarTask', classpath: project.configurations.jarjar.asPath

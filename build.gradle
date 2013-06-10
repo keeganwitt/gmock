@@ -1,5 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'signing'
 apply plugin: 'wiki'
 apply plugin: 'jarjar'
 
@@ -10,8 +11,12 @@ allprojects {
 
 group = 'org.gmock'
 archivesBaseName = 'gmock'
+
+def sonatypeRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+
 if (!('release' in gradle.startParameter.taskNames)) {
     version += '-SNAPSHOT'
+    sonatypeRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
 repositories {
@@ -24,19 +29,15 @@ configurations {
     jarjarifiedCompile // dependencies which are needed but will be jarjarified into the jar file of gmock
     allTestCompile // dependencies which are needed by both unit tests and integration tests
 
-    publicCompile.extendsFrom groovy
-
     compile.extendsFrom publicCompile, providedCompile, jarjarifiedCompile
     testCompile.extendsFrom allTestCompile
 
     intTestCompile.extendsFrom publicCompile, allTestCompile
     intTestRuntime.extendsFrom intTestCompile
-
-    deployerJars
 }
 
 dependencies {
-    groovy "org.codehaus.groovy:groovy-all:$groovyVersion"
+    publicCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
     providedCompile 'junit:junit:4.5'
     jarjarifiedCompile 'cglib:cglib:2.2.2',
                        'org.objenesis:objenesis:1.2'
@@ -47,8 +48,6 @@ dependencies {
                    'org.apache.tomcat:servlet-api:6.0.18',
                    'dom4j:dom4j:1.6.1'
     intTestCompile files(jar.archivePath)
-
-    deployerJars 'org.apache.maven.wagon:wagon-ssh:1.0-beta-2'
 }
 
 sourceSets {
@@ -60,7 +59,7 @@ sourceSets {
         java.srcDirs = test.java.srcDirs
         groovy.srcDirs = test.groovy.srcDirs
         compileClasspath = configurations.intTestCompile
-        runtimeClasspath = files(classes, configurations.intTestRuntime)
+        runtimeClasspath = output + configurations.intTestRuntime
     }
 }
 
@@ -81,9 +80,7 @@ tasks.compileIntTestJava.dependsOn jar
 
 task intTest(type: Test, dependsOn: [jar, intTestClasses]) {
     group = 'verification'
-    testClassesDir = sourceSets.intTest.classesDir
-    classpath = sourceSets.intTest.runtimeClasspath
-    testReportDir = file("$reportsDir/int-tests")
+    testReportDir = file("$reporting.baseDir/int-tests")
     testResultsDir = file("$buildDir/int-test-results")
 }
 
@@ -91,49 +88,72 @@ samples.each { sample ->
     evaluationDependsOn sample.path
 }
 
-tasks.check.dependsOn intTest, ':grails-test:test', samples*.check
+tasks.check.dependsOn intTest, ':grails-test:grails-test-app', samples*.check
+
+task groovydocJar(type: Jar, dependsOn: groovydoc) {
+    classifier = 'javadoc'
+    from 'build/docs/groovydoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives groovydocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
 
 tasks.uploadArchives {
     repositories.mavenDeployer {
-        configuration = configurations.deployerJars
-        repository url: 'scp://gmock.org/home/rsync/gmock/releases', {
-            authentication(userName: "rsync")
-        }
-    }
-}
+        beforeDeployment { deployment -> signing.signPom(deployment) }
 
-[tasks.install.repositories.mavenInstaller(), tasks.uploadArchives.repositories.mavenDeployer()]*.pom {
-    scopeMappings.with {
-        addMapping 0, configurations.groovy, 'compile'
-        addMapping 1, configurations.publicCompile, 'compile'
-    }
-    project {
-        description 'Mocking Framework for Groovy'
-        url 'http://www.gmock.org'
-        licenses {
-            license {
-                name 'Apache License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution 'repo'
+        repository(url: sonatypeRepositoryUrl) {
+            authentication(userName: sonatypeUsername, password: sonatypePassword)
+        }
+
+        pom {
+            scopeMappings.addMapping 0, configurations.publicCompile, 'compile'
+            project {
+                name 'Gmock'
+                packaging 'jar'
+                description 'Mocking Framework for Groovy'
+                url 'http://www.gmock.org'
+                licenses {
+                    license {
+                        name 'Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+                scm {
+                    connection 'scm:svn:http://gmock.googlecode.com/svn/trunk/'
+                    developerConnection 'scm:svn:https://gmock.googlecode.com/svn/trunk/'
+                    url 'http://code.google.com/p/gmock/source/browse/'
+                }
+                developers {
+                    developer {
+                        id 'johnnyjian'
+                        name 'Johnny Jian'
+                    }
+                    developer {
+                        id 'juliengagnet'
+                        name 'Julien Gagnet'
+                    }
+                }
             }
-        }
-        scm {
-            connection 'scm:svn:http://gmock.googlecode.com/svn/trunk/'
-            developerConnection 'scm:svn:https://gmock.googlecode.com/svn/trunk/'
-            url 'http://code.google.com/p/gmock/source/browse/'
-        }
-        distributionManagement {
-            repository = new org.apache.maven.model.DeploymentRepository(
-                id: 'gmock.website',
-                name: 'Gmock Website',
-                url: 'scp://gmock.org/home/rsync/gmock/releases'
-            )
         }
     }
 }
 
 tasks.wiki {
-    filename = "Documentation_${version[0]}_${version[2]}.wiki"
+    def filename = "Documentation_${version[0]}_${version[2]}.wiki"
     url = "http://gmock.googlecode.com/svn/wiki/$filename"
     dir = file("$buildDir/wiki")
     file = file("$dir/$filename")
@@ -175,8 +195,8 @@ task exploded(type: Copy, dependsOn: [jar, docs, samples*.wrapper]) {
 
 samples.each { sample ->
     sample.wrapper {
-        projectRelativePath = relativePath(sample.projectDir)
-        explodedDir = exploded.destinationDir
+        def projectRelativePath = relativePath(sample.projectDir)
+        def explodedDir = exploded.destinationDir
         gradleVersion = wrapper.gradleVersion
         jarFile = file("$explodedDir/wrapper/gradle-wrapper.jar")
         scriptFile = file("$explodedDir/$projectRelativePath/gradlew")
