@@ -209,6 +209,8 @@ task zip(type: Zip, dependsOn: exploded) {
     from exploded.destinationDir.parent
 }
 
+tasks.assemble.dependsOn zip
+
 task release(dependsOn: build)
 task snapshot(dependsOn: build)
 
