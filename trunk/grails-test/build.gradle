@@ -1,60 +1,21 @@
 buildscript {
     repositories {
-        mavenRepo urls: "http://repo.grails.org/grails/repo"
+        mavenRepo url: "http://repo.grails.org/grails/repo"
     }
 
     dependencies {
-        classpath "org.grails:grails-gradle-plugin:1.0",
-                  "org.grails:grails-bootstrap:$grailsVersion"
+        classpath "org.grails:grails-gradle-plugin:2.0.0-SNAPSHOT"
     }
 }
 
 apply plugin: 'grails'
 
-grailsLibs = [ // copied from the "settings.gradle" file from Grails
-    'grails-bootstrap',
-    'grails-core',
-    'grails-spring',
-    'grails-hibernate',
-    'grails-web',
-    'grails-test',
-    'grails-docs',
-    'grails-webflow',
-    'grails-crud',
-    'grails-resources',
-    'grails-scripts',
-    'grails-logging',
-
-    // Plugins
-    'grails-plugin-domain-class',
-    'grails-plugin-url-mappings',
-    'grails-plugin-controllers',
-    'grails-plugin-log4j',
-    'grails-plugin-mimetypes',
-    'grails-plugin-gsp',
-    'grails-plugin-filters',
-    'grails-plugin-codecs',
-    'grails-plugin-converters',
-    'grails-plugin-i18n',
-    'grails-plugin-servlets',
-    'grails-plugin-validation',
-    'grails-plugin-datasource',
-    'grails-plugin-services',
-    'grails-plugin-scaffolding',
-    'grails-plugin-testing',
-    'grails-plugin-tomcat',
-    'grails-plugin-async',
-]
-
 repositories {
-    mavenRepo urls: "http://repo.grails.org/grails/repo"
+    mavenRepo url: "http://repo.grails.org/grails/repo"
 }
 
 dependencies {
     compile rootProject
-    grailsLibs.each { lib ->
-        compile "org.grails:$lib:$grailsVersion"
-    }
-
-    runtime "org.slf4j:slf4j-api:1.6.2"
 }
+
+grails.grailsVersion = grailsVersion
