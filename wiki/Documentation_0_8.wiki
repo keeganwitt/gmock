@@ -8,7 +8,7 @@ Gmock is a mocking framework for the Groovy language.
 Gmock is all about simple syntax and readability of your tests so you spend less time learning the framework and more time writing code. To use Gmock just drop the gmock jar file into your classpath and make sure you also have junit.
 
 
-This documention describes the version 0.8 of Gmock which is compatible with Groovy 1.6.
+This documention describes the version 0.8 of Gmock which is compatible with Groovy 1.8.
 
 
 = Getting Started = 
