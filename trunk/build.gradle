@@ -12,12 +12,14 @@ allprojects {
 group = 'org.gmock'
 archivesBaseName = 'gmock'
 
-def sonatypeRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+def isRelease = 'release' in gradle.startParameter.taskNames
+def isSnapshot = !isRelease
 
-if (!('release' in gradle.startParameter.taskNames)) {
+if (isSnapshot) {
     version += '-SNAPSHOT'
-    sonatypeRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
 }
+
+def sonatypeRepositoryUrl = isRelease ? "https://oss.sonatype.org/service/local/staging/deploy/maven2/" : "https://oss.sonatype.org/content/repositories/snapshots/"
 
 repositories {
     mavenCentral()
@@ -106,13 +108,17 @@ artifacts {
     archives sourcesJar
 }
 
-signing {
-    sign configurations.archives
+if (isRelease) {
+    signing {
+        sign configurations.archives
+    }
 }
 
 tasks.uploadArchives {
     repositories.mavenDeployer {
-        beforeDeployment { deployment -> signing.signPom(deployment) }
+        if (isRelease) {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+        }
 
         repository(url: sonatypeRepositoryUrl) {
             authentication(userName: sonatypeUsername, password: sonatypePassword)
@@ -182,6 +188,7 @@ task exploded(type: Copy, dependsOn: [jar, docs, samples*.wrapper]) {
     }
     from buildDir, {
         include 'docs/**'
+        exclude 'docs/groovydoc'
     }
     from rootDir, {
         include 'samples/*/build.gradle'
