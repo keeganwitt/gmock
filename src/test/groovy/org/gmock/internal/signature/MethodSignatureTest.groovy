@@ -68,7 +68,7 @@ class MethodSignatureTest extends GMockTestCase {
     void testToString() {
         def object = new Object()
         def signature = new MethodSignature(object, "someOperate", ["test", 3, true])
-        assertEquals 'someOperate("test", 3, true)', signature.toString()
+        assertEquals "someOperate('test', 3, true)", signature.toString()
     }
 
     void testToStringWithMockName() {
@@ -76,7 +76,7 @@ class MethodSignatureTest extends GMockTestCase {
         object.mockName.chains().toString(true).returns(" on 'Mock'")
         def signature = new MethodSignature(object, "someOperate", ["test", 3, true])
         play {
-            assertEquals "'someOperate(\"test\", 3, true)' on 'Mock'", signature.toString(true)
+            assertEquals "'someOperate('test', 3, true)' on 'Mock'", signature.toString(true)
         }
     }
 
@@ -85,7 +85,7 @@ class MethodSignatureTest extends GMockTestCase {
         object.mockName.chains().toString(true).returns(" on 'Mock'")
         def signature = new MethodSignature(object, "someOperate", ["test", 3, true])
         play {
-            assertEquals "'someOperate(\"test\", 3, true).other()' on 'Mock'", signature.toString(true, '.other()')
+            assertEquals "'someOperate('test', 3, true).other()' on 'Mock'", signature.toString(true, '.other()')
         }
     }
 

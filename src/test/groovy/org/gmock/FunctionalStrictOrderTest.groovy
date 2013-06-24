@@ -561,7 +561,7 @@ class FunctionalStrictOrderTest extends GMockTestCase {
                        "    'Loader.init()': expected 1, actual 1\n" +
                        "    'new Loader()': expected 1, actual 1\n" +
                        "    'load(1)' on 'Mock for Loader (2)': expected 1, actual 1\n" +
-                       "    'name = \"test\"' on 'Mock for Loader (2)': expected 1, actual 1\n" +
+                       "    'name = 'test'' on 'Mock for Loader (2)': expected 1, actual 1\n" +
                        "    'name' on 'Mock for Loader (2)': expected 1, actual 0\n" +
                        "    'Loader.finalize()': expected 1, actual 0"
         def message = shouldFail(AssertionError) {

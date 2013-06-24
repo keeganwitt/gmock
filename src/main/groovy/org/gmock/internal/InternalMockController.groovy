@@ -109,7 +109,7 @@ class InternalMockController {
                 if (orderingController.ordered) {
                     throw new IllegalStateException("Play closures cannot be inside ordered closure.")
                 }
-                
+
                 mockCollection*.validate()
                 classExpectations.validate()
                 orderingController.validate()
@@ -141,7 +141,7 @@ class InternalMockController {
             }
         }
     }
-    
+
     private removeChainsMocks() {
         mockCollection.removeAll { it instanceof ChainsMockInternal }
     }
@@ -160,7 +160,7 @@ class InternalMockController {
 
     def addToExpectations(expectation, expectations) {
       orderingController.addToExpectations(expectation, expectations)
-    }  
+    }
 
 
     def fail(message, signature = null) {
@@ -200,11 +200,12 @@ class InternalMockController {
         def backup = internal
         internal = mode
         try {
-            return work.call()
+            // Cast "work" to Callable, because when "work" is a closure and we call the "call()" method on it, the
+            // method will be changed to "doCall()" in MetaClassImpl.createPogoCallSite()
+            return (work as Callable).call()
         } finally {
             internal = backup
         }
     }
 
 }
-

@@ -15,7 +15,9 @@
  */
 package org.gmock.internal.metaclass;
 
+import groovy.lang.GroovyObject;
 import groovy.lang.GroovySystem;
+import groovy.lang.MetaClass;
 import groovy.lang.MetaMethod;
 import groovy.lang.ProxyMetaClass;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
@@ -145,15 +147,23 @@ public class ConcreteMockProxyMetaClass extends ProxyMetaClass {
     }
 
     public void startProxy() {
-        DefaultGroovyMethods.setMetaClass(concreteObject, this);
+        setMetaClassToObject(concreteObject, this);
     }
 
     public void stopProxy() {
-        DefaultGroovyMethods.setMetaClass(concreteObject, adaptee);
+        setMetaClassToObject(concreteObject, adaptee);
     }
 
     public MockInternal getMock() {
         return mock;
+    }
+
+    private void setMetaClassToObject(Object object, MetaClass metaClass) {
+        if (object instanceof GroovyObject) {
+            DefaultGroovyMethods.setMetaClass((GroovyObject) object, metaClass);
+        } else {
+            DefaultGroovyMethods.setMetaClass(object, metaClass);
+        }
     }
 
 }

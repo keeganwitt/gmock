@@ -62,17 +62,17 @@ class StaticMethodSignatureTest extends GroovyTestCase {
 
     void testToString() {
         def signature = new StaticMethodSignature(Loader, "put", ["test", 3, true])
-        assertEquals 'Loader.put("test", 3, true)', signature.toString()
+        assertEquals "Loader.put('test', 3, true)", signature.toString()
     }
 
     void testToStringWithMockName() {
         def signature = new StaticMethodSignature(Loader, "put", ["test", 3, true])
-        assertEquals "'Loader.put(\"test\", 3, true)'", signature.toString(true)
+        assertEquals "'Loader.put('test', 3, true)'", signature.toString(true)
     }
 
     void testToStringWithMockNameAndPostfix() {
         def signature = new StaticMethodSignature(Loader, "put", ["test", 3, true])
-        assertEquals "'Loader.put(\"test\", 3, true).other()'", signature.toString(true, '.other()')
+        assertEquals "'Loader.put('test', 3, true).other()'", signature.toString(true, '.other()')
     }
 
     void testValidateWithMethodName(){

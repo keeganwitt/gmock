@@ -2,7 +2,7 @@ package org.gmock.test
 
 class PartialMockBugService {
 
-    static transactional = true
+    static transactional = false
 
     def serviceMethod() {
         'foo'

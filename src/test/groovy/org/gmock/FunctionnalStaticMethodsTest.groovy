@@ -474,7 +474,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
     void testNoCrossUsageToStaticPropertyGetterWithRegexStaticMethodName() {
         mock(Loader).static./isE\w*/().returns(true)
         def expected = "Unexpected static property getter call 'Loader.empty'\n" +
-                       "  'Loader.\"isE\\w*\"()': expected 1, actual 0"
+                       "  'Loader.'isE\\w*'()': expected 1, actual 0"
         def message = shouldFail(AssertionError) {
             play {
                 Loader.empty
@@ -486,7 +486,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
     void testNoCrossUsageToStaticPropertySetterWithRegexStaticMethodName() {
         mock(Loader).static./setF\w*/(true)
         def expected = "Unexpected static property setter call 'Loader.full = true'\n" +
-                       "  'Loader.\"setF\\w*\"(true)': expected 1, actual 0"
+                       "  'Loader.'setF\\w*'(true)': expected 1, actual 0"
         def message = shouldFail(AssertionError) {
             play {
                 Loader.full = true
@@ -511,7 +511,7 @@ class FunctionnalStaticMethodsTest extends GMockTestCase {
     void testRegexStaticPropertyNameAndFailed() {
         mock(Loader).static./.*/.returns(true)
         def expected = "Unexpected static property setter call 'Loader.something = true'\n" +
-                       "  'Loader.\".*\"': expected 1, actual 0"
+                       "  'Loader.'.*'': expected 1, actual 0"
         def message = shouldFail(AssertionError) {
             play {
                 Loader.something = true
