@@ -16,7 +16,7 @@
 package org.gmock
 
 import org.gmock.utils.*
-import org.junit.Test;
+import org.junit.Test
 
 import static org.hamcrest.Matchers.greaterThan
 import static org.hamcrest.Matchers.greaterThanOrEqualTo
@@ -92,7 +92,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
             fail("Should have throw an exception")
         } catch (AssertionError e){
             def expected = "Expectation not matched on verify:\n" +
-                           "  'new Loader(\"1\", \"2\")': expected 1, actual 1\n" +
+                           "  'new Loader('1', '2')': expected 1, actual 1\n" +
                            "  'new Loader(3, 4)': expected 1, actual 0"
             assertEquals expected, e.message
         }
@@ -109,7 +109,7 @@ class FunctionnalConstructorsTest extends GMockTestCase {
             fail("Should have throw an exception")
         } catch (AssertionError e){
             def expected = "Unexpected constructor call 'new Loader(${now.inspect()})'\n"+
-                           "  'new Loader(\"1\")': expected 1, actual 0"
+                           "  'new Loader('1')': expected 1, actual 0"
             assertEquals expected, e.message
         }
 
@@ -125,8 +125,8 @@ class FunctionnalConstructorsTest extends GMockTestCase {
 
     void testConstructorHamcrestMatcherNotMatched() {
         mock(Loader, constructor(greaterThan(5), "2"))
-        def expected = "Unexpected constructor call 'new Loader(5, \"2\")'\n" +
-                       "  'new Loader(a value greater than <5>, \"2\")': expected 1, actual 0"
+        def expected = "Unexpected constructor call 'new Loader(5, '2')'\n" +
+                       "  'new Loader(a value greater than <5>, '2')': expected 1, actual 0"
 
         def message = shouldFail(AssertionError) {
             play {
@@ -146,8 +146,8 @@ class FunctionnalConstructorsTest extends GMockTestCase {
 
     void testConstructorClosureMatcherNotMatched() {
         mock(Loader, constructor(match { it > 5 }, "2"))
-        def expected = "Unexpected constructor call 'new Loader(5, \"2\")'\n" +
-                       "  'new Loader(a value matching the closure matcher, \"2\")': expected 1, actual 0"
+        def expected = "Unexpected constructor call 'new Loader(5, '2')'\n" +
+                       "  'new Loader(a value matching the closure matcher, '2')': expected 1, actual 0"
 
         def message = shouldFail(AssertionError) {
             play {
@@ -227,16 +227,16 @@ class FunctionnalConstructorsTest extends GMockTestCase {
             assertEquals 'b', createGroovyLoader().load('a')
         }
     }
-    
+
     void testMockConstructorOfInnerClass() {
         mock InnerClass, constructor(1, 2)
         play {
             new InnerClass(1, 2)
         }
     }
-    
+
     class InnerClass {}
-    
+
     void testMockingFileConstructor() {
         mock File, constructor('test.txt'), {
             getText() returns 'some text'

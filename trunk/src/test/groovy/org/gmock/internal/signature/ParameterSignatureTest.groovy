@@ -52,7 +52,7 @@ class ParameterSignatureTest extends GroovyTestCase {
     void testToString() {
         def signature = new ParameterSignature(["test", 3, true, [1, 2], [3, 4] as Object[], [a: "b", c: "d"], [], [:],
                 is(greaterThanOrEqualTo(3)), match { it > 3 }])
-        assertEquals '"test", 3, true, [1, 2], [3, 4], ["a":"b", "c":"d"], [], [:], ' +
+        assertEquals "'test', 3, true, [1, 2], [3, 4], ['a':'b', 'c':'d'], [], [:], " +
                      'is a value greater than or equal to <3>, a value matching the closure matcher',
                 signature.toString()
     }

@@ -69,7 +69,7 @@ class PropertySetSignatureTest extends GMockTestCase {
     void testToString() {
         def object = new Object()
         def signature = new PropertySetSignature(object, "name", "tostring")
-        assertEquals 'name = "tostring"', signature.toString()
+        assertEquals "name = 'tostring'", signature.toString()
     }
 
     void testToStringWithMockName() {
@@ -77,7 +77,7 @@ class PropertySetSignatureTest extends GMockTestCase {
         object.mockName.chains().toString(true).returns(" on 'Mock'")
         def signature = new PropertySetSignature(object, "name", "tostring")
         play {
-            assertEquals "'name = \"tostring\"' on 'Mock'", signature.toString(true)
+            assertEquals "'name = 'tostring'' on 'Mock'", signature.toString(true)
         }
     }
 

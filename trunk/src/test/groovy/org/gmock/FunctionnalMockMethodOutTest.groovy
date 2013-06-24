@@ -19,7 +19,6 @@ import org.gmock.utils.FakeTagLib
 
 class FunctionnalMockMethodOutTest extends GMockTestCase {
 
-
     void testMockMethodOut() {
         def tagLib = new FakeTagLib()
         def mockTabLib = mock(tagLib)
@@ -65,8 +64,8 @@ class FunctionnalMockMethodOutTest extends GMockTestCase {
                 tagLib.linkHello([some: "attr"])
             }
         }
-        def expected = """Unexpected method call 'link(["some":"attr"], "hello")'
-  'link(["some":"attr"], "goodBye")': expected 1, actual 0"""
+        def expected = """Unexpected method call 'link(['some':'attr'], 'hello')'
+  'link(['some':'attr'], 'goodBye')': expected 1, actual 0"""
         assertEquals expected, message
 
     }

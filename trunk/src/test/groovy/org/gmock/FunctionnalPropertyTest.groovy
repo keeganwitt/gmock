@@ -67,8 +67,8 @@ class FunctionnalPropertyTest extends GMockTestCase {
         } catch (AssertionError e){
             def expected = "Unexpected property setter call 'unexpected = 10'\n"+
                            "  'name': expected 1, actual 1\n"+
-                           "  'id = \"some id\"': expected 1, actual 0\n"+
-                           "  'load(\"fruit\")': expected 1, actual 0"
+                           "  'id = 'some id'': expected 1, actual 0\n"+
+                           "  'load('fruit')': expected 1, actual 0"
 
             assertEquals expected, e.message
         }
@@ -87,7 +87,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
         } catch (AssertionError e){
             def expected = "Expectation not matched on verify:\n" +
                    "  'name': expected 1, actual 1\n" +
-                   "  'id = \"some id\"': expected 1, actual 0"
+                   "  'id = 'some id'': expected 1, actual 0"
             assertEquals expected, e.message
         }
     }
@@ -444,7 +444,7 @@ class FunctionnalPropertyTest extends GMockTestCase {
 
     void testAssignPropertyInRecordState() {
         def mockLoader = mock()
-        def expected = "Cannot use property setter in record mode. Are you trying to mock a setter? Use 'id.set(\"1\")' instead."
+        def expected = "Cannot use property setter in record mode. Are you trying to mock a setter? Use 'id.set('1')' instead."
         def message = shouldFail(MissingPropertyException) {
             mockLoader.id = "1"
         }
