@@ -149,7 +149,7 @@ tasks.uploadArchives {
                         name 'Johnny Jian'
                     }
                     developer {
-                        id 'juliengagnet'
+                        id 'julien.gagnet'
                         name 'Julien Gagnet'
                     }
                 }
