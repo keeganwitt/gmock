@@ -1,0 +1,12 @@
+apply plugin: 'groovy'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'commons-lang:commons-lang:2.4',
+            localGroovy(),
+            gradleApi()
+    testCompile 'junit:junit:4.5'
+}
