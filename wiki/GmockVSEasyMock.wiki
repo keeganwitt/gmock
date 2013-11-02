@@ -4,13 +4,7 @@
 
 = Basic Usages =
 
-<table>
-<tr>
-<th>EasyMock</th>
-<th>Gmock</th>
-</tr>
-<tr>
-<td align="top">
+=== EasyMock ===
 {{{
 List mock = createMock(List.class);
 
@@ -25,8 +19,8 @@ someCodeThatInteractsWithMock(mock);
 
 verify(mock);
 }}}
-</td>
-<td align="top">
+
+=== Gmock ===
 {{{
 def mock = mock(List)
 
@@ -50,9 +44,7 @@ play {
   someCodeThatInteractsWithMock(mock)
 }
 }}}
-</td>
-</tr>
-</table>
+
 
 = Order Checking =
 
