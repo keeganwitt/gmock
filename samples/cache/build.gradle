@@ -5,7 +5,7 @@ repositories {
 }
 
 dependencies {
-    compile "org.codehaus.groovy:groovy-all:$groovyVersion",
+    compile "org.codehaus.groovy:groovy-all:$compileGroovyVersion",
             'hsqldb:hsqldb:1.8.0.7'
     testCompile 'junit:junit:4.5',
                 'org.hamcrest:hamcrest-library:1.1',

@@ -39,7 +39,7 @@ configurations {
 }
 
 dependencies {
-    publicCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
+    publicCompile "org.codehaus.groovy:groovy-all:$compileGroovyVersion"
     providedCompile 'junit:junit:4.5'
     jarjarifiedCompile 'cglib:cglib:2.2.2',
                        'org.objenesis:objenesis:1.2'
@@ -65,7 +65,6 @@ sourceSets {
     }
 }
 
-
 // Tasks
 
 defaultTasks ':test'
@@ -82,6 +81,8 @@ tasks.compileIntTestJava.dependsOn jar
 
 task intTest(type: Test, dependsOn: [jar, intTestClasses]) {
     group = 'verification'
+    testClassesDir = sourceSets.intTest.output.classesDir
+    classpath = sourceSets.intTest.runtimeClasspath
     testReportDir = file("$reporting.baseDir/int-tests")
     testResultsDir = file("$buildDir/int-test-results")
 }
@@ -91,6 +92,40 @@ samples.each { sample ->
 }
 
 tasks.check.dependsOn intTest, ':grails-test:grails-test-app', samples*.check
+
+supportGroovyVersions.split(',').each { supportGroovyVersion ->
+
+    def version = supportGroovyVersion.replaceAll(/[\.-]/, '')
+
+    configurations.create("groovy${version}TestCompile") {
+        extendsFrom configurations.intTestCompile
+    }
+    configurations.create("groovy${version}TestRuntime") {
+        extendsFrom configurations."groovy${version}TestCompile"
+    }
+
+    dependencies."groovy${version}TestCompile"("org.codehaus.groovy:groovy-all:${supportGroovyVersion}")
+
+    sourceSets.create("groovy${version}Test") {
+        java.srcDirs = sourceSets.test.java.srcDirs
+        groovy.srcDirs = sourceSets.test.groovy.srcDirs
+        compileClasspath = configurations."groovy${version}TestCompile"
+        runtimeClasspath = output + configurations."groovy${version}TestRuntime"
+    }
+
+    tasks.getByName("compileGroovy${version}TestJava").dependsOn jar
+
+    task "groovy${version}Test"(type: Test, dependsOn: [jar, "groovy${version}TestClasses"]) {
+        group = 'verification'
+        testClassesDir = sourceSets."groovy${version}Test".output.classesDir
+        classpath = sourceSets."groovy${version}Test".runtimeClasspath
+        testReportDir = file("$reporting.baseDir/groovy${version}-tests")
+        testResultsDir = file("$buildDir/groovy${version}-test-results")
+    }
+
+    tasks.check.dependsOn ":groovy${version}Test"
+
+}
 
 task groovydocJar(type: Jar, dependsOn: groovydoc) {
     classifier = 'javadoc'
@@ -194,7 +229,7 @@ task exploded(type: Copy, dependsOn: [jar, docs, samples*.wrapper]) {
     }
     from rootDir, {
         include 'samples/*/build.gradle'
-        expand groovyVersion: groovyVersion
+        expand compileGroovyVersion: compileGroovyVersion
         filter { line ->
             line.replace 'rootProject', "files('../../$jar.archiveName')"
         }
