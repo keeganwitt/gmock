@@ -65,6 +65,10 @@ sourceSets {
     }
 }
 
+ext {
+    samples = subprojects.findAll { it.path.startsWith ':samples:' }
+}
+
 // Tasks
 
 defaultTasks ':test'
@@ -257,7 +261,3 @@ tasks.assemble.dependsOn zip
 
 task release(dependsOn: build)
 task snapshot(dependsOn: build)
-
-def getSamples() {
-   subprojects.findAll { it.path.startsWith ':samples:' }
-}
