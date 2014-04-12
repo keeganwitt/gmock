@@ -101,7 +101,7 @@ class MockFactory {
                (clazz.declaredConstructors.size() > 0 && clazz.declaredConstructors.every { Modifier.isPrivate(it.modifiers) }) || // all constructors are private
                isGetMetaClassMethodFinal(clazz) // the getMetaClass() method is final
     }
-    
+
     private boolean isGetMetaClassMethodFinal(Class clazz) {
         try {
             def method = clazz.getMethod("getMetaClass", null)
@@ -214,7 +214,15 @@ class MockFactory {
 
         def enhancer = new Enhancer(superclass: superClass, interfaces: interfaces, callbackFilter: callbackFilter,
                 callbackTypes: callbackTypes)
-        def mockClass = enhancer.createClass()
+        def mockClass = null
+
+        try {
+            mockClass = enhancer.createClass()
+        } catch (e) {
+            // This may caused by some class loader issues (see issue-140).
+            // Give up generating subclass, and modify metaclass only instead.
+            return mockFinalClass(clazz, mpmc, invokeConstructorRecorder)
+        }
 
         def mockInstance = newInstance(mockClass, invokeConstructorRecorder)
         MockHelper.setCallbacksTo(mockInstance, callbacks as Callback[])
