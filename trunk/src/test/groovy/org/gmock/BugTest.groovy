@@ -15,19 +15,18 @@
  */
 package org.gmock
 
+import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE
+import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE_VALUE
+
 import javax.servlet.http.HttpServletRequest
 import javax.sound.sampled.AudioSystem
 
 import org.dom4j.io.SAXReader
-import org.gmock.GMockTestCase
+import org.gmock.utils.Echo
 import org.gmock.utils.JavaTestHelper
 import org.gmock.utils.Meh
+import org.gmock.utils.SimpleUtility
 import org.gmock.utils.TestClass
-
-import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE
-import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE_VALUE
-
-import org.gmock.utils.Echo
 import org.w3c.dom.Element
 
 class BugTest extends GMockTestCase {
@@ -126,6 +125,21 @@ class BugTest extends GMockTestCase {
 
         play {
             assert mock.load('a') == 'b'
+        }
+    }
+
+    void testUseMockFileAsParameterThrowsNullPointerException() {
+        SimpleUtility utility = mock(SimpleUtility)
+
+        File file1 = mock(File)
+        utility.deleteDirectory(file1)
+
+        File file2 = mock(File)
+        utility.deleteDirectory(file2)
+
+        play {
+            utility.deleteDirectory(file1)
+            utility.deleteDirectory(file2)
         }
     }
 

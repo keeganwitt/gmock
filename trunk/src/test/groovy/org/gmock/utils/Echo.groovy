@@ -1,6 +1,5 @@
 package org.gmock.utils
 
-
 class Echo {
     def output
 
