@@ -40,7 +40,7 @@ class ParameterSignature {
 
     String toString() {
         arguments.collect {
-            if (it != null && InvokerHelper.getMetaClass(it).getClass().package.name == 'org.gmock.internal.metaclass') {
+            if (isMock(it)) {
                 def s = MockHelper.toString(it)
                 return "<$s>"
             } else {
@@ -59,7 +59,11 @@ class ParameterSignature {
 
     boolean equals(Object signature) {
         if (!equalsWithoutArguments(signature)) return false
-        return arguments == signature.arguments
+        if (arguments.size() != signature.arguments.size()) return false
+        return [arguments, signature.arguments].transpose().every { arg1, arg2 ->
+            if (isMock(arg1)) return arg1.is(arg2)
+            else return arg1 == arg2
+        }
     }
 
     boolean match(Object signature) {
@@ -67,8 +71,13 @@ class ParameterSignature {
         if (arguments.size() != signature.arguments.size()) return false
         return [arguments, signature.arguments].transpose().every { arg1, arg2 ->
             if (isMatcher(arg1)) return arg1.matches(arg2)
+            else if (isMock(arg1)) return arg1.is(arg2)
             else return arg1 == arg2
         }
+    }
+
+    private boolean isMock(object) {
+        object != null && InvokerHelper.getMetaClass(object).getClass().package.name == 'org.gmock.internal.metaclass'
     }
 
     private boolean isMatcher(object) {
