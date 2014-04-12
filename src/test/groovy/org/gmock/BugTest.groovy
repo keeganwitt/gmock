@@ -17,13 +17,16 @@ package org.gmock
 
 import javax.servlet.http.HttpServletRequest
 import javax.sound.sampled.AudioSystem
+
 import org.dom4j.io.SAXReader
 import org.gmock.GMockTestCase
 import org.gmock.utils.JavaTestHelper
 import org.gmock.utils.Meh
 import org.gmock.utils.TestClass
+
 import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE
 import static org.gmock.utils.JavaTestHelper.SCHEMA_LANGUAGE_VALUE
+
 import org.gmock.utils.Echo
 import org.w3c.dom.Element
 
@@ -110,6 +113,19 @@ class BugTest extends GMockTestCase {
         m.fun(null)
         shouldFail(AssertionError) {
             play {}
+        }
+    }
+
+    void testCglibClassNotFoundException() {
+        def jarUrl = this.class.getResource('/org/gmock/utils/JavaLoader.jar')
+        def classLoader = new URLClassLoader([jarUrl] as URL[], (ClassLoader) null)
+        def clazz = classLoader.loadClass('org.gmock.utils.JavaLoader')
+
+        def mock = mock(clazz)
+        mock.load('a') returns 'b'
+
+        play {
+            assert mock.load('a') == 'b'
         }
     }
 

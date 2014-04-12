@@ -60,6 +60,7 @@ sourceSets {
     intTest {
         java.srcDirs = test.java.srcDirs
         groovy.srcDirs = test.groovy.srcDirs
+        resources.srcDirs = test.resources.srcDirs
         compileClasspath = configurations.intTestCompile
         runtimeClasspath = output + configurations.intTestRuntime
     }
@@ -113,6 +114,7 @@ supportGroovyVersions.split(',').each { supportGroovyVersion ->
     sourceSets.create("groovy${version}Test") {
         java.srcDirs = sourceSets.test.java.srcDirs
         groovy.srcDirs = sourceSets.test.groovy.srcDirs
+        resources.srcDirs = sourceSets.test.resources.srcDirs
         compileClasspath = configurations."groovy${version}TestCompile"
         runtimeClasspath = output + configurations."groovy${version}TestRuntime"
     }
