@@ -46,7 +46,7 @@ void testBasic(){
 * Times expectation: mockLoader.load("fruit").returns("apple").atLeastOnce()
 * Custom matcher: mockLoader.load(match{ it.startsWith("fru") })
 * Strict ordering: ordered { ... }
-* Optional support for Hamcrest matcher: mockLoader.put("test", is(not(lessThan(5))))
+* Optional support for [Hamcrest](http://hamcrest.org/) matcher: mockLoader.put("test", is(not(lessThan(5))))
 * GMockController if you can't extend GMockTestCase in your test 
 
 Here is a full example:
